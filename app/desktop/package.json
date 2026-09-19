@@ -11,8 +11,10 @@
     "dist": "electron-builder --publish never"
   },
   "dependencies": {
+    "better-sqlite3": "^12.4.1",
     "cross-env": "^10.1.0",
     "electron-updater": "^6.6.2",
+    "jsonwebtoken": "^9.0.2",
     "zod": "^4.1.5"
   },
   "devDependencies": {
@@ -28,10 +30,17 @@
     },
     "files": [
       "src/**/*",
-      "../backend/src/**/*",
-      "../frontend/dist/**/*",
       "package.json",
-      "node_modules/electron-updater/**/*"
+      {
+        "from": "../backend/src",
+        "to": "backend/src",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "../frontend/dist",
+        "to": "frontend/dist",
+        "filter": ["**/*"]
+      }
     ],
     "extraMetadata": {
       "name": "restaurant-order-manager"

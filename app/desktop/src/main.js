@@ -3,8 +3,24 @@ const { app, BrowserWindow, ipcMain, dialog, shell } = require("electron");
 const { autoUpdater } = require("electron-updater");
 const { z } = require("zod");
 
-const { openDatabase } = require("../../backend/src/db");
-const { createServices } = require("../../backend/src/services");
+// In dev, this file lives at app/desktop/src/main.js and the backend source
+// is a sibling package two levels up (app/backend/src). electron-builder
+// can't glob files from outside app/desktop's own directory (see
+// package.json's build.files), so the packaged build instead copies
+// ../backend/src into the asar at backend/src — one level up from this
+// file, not two. Same story for the frontend's built assets.
+const backendSrcDir = app.isPackaged
+  ? path.join(__dirname, "..", "backend", "src")
+  : path.join(__dirname, "..", "..", "backend", "src");
+
+const { openDatabase } = require(path.join(backendSrcDir, "db"));
+const { createServices } = require(path.join(backendSrcDir, "services"));
+
+function getFrontendIndexPath() {
+  return app.isPackaged
+    ? path.join(__dirname, "..", "frontend", "dist", "index.html")
+    : path.join(__dirname, "..", "..", "frontend", "dist", "index.html");
+}
 
 let mainWindow;
 let services;
@@ -149,7 +165,7 @@ function createWindow() {
   if (devUrl) {
     mainWindow.loadURL(devUrl);
   } else {
-    mainWindow.loadFile(path.join(__dirname, "../../frontend/dist/index.html"));
+    mainWindow.loadFile(getFrontendIndexPath());
   }
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
