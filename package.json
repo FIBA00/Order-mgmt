@@ -1,17 +1,18 @@
 {
-  "name": "restaurant-order-manager",
-  "version": "0.1.0",
+  "name": "electron-monorepo",
+  "version": "1.0.0",
   "private": true,
-  "description": "Restaurant Order Manager - Desktop App Revisited",
-  "workspaces": ["apps/frontend", "apps/backend", "apps/desktop"],
   "scripts": {
-    "dev": "concurrently -k \"npm run dev --workspace apps/backend\" \"npm run dev --workspace apps/frontend\"",
-    "build": "npm run build --workspace apps/frontend",
-    "desktop:dev": "npm run dev --workspace apps/desktop",
-    "desktop:package": "npm run make --workspace apps/desktop",
-    "test": "npm run test --workspace apps/backend"
+    "dev:frontend": "cross-env NODE_ENV=development pnpm --filter frontend dev",
+    "dev:electron": "wait-on http://localhost:5173 && cross-env NODE_ENV=development pnpm --filter @app/desktop dev",
+    "start": "concurrently -n \"vite,electron\" -c \"blue,green\" \"pnpm dev:frontend\" \"pnpm dev:electron\"",
+    "build:frontend": "cross-env NODE_ENV=production pnpm --filter frontend build",
+    "build:electron": "cross-env NODE_ENV=production pnpm --filter @app/desktop build",
+    "build": "pnpm build:frontend && pnpm build:electron"
   },
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.4",
+    "cross-env": "^7.0.3",
+    "wait-on": "^8.0.1"
   }
 }
