@@ -1,0 +1,23 @@
+RESTAURANT ORDER MANAGER
+
+WEB / SAAS
+Browser -> React -> HTTPS -> Express -> PostgreSQL
+
+DESKTOP / OFFLINE
+Electron -> React Renderer
+             |
+             | IPC
+             v
+        Node services -> SQLite
+
+DISTRIBUTION
+Source -> CI -> Build -> Package -> Sign -> Release
+
+UPDATE
+Installed app -> HTTPS release metadata -> newer version?
+                                      -> download -> verify -> install -> restart
+
+DATA
+Application files != User data
+Executable/installer is replaceable.
+SQLite database/backups live in OS application-data storage.

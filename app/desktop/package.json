@@ -1,0 +1,59 @@
+{
+  "name": "@restaurant/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "main": "src/main.js",
+  "scripts": {
+    "dev": "electron .",
+    "start": "electron .",
+    "package": "electron-builder --dir",
+    "make": "electron-builder",
+    "dist": "electron-builder --publish never"
+  },
+  "dependencies": {
+    "electron-updater": "^6.6.2"
+  },
+  "devDependencies": {
+    "electron": "^38.0.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.desktopapprevisited.restaurant",
+    "productName": "Restaurant Order Manager",
+    "asar": true,
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "../../apps/backend/src/**/*",
+      "../../apps/frontend/dist/**/*",
+      "package.json",
+      "node_modules/electron-updater/**/*"
+    ],
+    "extraMetadata": {
+      "name": "restaurant-order-manager"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "YOUR_GITHUB_USERNAME",
+        "repo": "restaurant-order-manager"
+      }
+    ]
+  }
+}
