@@ -2,6 +2,11 @@ import React from "react"
 
 const isDesktop = typeof window !== "undefined" && Boolean(window.desktopAPI);
 
+// Called whenever a request comes back 401 (expired/invalid token) or the
+// desktop session is gone, so the UI can drop back to the login screen
+// instead of failing silently on every subsequent action.
+let onSessionExpired = () => {};
+
 function httpApi() {
   let token = localStorage.getItem("token");
 
@@ -14,6 +19,12 @@ function httpApi() {
         ...options.headers
       }
     });
+
+    if (response.status === 401) {
+      token = null;
+      localStorage.removeItem("token");
+      onSessionExpired();
+    }
 
     const body = await response.json();
     if (!response.ok) throw new Error(body.error || "Request failed");
@@ -30,6 +41,10 @@ function httpApi() {
         token = result.token;
         localStorage.setItem("token", token);
         return result.user;
+      },
+      async logout() {
+        token = null;
+        localStorage.removeItem("token");
       }
     },
     menu: {
@@ -49,11 +64,36 @@ function httpApi() {
 }
 
 function desktopApi() {
+  // The main process throws "Authentication required" once currentUser is
+  // cleared (logout, or the session was never established). Surface that
+  // the same way the HTTP client surfaces a 401.
+  function guard(fn) {
+    return async (...args) => {
+      try {
+        return await fn(...args);
+      } catch (error) {
+        if (error.message?.includes("Authentication required")) {
+          onSessionExpired();
+        }
+        throw error;
+      }
+    };
+  }
+
   return {
     auth: window.desktopAPI.auth,
-    menu: window.desktopAPI.menu,
-    orders: window.desktopAPI.orders,
-    dashboard: window.desktopAPI.dashboard
+    menu: {
+      list: guard(window.desktopAPI.menu.list),
+      create: guard(window.desktopAPI.menu.create)
+    },
+    orders: {
+      list: guard(window.desktopAPI.orders.list),
+      create: guard(window.desktopAPI.orders.create),
+      setStatus: guard(window.desktopAPI.orders.setStatus)
+    },
+    dashboard: {
+      today: guard(window.desktopAPI.dashboard.today)
+    }
   };
 }
 
@@ -71,6 +111,22 @@ export default function App() {
   const [orders, setOrders] = React.useState([]);
   const [dashboard, setDashboard] = React.useState(null);
   const [message, setMessage] = React.useState("");
+
+  React.useEffect(() => {
+    onSessionExpired = () => {
+      setUser(null);
+      setMessage("Session expired — please log in again");
+    };
+    return () => { onSessionExpired = () => {}; };
+  }, []);
+
+  async function logout() {
+    await api.auth.logout();
+    setUser(null);
+    setMenu([]);
+    setOrders([]);
+    setDashboard(null);
+  }
 
   async function login(event) {
     event.preventDefault();
@@ -96,8 +152,9 @@ export default function App() {
 
   async function createOrder(menuItem) {
     try {
+      // userId is derived server-side from the authenticated session
+      // (JWT on web, tracked IPC session on desktop) — never sent by the client.
       await api.orders.create({
-        userId: user.id,
         items: [{ menuItemId: menuItem.id, quantity: 1 }]
       });
       await refresh();
@@ -140,7 +197,12 @@ export default function App() {
     "main",
     { style: { padding: 32, fontFamily: "sans-serif" } },
     React.createElement("h1", null, "Restaurant Dashboard"),
-    React.createElement("p", null, `Logged in as ${user.username} (${user.role})`),
+    React.createElement(
+      "p",
+      null,
+      `Logged in as ${user.username} (${user.role}) `,
+      React.createElement("button", { onClick: logout }, "Log out")
+    ),
     dashboard && React.createElement(
       "section",
       null,

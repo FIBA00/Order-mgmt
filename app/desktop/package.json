@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "cross-env": "^10.1.0",
-    "electron-updater": "^6.6.2"
+    "electron-updater": "^6.6.2",
+    "zod": "^4.1.5"
   },
   "devDependencies": {
     "electron": "^38.0.0",
@@ -27,8 +28,8 @@
     },
     "files": [
       "src/**/*",
-      "../../apps/backend/src/**/*",
-      "../../apps/frontend/dist/**/*",
+      "../backend/src/**/*",
+      "../frontend/dist/**/*",
       "package.json",
       "node_modules/electron-updater/**/*"
     ],
@@ -54,8 +55,8 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "YOUR_GITHUB_USERNAME",
-        "repo": "restaurant-order-manager"
+        "owner": "FIBA00",
+        "repo": "Order-mgmt"
       }
     ]
   }

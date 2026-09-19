@@ -2,9 +2,22 @@ const express = require("express");
 const { z } = require("zod");
 const jwt = require("jsonwebtoken");
 
-function createApp(services, { jwtSecret = "development-only-secret" } = {}) {
+function createApp(services, {
+  jwtSecret = "development-only-secret",
+  corsOrigin = process.env.CORS_ORIGIN || "http://localhost:5173"
+} = {}) {
   const app = express();
   app.use(express.json());
+
+  // Minimal CORS for local web-mode dev (Vite on :5173 talking to Express on :4000).
+  // Kept dependency-free on purpose; swap for the `cors` package if origins grow.
+  app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", corsOrigin);
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
+    if (req.method === "OPTIONS") return res.sendStatus(204);
+    next();
+  });
 
   function authenticate(req, res, next) {
     const token = req.headers.authorization?.replace("Bearer ", "");
