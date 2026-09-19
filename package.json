@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev:frontend": "cross-env NODE_ENV=development pnpm --filter frontend dev",
-    "dev:electron": "wait-on http://localhost:5173 && cross-env NODE_ENV=development pnpm --filter @app/desktop dev",
-    "start": "concurrently -n \"vite,electron\" -c \"blue,green\" \"pnpm dev:frontend\" \"pnpm dev:electron\"",
-    "build:frontend": "cross-env NODE_ENV=production pnpm --filter frontend build",
-    "build:electron": "cross-env NODE_ENV=production pnpm --filter @app/desktop build",
+    "dev:backend": "cross-env NODE_ENV=development pnpm --filter @restaurant/backend dev",
+    "dev:frontend": "cross-env NODE_ENV=development pnpm --filter @restaurant/frontend dev",
+    "dev:electron": "wait-on http://localhost:5173 && cross-env NODE_ENV=development pnpm --filter @restaurant/desktop dev",
+    "start": "concurrently -n \"backend,vite,electron\" -c \"yellow,blue,green\" \"pnpm dev:backend\" \"pnpm dev:frontend\" \"pnpm dev:electron\"",
+    "build:frontend": "cross-env NODE_ENV=production pnpm --filter @restaurant/frontend build",
+    "build:electron": "cross-env NODE_ENV=production pnpm --filter @restaurant/desktop package",
     "build": "pnpm build:frontend && pnpm build:electron"
   },
   "devDependencies": {
