@@ -28,6 +28,15 @@ export default function MenuService() {
       });
     return item;
   }
+  async function update(id, data) {
+    const [item] = await database
+      .update(menuItems)
+      .set({ name: data.name })
+      .where(eq(menuItems.id, id))
+      .returning();
+    if (!item) throw updateError(`Updating menu item ${id} failed`);
+    return item;
+  }
 
   async function setActive(id, active) {
     const [item] = await database
