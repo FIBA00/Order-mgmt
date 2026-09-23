@@ -4,15 +4,16 @@ import { database } from "../../database/database.js";
 
 export default function MenuService() {
   async function list() {
-    return database
+    const items = await database
       .select({
         id: menuItems.id,
         name: menuItems.name,
-        priceCents: menuItems.priceCents,
+        priceCents: menuItems.price_cents,
         active: menuItems.active,
       })
       .from(menuItems)
       .orderBy(asc(menuItems.name));
+    return items;
   }
 
   async function create(name, priceCents) {

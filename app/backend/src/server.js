@@ -34,44 +34,39 @@ const SESSION_SECRET =
   process.env.SESSION_SECRET || "82w9eisfdjnweoisdfnmpe;asdjn";
 const NODE_ENV = process.env.NODE_ENV || "local";
 
-app.use( express.json() );
-app.use( function handleHeaders ( req, res, next )
-{
-  res.setHeader( "Access-Control-Allow-Origin", CLIENT );
-  res.setHeader( "Access-Control-Allow-Methods", "GET,POST,PATCH,OPTIONS" );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Content-Type, Authorization",
-  );
-  if ( req.method === "OPTIONS" )
-  {
-    return res.sendStatus( 204 );
+app.use(express.json());
+app.use(function handleHeaders(req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", CLIENT);
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
   }
   next();
-} );
+});
 app.use(
-  cors( {
+  cors({
     origin: CLIENT || "*",
     credentials: true,
-  } ),
+  }),
 );
 app.use(
-  bodyParser.json( {
+  bodyParser.json({
     limit: REQUEST_LIMIT || "100kb",
-  } ),
+  }),
 );
 app.use(
-  bodyParser.urlencoded( {
+  bodyParser.urlencoded({
     extended: true,
     limit: REQUEST_LIMIT || "100kb",
-  } ),
+  }),
 );
 app.use(
-  bodyParser.text( {
+  bodyParser.text({
     limit: REQUEST_LIMIT || "100kb",
-  } ),
+  }),
 );
-app.use( cookieParser( SESSION_SECRET ) );
+app.use(cookieParser(SESSION_SECRET));
 
 RegisterRoutes(app);
 // registerAdminRoutes(app);

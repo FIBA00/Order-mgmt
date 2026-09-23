@@ -5,26 +5,29 @@ import inputValidationBody from "../../middlewares/validation.middleware.js";
 import respondWith from "../../middlewares/response.middleware.js";
 import { isLoggedIn, requireRole } from "../../middlewares/auth.middleware.js";
 import {
+  menuItemResponse,
   createMenuItemInputSchema,
   updateMenuItemInputSchema,
+  menuItemListResponse,
 } from "./menu.schema.js";
+
 import { getMenus, createMenu, updateMenu } from "./menu.ctrl.js";
 
 const menuRoute = express.Router();
 
-menuRoute.get("/", requireRole("owner"), getMenus);
+menuRoute.get("/pub", getMenus);
+
 menuRoute.post(
   "/",
-  requireRole("owner"),
-  inputValidationBody(createMenuItemInputSchema),
+  inputValidationBody( createMenuItemInputSchema ),
   createMenu,
 );
 
-menuRoute.put(
-  "/apply/:id",
-  requireRole("owner"),
-  inputValidationBody(updateMenuItemInputSchema),
-  updateMenu,
-);
+// menuRoute.put(
+//   "/apply/:id",
+//   requireRole( "owner" ),
+//   inputValidationBody( updateMenuItemInputSchema ),
+//   updateMenu,
+// );
 
 export default menuRoute;

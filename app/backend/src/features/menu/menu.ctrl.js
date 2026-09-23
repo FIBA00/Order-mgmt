@@ -15,12 +15,18 @@ export async function getMenus(req, res, next) {
   {
     try {
       const items = await menuService.list();
+      if (!items) {
+        return res.status(404).json({
+          success: false,
+          message: "No menu items found.",
+        });
+      }
       return res.status(200).json({
         success: true,
         message: "Successfully retrieved menu items.",
         data: items,
       });
-    } catch (err) {
+    } catch (error) {
       console.error("Error while getting menu items:", error.message);
       return res.status(500).json({
         success: false,
@@ -39,7 +45,7 @@ export async function createMenu(req, res, next) {
       message: "Successfully created menu.",
       data: item,
     });
-  } catch (err) {
+  } catch (error) {
     console.error("Error while creating  menu items:", error.message);
     return res.status(500).json({
       success: false,

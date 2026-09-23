@@ -1,8 +1,8 @@
-import { DATABASE_URL } from "./src/db/database.js";
+import { DB_URL } from "./src/database/database.js";
 
 export default {
-  schema: "./src/db/models.js",
+  schema: "./src/database/models.js",
   out: "./drizzle",
   dialect: "postgresql",
-  dbCredentials: { url: DATABASE_URL },
+  dbCredentials: { url: DB_URL },
 };

@@ -4,7 +4,7 @@
     "body": {
         "mimeType": "No Body"
     },
-    "url": "http://localhost:8000/",
+    "url": "http://localhost:8000/health",
     "sortOrder": 4,
     "parameters": [],
     "pathParameters": []
