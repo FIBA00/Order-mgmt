@@ -1,32 +1,78 @@
-const { db, pool } = require("./db");
-const { createAuthService } = require("./features/auth/auth.service");
-const { createMenuService } = require("./features/menu/menu.service");
-const { createOrdersService } = require("./features/orders/orders.service");
-const { createDashboardService } = require("./features/dashboard/dashboard.service");
-const { createApp } = require("./app");
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import process from "node:process";
+import bodyParser from "body-parser";
+import os from "os";
 
-if (!process.env.DATABASE_URL) {
-  console.error("ERROR: DATABASE_URL environment variable is required");
-  process.exit(1);
+// ! internal imports
+import log from "./utils/logger.js";
+import errorHandler from "./middlewares/error_handler.js";
+
+const app = express();
+
+// env
+const PORT = process.env.PORT || 8000;
+const CLIENT = process.env.CLIENT_URL || "http://localhost:5173";
+const REQUEST_LIMIT = process.env.REQUEST_LIMIT || "100kb";
+const SESSION_SECRET = process.env.SESSION_SECRET || "82w9eisfdjnweoisdfnmpe;asdjn";
+const NODE_ENV = process.env.NODE_ENV || "local";
+
+export default class ExpressServer
+{
+  constructor ()
+  {
+    app.use( express.json() );
+    app.use( function handleHeaders ( req, res, next )
+    {
+      res.setHeader( "Access-Control-Allow-Origin", CLIENT );
+      res.setHeader( "Access-Control-Allow-Methods", "GET,POST,PATCH,OPTIONS" );
+      res.setHeader( "Access-Control-Allow-Headers", "Content-Type, Authorization" );
+      if ( req.method === "OPTIONS" )
+      {
+        return res.sendStatus( 204 );
+      }
+      next();
+    } );
+    app.use(
+      cors( {
+        origin: CLIENT || "*",
+        credentials: true,
+      } ),
+    );
+    app.use(
+      bodyParser.json( {
+        limit: REQUEST_LIMIT || "100kb",
+      } ),
+    );
+    app.use(
+      bodyParser.urlencoded( {
+        extended: true,
+        limit: REQUEST_LIMIT || "100kb",
+      } ),
+    );
+    app.use(
+      bodyParser.text( {
+        limit: REQUEST_LIMIT || "100kb",
+      } ),
+    );
+    app.use( cookieParser( SESSION_SECRET ) );
+  }
+  router ( routes )
+  {
+    routes( app );
+    app.use( errorHandler );
+    return this;
+  }
+
+  listen ( port = PORT )
+  {
+    app.listen( function logServer ()
+    {
+      log.info(
+        `App is up and running in ${ NODE_ENV || "development" } @: ${ os.hostname() } on port: ${ port }`,
+      );
+    } );
+    return app;
+  }
 }
-
-const services = {
-  auth:      createAuthService(db),
-  menu:      createMenuService(db),
-  orders:    createOrdersService(db),
-  dashboard: createDashboardService(db)
-};
-
-const app = createApp(services, {
-  jwtSecret: process.env.JWT_SECRET || "development-only-secret"
-});
-
-const port = Number(process.env.PORT || 4000);
-
-app.listen(port, "127.0.0.1", () => {
-  console.log(`Restaurant API: http://127.0.0.1:${port}`);
-});
-
-// Graceful shutdown
-process.on("SIGTERM", () => pool.end());
-process.on("SIGINT",  () => pool.end());
