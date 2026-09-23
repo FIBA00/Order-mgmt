@@ -1,11 +1,11 @@
-const { z } = require("zod");
+import { z }  from("zod");
 
-export const createMenuItemSchema = z.object({
+export const createMenuItemInputSchema = z.object({
   name: z.string().min(1),
   priceCents: z.number().int().nonnegative(),
 });
 
-export const updateMenuItemSchema = z.object({
+export const updateMenuItemInputSchema = z.object({
   name: z.string().min(1),
-  priceCents: z.number().int().nonnegativ(),
+  priceCents: z.number().int().nonnegative(),
 });

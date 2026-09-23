@@ -1,0 +1,4 @@
+{
+	"js/ts.updateImportsOnFileMove.enabled": "always",
+	"path-intellisense.extensionOnImport": true
+}

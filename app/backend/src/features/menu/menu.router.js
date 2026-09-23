@@ -4,7 +4,7 @@ import express from "express";
 import inputValidationBody from "../../middlewares/validation.middleware.js";
 import respondWith from "../../middlewares/response.middleware.js";
 import { isLoggedIn, requireRole } from "../../middlewares/auth.middleware.js";
-import createMenuItemSchema from "./menu.schema.js";
+import { createMenuItemInputSchema, updateMenuItemInputSchema } from "./menu.schema.js";
 import { getMenus, createMenu } from "./menu.ctrl.js";
 
 const menuRoute = express.Router();
@@ -12,16 +12,17 @@ const menuRoute = express.Router();
 menuRoute.get(
   "/",
   isLoggedIn,
-  requireRole("owner"),
-  respondWith(OwnerShopListResponse),
+  requireRole( "owner" ),
   getMenus,
 );
 menuRoute.post(
   "/",
   isLoggedIn,
-  requireRole("owner"),
-  inputValidationBody(createMenuItemSchema),
+  requireRole( "owner" ),
+  inputValidationBody( createMenuItemInputSchema ),
   createMenu,
 );
+
+menuRoute.put( "/apply/:id", isLoggedIn, requireRole( "owner" ), inputValidationBody( updateMenuItemInputSchema ), updateMenu );
 
 export default menuRoute;
