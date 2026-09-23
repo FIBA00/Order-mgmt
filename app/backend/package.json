@@ -5,7 +5,7 @@
   "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon --watch src/server.js --restart",
+    "dev": "nodemon  src/server.js",
     "start": "nodemon src/server.js",
     "test": "nodemon --test",
     "lint": "prettier --write ."

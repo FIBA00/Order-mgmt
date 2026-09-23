@@ -1,13 +1,14 @@
-import { Router } from "express";
-import { loginSchema } from "./auth.schema.js";
+import express  from "express";
 import jwt from "jsonwebtoken";
-import { loginUser, profileUser } from "./auth.ctrl.js";
 
+// ! internal imports
+import { loginSchema } from "./auth.schema.js";
+import { loginUser, profileUser, signupUser } from "./auth.ctrl.js";
+import { isLoggedIn } from "../../middlewares/auth.middleware.js"
 
-const authRouter = Router();
-
-authRouter.post( "/login", loginUser)
-authRouter.get( "/me",  profileUser )
-
+const authRouter = express.Router();
+authRouter.get("/me", isLoggedIn, profileUser);
+authRouter.post("/login", loginUser);
+authRouter.post("/signup", signupUser);
 
 export default authRouter;

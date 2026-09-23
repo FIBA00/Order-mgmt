@@ -17,11 +17,7 @@ const menuRoute = express.Router();
 
 menuRoute.get("/pub", getMenus);
 
-menuRoute.post(
-  "/",
-  inputValidationBody( createMenuItemInputSchema ),
-  createMenu,
-);
+menuRoute.post("/", inputValidationBody(createMenuItemInputSchema), createMenu);
 
 // menuRoute.put(
 //   "/apply/:id",
