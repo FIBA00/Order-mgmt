@@ -1,0 +1,11 @@
+{
+    "_type": "request",
+    "method": "GET",
+    "body": {
+        "mimeType": "No Body"
+    },
+    "url": "http://localhost:8000/",
+    "sortOrder": 4,
+    "parameters": [],
+    "pathParameters": []
+}

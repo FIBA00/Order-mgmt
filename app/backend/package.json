@@ -2,12 +2,12 @@
   "name": "@restaurant/backend",
   "version": "0.1.0",
   "private": true,
-  "main": "app.js",
+  "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "dev": "node --watch app.js",
-    "start": "node app.js",
-    "test": "node --test",
+    "dev": "nodemon --watch src/server.js",
+    "start": "nodemon src/server.js",
+    "test": "nodemon --test",
     "lint": "prettier --write ."
   },
   "dependencies": {
@@ -21,6 +21,7 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mocha": "^12.0.2",
+    "nodemon": "^3.1.14",
     "pg": "^8.16.0",
     "pino": "^10.3.1",
     "pino-pretty": "^13.1.3",

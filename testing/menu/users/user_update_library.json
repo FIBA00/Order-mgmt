@@ -1,0 +1,23 @@
+{
+    "_type": "request",
+    "method": "PATCH",
+    "body": {
+        "mimeType": "application/json",
+        "text": "{\n    \"name\": \"FraolLab\",\n    \"address\": \"Addis Ababa, 6 kilo\"\n}"
+    },
+    "url": "http://localhost:8001/api/library/abc75204-6610-48d2-b23e-5eb5a64360d7",
+    "sortOrder": 3,
+    "parameters": [],
+    "pathParameters": [],
+    "authentication": {
+        "type": "bearer",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY3YTc1OWYyLTc0OTUtNDU4Mi1hNjVkLTY2OGZiY2FiNTgxOCIsImVtYWlsIjoiZnJhb2xidWx0aTBAZ21haWwuY29tIiwicm9sZSI6InBhdHJvbiIsInRva2VuVmVyc2lvbiI6MCwiaWF0IjoxNzg2Mjg4NTI0LCJleHAiOjE3ODYyOTU3MjR9.faOqW0qKAfQajXUtI6G8--jvPzQN309DFRGV_SM5au4",
+        "prefix": "bearer"
+    },
+    "headers": [
+        {
+            "name": "Content-Type",
+            "value": "application/json"
+        }
+    ]
+}

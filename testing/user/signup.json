@@ -1,0 +1,18 @@
+{
+    "_type": "request",
+    "method": "POST",
+    "body": {
+        "mimeType": "application/json",
+        "text": "{\n    \"email\": \"fraolbulti0@gmail.com\",\n    \"username\": \"Fraol Bulti\",\n    \"phone\": \"0919545063\",\n    \"password\": \"1234567890\",\n    \"confirmPassword\": \"1234567890\"\n    \n}"
+    },
+    "url": "http://localhost:8001/api/user/signup",
+    "sortOrder": 0,
+    "parameters": [],
+    "pathParameters": [],
+    "headers": [
+        {
+            "name": "Content-Type",
+            "value": "application/json"
+        }
+    ]
+}

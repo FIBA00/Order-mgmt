@@ -1,0 +1,23 @@
+{
+    "_type": "request",
+    "method": "POST",
+    "body": {
+        "mimeType": "application/json",
+        "text": "{\n    \"name\": \"FLab\",\n    \"address\": \"Addis Ababa, 4 kilo\"\n}"
+    },
+    "url": "http://localhost:8001/api/library",
+    "sortOrder": 2,
+    "parameters": [],
+    "pathParameters": [],
+    "authentication": {
+        "type": "bearer",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY3YTc1OWYyLTc0OTUtNDU4Mi1hNjVkLTY2OGZiY2FiNTgxOCIsImVtYWlsIjoiZnJhb2xidWx0aTBAZ21haWwuY29tIiwicm9sZSI6InBhdHJvbiIsInRva2VuVmVyc2lvbiI6MCwiaWF0IjoxNzg2MzA0NDk5LCJleHAiOjE3ODYzMTE2OTl9.KUR16jT_OXb581K6gtP1oD8kiFp95m9qxBml2gx8vNU",
+        "prefix": "bearer"
+    },
+    "headers": [
+        {
+            "name": "Content-Type",
+            "value": "application/json"
+        }
+    ]
+}
