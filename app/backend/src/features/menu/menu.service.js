@@ -1,35 +1,36 @@
-const { eq, asc } = require("drizzle-orm");
-const { menuItems } = require("../../db/schema");
-const { createError } = require("../../middleware/errors");
+import { eq, asc } from "drizzle-orm";
+import { menuItems } from "../../db/models.js";
+import { createError } from "../../middleware/error.middleware.js";
+import { database } from "../../db/database.js";
 
-function createMenuService(db) {
+export default function MenuService() {
   async function list() {
-    return db
+    return database
       .select({
-        id:         menuItems.id,
-        name:       menuItems.name,
+        id: menuItems.id,
+        name: menuItems.name,
         priceCents: menuItems.priceCents,
-        active:     menuItems.active
+        active: menuItems.active,
       })
       .from(menuItems)
       .orderBy(asc(menuItems.name));
   }
 
   async function create(name, priceCents) {
-    const [item] = await db
+    const [item] = await database
       .insert(menuItems)
       .values({ name, priceCents })
       .returning({
-        id:         menuItems.id,
-        name:       menuItems.name,
+        id: menuItems.id,
+        name: menuItems.name,
         priceCents: menuItems.priceCents,
-        active:     menuItems.active
+        active: menuItems.active,
       });
     return item;
   }
 
   async function setActive(id, active) {
-    const [item] = await db
+    const [item] = await database
       .update(menuItems)
       .set({ active })
       .where(eq(menuItems.id, id))
@@ -41,5 +42,3 @@ function createMenuService(db) {
 
   return { list, create, setActive };
 }
-
-module.exports = { createMenuService };

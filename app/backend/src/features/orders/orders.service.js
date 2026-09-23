@@ -6,11 +6,11 @@ function createOrdersService(db) {
   async function list() {
     return db
       .select({
-        id:         orders.id,
-        status:     orders.status,
+        id: orders.id,
+        status: orders.status,
         totalCents: orders.totalCents,
-        createdAt:  orders.createdAt,
-        username:   users.username
+        createdAt: orders.createdAt,
+        username: users.username,
       })
       .from(orders)
       .innerJoin(users, eq(orders.userId, users.id))
@@ -26,23 +26,37 @@ function createOrdersService(db) {
         const [menu] = await tx
           .select({ id: menuItems.id, priceCents: menuItems.priceCents })
           .from(menuItems)
-          .where(and(eq(menuItems.id, item.menuItemId), eq(menuItems.active, true)))
+          .where(
+            and(eq(menuItems.id, item.menuItemId), eq(menuItems.active, true)),
+          )
           .limit(1);
 
-        if (!menu) throw createError(`Menu item ${item.menuItemId} not found or inactive`, 400);
+        if (!menu)
+          throw createError(
+            `Menu item ${item.menuItemId} not found or inactive`,
+            400,
+          );
 
         totalCents += menu.priceCents * item.quantity;
-        resolved.push({ menuItemId: menu.id, quantity: item.quantity, unitPriceCents: menu.priceCents });
+        resolved.push({
+          menuItemId: menu.id,
+          quantity: item.quantity,
+          unitPriceCents: menu.priceCents,
+        });
       }
 
       const [order] = await tx
         .insert(orders)
         .values({ userId, status: "open", totalCents })
-        .returning({ id: orders.id, totalCents: orders.totalCents, status: orders.status });
+        .returning({
+          id: orders.id,
+          totalCents: orders.totalCents,
+          status: orders.status,
+        });
 
-      await tx.insert(orderItems).values(
-        resolved.map(item => ({ orderId: order.id, ...item }))
-      );
+      await tx
+        .insert(orderItems)
+        .values(resolved.map((item) => ({ orderId: order.id, ...item })));
 
       return order;
     });

@@ -11,16 +11,21 @@ const jwt = require("jsonwebtoken");
 const JWT_SECRET = "test-secret";
 
 async function buildTestApp() {
-  process.env.DATABASE_URL = process.env.TEST_DATABASE_URL || process.env.DATABASE_URL;
+  process.env.DATABASE_URL =
+    process.env.TEST_DATABASE_URL || process.env.DATABASE_URL;
 
   // Fresh require so each test file gets a fresh pool
   const { db, pool } = require("./src/db");
-  const { createAuthService }      = require("./src/features/auth/auth.service");
-  const { createMenuService }      = require("./src/features/menu/menu.service");
-  const { createOrdersService }    = require("./src/features/orders/orders.service");
-  const { createDashboardService } = require("./src/features/dashboard/dashboard.service");
-  const { createApp }              = require("./src/app");
-  const { users, menuItems }       = require("./src/db/schema");
+  const { createAuthService } = require("./src/features/auth/auth.service");
+  const { createMenuService } = require("./src/features/menu/menu.service");
+  const {
+    createOrdersService,
+  } = require("./src/features/orders/orders.service");
+  const {
+    createDashboardService,
+  } = require("./src/features/dashboard/dashboard.service");
+  const { createApp } = require("./src/app");
+  const { users, menuItems } = require("./src/db/schema");
   const crypto = require("node:crypto");
 
   function hashPassword(password) {
@@ -60,16 +65,24 @@ async function buildTestApp() {
   `);
 
   await db.insert(users).values([
-    { username: "admin",   passwordHash: hashPassword("admin123"), role: "admin" },
-    { username: "cashier", passwordHash: hashPassword("cashier123"), role: "cashier" }
+    {
+      username: "admin",
+      passwordHash: hashPassword("admin123"),
+      role: "admin",
+    },
+    {
+      username: "cashier",
+      passwordHash: hashPassword("cashier123"),
+      role: "cashier",
+    },
   ]);
   await db.insert(menuItems).values([{ name: "Burger", priceCents: 850 }]);
 
   const services = {
-    auth:      createAuthService(db),
-    menu:      createMenuService(db),
-    orders:    createOrdersService(db),
-    dashboard: createDashboardService(db)
+    auth: createAuthService(db),
+    menu: createMenuService(db),
+    orders: createOrdersService(db),
+    dashboard: createDashboardService(db),
   };
 
   const app = createApp(services, { jwtSecret: JWT_SECRET });
@@ -78,10 +91,16 @@ async function buildTestApp() {
   const baseUrl = `http://127.0.0.1:${port}`;
 
   function tokenFor(role, id = 999) {
-    return jwt.sign({ id, username: `${role}-test`, role }, JWT_SECRET, { expiresIn: "1h" });
+    return jwt.sign({ id, username: `${role}-test`, role }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
   }
 
-  return { baseUrl, tokenFor, close: () => new Promise(r => server.close(r)).then(() => pool.end()) };
+  return {
+    baseUrl,
+    tokenFor,
+    close: () => new Promise((r) => server.close(r)).then(() => pool.end()),
+  };
 }
 
 test("rejects login with wrong password", async () => {
@@ -90,10 +109,12 @@ test("rejects login with wrong password", async () => {
     const res = await fetch(`${baseUrl}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: "admin", password: "wrong" })
+      body: JSON.stringify({ username: "admin", password: "wrong" }),
     });
     assert.equal(res.status, 401);
-  } finally { await close(); }
+  } finally {
+    await close();
+  }
 });
 
 test("rejects requests with no token", async () => {
@@ -101,7 +122,9 @@ test("rejects requests with no token", async () => {
   try {
     const res = await fetch(`${baseUrl}/api/menu`);
     assert.equal(res.status, 401);
-  } finally { await close(); }
+  } finally {
+    await close();
+  }
 });
 
 test("rejects a cashier creating a menu item (adminOnly)", async () => {
@@ -109,11 +132,16 @@ test("rejects a cashier creating a menu item (adminOnly)", async () => {
   try {
     const res = await fetch(`${baseUrl}/api/menu`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${tokenFor("cashier")}` },
-      body: JSON.stringify({ name: "Fries", priceCents: 400 })
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${tokenFor("cashier")}`,
+      },
+      body: JSON.stringify({ name: "Fries", priceCents: 400 }),
     });
     assert.equal(res.status, 403);
-  } finally { await close(); }
+  } finally {
+    await close();
+  }
 });
 
 test("allows an admin to create a menu item", async () => {
@@ -121,13 +149,18 @@ test("allows an admin to create a menu item", async () => {
   try {
     const res = await fetch(`${baseUrl}/api/menu`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${tokenFor("admin")}` },
-      body: JSON.stringify({ name: "Fries", priceCents: 400 })
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${tokenFor("admin")}`,
+      },
+      body: JSON.stringify({ name: "Fries", priceCents: 400 }),
     });
     assert.equal(res.status, 201);
     const { item } = await res.json();
     assert.equal(item.name, "Fries");
-  } finally { await close(); }
+  } finally {
+    await close();
+  }
 });
 
 test("creates an order and computes total from menu prices server-side", async () => {
@@ -135,20 +168,25 @@ test("creates an order and computes total from menu prices server-side", async (
   try {
     // Get the seeded burger's id
     const menuRes = await fetch(`${baseUrl}/api/menu`, {
-      headers: { Authorization: `Bearer ${tokenFor("cashier")}` }
+      headers: { Authorization: `Bearer ${tokenFor("cashier")}` },
     });
     const { items } = await menuRes.json();
     const burger = items[0];
 
     const res = await fetch(`${baseUrl}/api/orders`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${tokenFor("cashier", 1)}` },
-      body: JSON.stringify({ items: [{ menuItemId: burger.id, quantity: 2 }] })
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${tokenFor("cashier", 1)}`,
+      },
+      body: JSON.stringify({ items: [{ menuItemId: burger.id, quantity: 2 }] }),
     });
     assert.equal(res.status, 201);
     const { order } = await res.json();
     assert.equal(order.totalCents, 850 * 2);
-  } finally { await close(); }
+  } finally {
+    await close();
+  }
 });
 
 test("rejects an order referencing a non-existent menu item", async () => {
@@ -156,11 +194,16 @@ test("rejects an order referencing a non-existent menu item", async () => {
   try {
     const res = await fetch(`${baseUrl}/api/orders`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${tokenFor("cashier")}` },
-      body: JSON.stringify({ items: [{ menuItemId: 999999, quantity: 1 }] })
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${tokenFor("cashier")}`,
+      },
+      body: JSON.stringify({ items: [{ menuItemId: 999999, quantity: 1 }] }),
     });
     assert.equal(res.status, 400);
-  } finally { await close(); }
+  } finally {
+    await close();
+  }
 });
 
 test("rejects an invalid order status", async () => {
@@ -168,9 +211,14 @@ test("rejects an invalid order status", async () => {
   try {
     const res = await fetch(`${baseUrl}/api/orders/1/status`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${tokenFor("cashier")}` },
-      body: JSON.stringify({ status: "refunded" })
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${tokenFor("cashier")}`,
+      },
+      body: JSON.stringify({ status: "refunded" }),
     });
     assert.equal(res.status, 400);
-  } finally { await close(); }
+  } finally {
+    await close();
+  }
 });

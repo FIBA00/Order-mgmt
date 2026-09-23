@@ -1,40 +1,27 @@
-const { Router } = require("express");
-const { createMenuItemSchema } = require("./menu.schema");
+import express from "express";
 
-function createMenuRouter(menuService, authenticate, adminOnly) {
-  const router = Router();
+// ! internal imports
+import inputValidationBody from "../../middlewares/validation.middleware.js";
+import respondWith from "../../middlewares/response.middleware.js";
+import { isLoggedIn, requireRole } from "../../middlewares/auth.middleware.js";
+import createMenuItemSchema from "./menu.schema.js";
+import { getMenus, createMenu } from "./menu.ctrl.js";
 
-  router.get("/", authenticate, async (_req, res, next) => {
-    try {
-      const items = await menuService.list();
-      res.json({ items });
-    } catch (err) {
-      next(err);
-    }
-  });
+const menuRoute = express.Router();
 
-  router.post("/", authenticate, adminOnly, async (req, res, next) => {
-    try {
-      const input = createMenuItemSchema.parse(req.body);
-      const item = await menuService.create(input.name, input.priceCents);
-      res.status(201).json({ item });
-    } catch (err) {
-      next(err);
-    }
-  });
+menuRoute.get(
+  "/",
+  isLoggedIn,
+  requireRole("owner"),
+  respondWith(OwnerShopListResponse),
+  getMenus,
+);
+menuRoute.post(
+  "/",
+  isLoggedIn,
+  requireRole("owner"),
+  inputValidationBody(createMenuItemSchema),
+  createMenu,
+);
 
-  router.patch("/:id/active", authenticate, adminOnly, async (req, res, next) => {
-    try {
-      const { z } = require("zod");
-      const { active } = z.object({ active: z.boolean() }).parse(req.body);
-      const item = await menuService.setActive(Number(req.params.id), active);
-      res.json({ item });
-    } catch (err) {
-      next(err);
-    }
-  });
-
-  return router;
-}
-
-module.exports = { createMenuRouter };
+export default menuRoute;

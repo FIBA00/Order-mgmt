@@ -6,7 +6,10 @@ const { createError } = require("../../middleware/errors");
 function verifyPassword(password, stored) {
   const [salt, expected] = stored.split(":");
   const actual = crypto.scryptSync(password, salt, 64).toString("hex");
-  return crypto.timingSafeEqual(Buffer.from(actual, "hex"), Buffer.from(expected, "hex"));
+  return crypto.timingSafeEqual(
+    Buffer.from(actual, "hex"),
+    Buffer.from(expected, "hex"),
+  );
 }
 
 function createAuthService(db) {

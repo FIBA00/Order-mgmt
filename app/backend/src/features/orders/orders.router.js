@@ -26,7 +26,10 @@ function createOrdersRouter(ordersService, authenticate) {
   router.patch("/:id/status", authenticate, async (req, res, next) => {
     try {
       const { status } = setStatusSchema.parse(req.body);
-      const order = await ordersService.setStatus(Number(req.params.id), status);
+      const order = await ordersService.setStatus(
+        Number(req.params.id),
+        status,
+      );
       res.json({ order });
     } catch (err) {
       next(err);

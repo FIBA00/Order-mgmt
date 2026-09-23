@@ -12,9 +12,8 @@ if (!process.env.DATABASE_URL) {
 
 export default new ExpressServer()
   .router(RegisterRoutes)
-  .listen( process.env.PORT );
-  
+  .listen(process.env.PORT);
 
 // Graceful shutdown
 process.on("SIGTERM", () => pool.end());
-process.on("SIGINT",  () => pool.end());
+process.on("SIGINT", () => pool.end());
