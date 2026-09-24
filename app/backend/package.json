@@ -8,10 +8,15 @@
     "dev": "nodemon  src/server.js",
     "start": "nodemon src/server.js",
     "test": "nodemon --test",
-    "lint": "prettier --write ."
+    "lint": "prettier --write .",
+    "db:generate:sqlite": "drizzle-kit generate --config=drizzle.sqlite.config.js",
+    "db:generate:postgres": "drizzle-kit generate --config=drizzle.postgres.config.js",
+    "db:migrate:sqlite": "node src/database/migrate.js sqlite",
+    "db:migrate:postgres": "node src/database/migrate.js postgres"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "better-sqlite3": "^12.11.1",
     "body-parser": "^2.3.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",

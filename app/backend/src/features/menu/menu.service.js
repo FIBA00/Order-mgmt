@@ -8,7 +8,7 @@ export default function MenuService() {
       .select({
         id: menuItems.id,
         name: menuItems.name,
-        priceCents: menuItems.priceCents,  // FIX: was menuItems.price_cents
+        priceCents: menuItems.priceCents, // FIX: was menuItems.price_cents
         active: menuItems.active,
       })
       .from(menuItems)
