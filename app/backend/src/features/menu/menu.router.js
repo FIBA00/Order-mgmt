@@ -1,29 +1,29 @@
 import express from "express";
 
-// ! internal imports
 import inputValidationBody from "../../middlewares/validation.middleware.js";
-import respondWith from "../../middlewares/response.middleware.js";
-import { isLoggedIn, requireRole } from "../../middlewares/auth.middleware.js";
-import {
-  menuItemResponse,
-  createMenuItemInputSchema,
-  updateMenuItemInputSchema,
-  menuItemListResponse,
-} from "./menu.schema.js";
+import { requireRole } from "../../middlewares/auth.middleware.js";
 
-import { getMenus, createMenu, updateMenu } from "./menu.ctrl.js";
+import { createMenuItemInputSchema, updateMenuItemInputSchema, } from "./menu.schema.js";
 
-const menuRoute = express.Router();
+import { menuService } from "../index.js";
+import { createMenuController } from "./menu.ctrl.js";
 
-menuRoute.get("/", getMenus);
-menuRoute.get("/pub", getMenus);
-menuRoute.post("/", inputValidationBody(createMenuItemInputSchema), createMenu);
+const router = express.Router();
+const controller = createMenuController(menuService);
 
-// menuRoute.put(
-//   "/apply/:id",
-//   requireRole( "owner" ),
-//   inputValidationBody( updateMenuItemInputSchema ),
-//   updateMenu,
-// );
+router.get("/", controller.getMenus);
+router.get("/pub", controller.getMenus);
+router.post(
+  "/",
+  requireRole("admin", "owner"),
+  inputValidationBody(createMenuItemInputSchema),
+  controller.createMenu,
+);
+router.patch(
+  "/:id",
+  requireRole("admin", "owner"),
+  inputValidationBody(updateMenuItemInputSchema),
+  controller.updateMenu,
+);
 
-export default menuRoute;
+export default router;

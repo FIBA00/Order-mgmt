@@ -1,52 +1,53 @@
-import { eq, asc } from "drizzle-orm";
-import { menuItems } from "../../database/models.js";
-import { database } from "../../database/database.js";
-
-export default function MenuService() {
-  async function list() {
-    const items = await database
-      .select({
-        id: menuItems.id,
-        name: menuItems.name,
-        priceCents: menuItems.priceCents, // FIX: was menuItems.price_cents
-        active: menuItems.active,
-      })
-      .from(menuItems)
-      .orderBy(asc(menuItems.name));
-    return items;
+export function createMenuService ( menuRepository )
+{
+  async function list ()
+  {
+    return menuRepository.findAll();
   }
 
-  async function create(name, priceCents) {
-    const [item] = await database
-      .insert(menuItems)
-      .values({ name, priceCents })
-      .returning({
-        id: menuItems.id,
-        name: menuItems.name,
-        priceCents: menuItems.priceCents,
-        active: menuItems.active,
-      });
-    return item;
+  async function create ( { name, priceCents } )
+  {
+    return menuRepository.create( {
+      name,
+      priceCents,
+    } );
   }
 
-  async function update(id, data) {
-    const [item] = await database
-      .update(menuItems)
-      .set({ name: data.name })
-      .where(eq(menuItems.id, id))
-      .returning();
-    return item;
+  async function update ( id, data )
+  {
+    const item = await menuRepository.findById( id );
+
+    if ( !item )
+    {
+      const error = new Error( "Menu item not found" );
+      error.statusCode = 404;
+      throw error;
+    }
+
+    return menuRepository.update( id, {
+      name: data.name,
+      priceCents: data.priceCents,
+    } );
   }
 
-  async function setActive(id, active) {
-    const [item] = await database
-      .update(menuItems)
-      .set({ active })
-      .where(eq(menuItems.id, id))
-      .returning({ id: menuItems.id });
+  async function setActive ( id, active )
+  {
+    const item = await menuRepository.findById( id );
 
-    return item;
+    if ( !item )
+    {
+      const error = new Error( "Menu item not found" );
+      error.statusCode = 404;
+      throw error;
+    }
+
+    return menuRepository.setActive( id, active );
   }
 
-  return { list, create, setActive, update };
+  return {
+    list,
+    create,
+    update,
+    setActive,
+  };
 }

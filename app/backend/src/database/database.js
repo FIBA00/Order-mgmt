@@ -7,132 +7,69 @@ import Database from "better-sqlite3";
 import path from "node:path";
 import fs from "node:fs";
 
-// ! Internal imports
-import * as models from "./models.js";
 import "../configs/env.config.js";
 import log from "../utils/logger.js";
 
-// --------------------------------------------------
-// Configuration
-// --------------------------------------------------
+import * as sqliteSchema from "./schema/sqlite/index.js";
+import * as postgresSchema from "./schema/postgres/index.js";
 
 const DB_URL = process.env.DATABASE_URL;
 
-if (!DB_URL) {
-  throw new Error("[Database] DATABASE_URL is not defined.");
+if ( !DB_URL )
+{
+  throw new Error( "DATABASE_URL is not defined" );
 }
 
-// --------------------------------------------------
-// Database type
-// --------------------------------------------------
-
 const isSqlite =
-  DB_URL.endsWith(".sqlite") ||
-  DB_URL.endsWith(".db") ||
-  DB_URL.startsWith("file:") ||
-  DB_URL.startsWith("sqlite:");
-
-// --------------------------------------------------
-// Database instances
-// --------------------------------------------------
+  DB_URL.endsWith( ".sqlite" ) ||
+  DB_URL.endsWith( ".db" ) ||
+  DB_URL.startsWith( "file:" ) ||
+  DB_URL.startsWith( "sqlite:" );
 
 let database;
 let pool;
 let sqliteClient;
+let schema;
 
-// --------------------------------------------------
-// SQLite
-// --------------------------------------------------
+if ( isSqlite )
+{
+  const filePath = DB_URL
+    .replace( /^sqlite:/, "" )
+    .replace( /^file:/, "" );
 
-if (isSqlite) {
-  const filePath = DB_URL.replace(/^sqlite:/, "").replace(/^file:/, "");
+  const directory = path.dirname( filePath );
 
-  const directory = path.dirname(filePath);
-
-  if (directory !== "." && !fs.existsSync(directory)) {
-    log.info(`[Database] Creating SQLite directory: ${directory}`);
-
-    fs.mkdirSync(directory, { recursive: true });
+  if ( directory !== "." && !fs.existsSync( directory ) )
+  {
+    fs.mkdirSync( directory, { recursive: true } );
   }
 
-  log.info(`[Database] Using SQLite: ${filePath}`);
+  sqliteClient = new Database( filePath );
+  schema = sqliteSchema;
+  database = drizzleSqlite( sqliteClient, {
+    schema,
+  } );
 
-  sqliteClient = new Database(filePath);
-
-  database = drizzleSqlite(sqliteClient, {
-    schema: models,
-  });
-}
-
-// --------------------------------------------------
-// PostgreSQL
-// --------------------------------------------------
-
-if (!isSqlite) {
-  log.info("[Database] Using PostgreSQL");
-
-  pool = new Pool({
+  log.info( "Using SQLite database" );
+} else
+{
+  pool = new Pool( {
     connectionString: DB_URL,
-  });
+  } );
+  schema = postgresSchema;
+  database = drizzlePg( pool, {
+    schema,
+  } );
 
-  database = drizzlePg(pool, {
-    schema: models,
-  });
+  log.info( "Using PostgreSQL database" );
 }
 
-// --------------------------------------------------
-// Connection check
-// --------------------------------------------------
-
-async function checkDatabaseConnection() {
-  if (isSqlite) {
-    try {
-      sqliteClient.prepare("SELECT 1").get();
-
-      log.info("[Database] SQLite connection OK");
-
-      return true;
-    } catch (error) {
-      log.error("[Database] SQLite connection failed:", error);
-
-      return false;
-    }
-  }
-
-  if (!pool) {
-    log.error("[Database] PostgreSQL pool is not initialized");
-
-    return false;
-  }
-
-  try {
-    const client = await pool.connect();
-
-    try {
-      await client.query("SELECT 1");
-
-      log.info("[Database] PostgreSQL connection OK");
-
-      return true;
-    } finally {
-      client.release();
-    }
-  } catch (error) {
-    log.error("[Database] PostgreSQL connection failed:", error);
-
-    return false;
-  }
-}
-
-// --------------------------------------------------
-// Exports
-// --------------------------------------------------
-
-export {
+export
+{
   DB_URL,
   database,
+  schema,
   isSqlite,
   pool,
   sqliteClient,
-  checkDatabaseConnection,
 };
