@@ -8,7 +8,7 @@ export default function MenuService() {
       .select({
         id: menuItems.id,
         name: menuItems.name,
-        priceCents: menuItems.price_cents,
+        priceCents: menuItems.priceCents,  // FIX: was menuItems.price_cents
         active: menuItems.active,
       })
       .from(menuItems)
@@ -28,6 +28,7 @@ export default function MenuService() {
       });
     return item;
   }
+
   async function update(id, data) {
     const [item] = await database
       .update(menuItems)
@@ -47,5 +48,5 @@ export default function MenuService() {
     return item;
   }
 
-  return { list, create, setActive };
+  return { list, create, setActive, update };
 }

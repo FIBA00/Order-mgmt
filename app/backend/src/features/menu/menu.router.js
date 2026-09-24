@@ -16,7 +16,6 @@ import { getMenus, createMenu, updateMenu } from "./menu.ctrl.js";
 const menuRoute = express.Router();
 
 menuRoute.get("/pub", getMenus);
-
 menuRoute.post("/", inputValidationBody(createMenuItemInputSchema), createMenu);
 
 // menuRoute.put(
