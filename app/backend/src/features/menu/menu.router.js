@@ -12,7 +12,7 @@ import {
 } from "./menu.schema.js";
 
 const menuRouter = express.Router();
-const repository = createMenuRepository({ db: database, schema, });
+const repository = createMenuRepository({ db: database, schema });
 const service = createMenuService(repository);
 const controller = createMenuController(service);
 

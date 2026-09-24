@@ -5,13 +5,13 @@ import process from "node:process";
 
 // ! internal import
 import "../configs/env.config.js";
-import { database } from "../database/database.js";
-import { users } from "../database/models.js";
+import { database, schema } from "../database/database.js";
 import log from "../utils/logger.js";
 
 const SECRET =
   process.env.JWT_SECRET || "sidojfijs90fosjdf094jf3094fjisidfjs0fojsvmidj";
 const NODE_ENV = process.env.NODE_ENV || "production";
+const { users } = schema;
 
 export function setAuthCookie(res, token) {
   res.cookie("accessToken", token, {
