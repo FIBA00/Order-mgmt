@@ -1,0 +1,23 @@
+{
+    "_type": "request",
+    "method": "POST",
+    "body": {
+        "mimeType": "application/json",
+        "text": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n    \n}"
+    },
+    "url": "http://0.0.0.0:8000/api/auth/login",
+    "sortOrder": 1,
+    "parameters": [],
+    "pathParameters": [],
+    "authentication": {
+        "type": "No Auth",
+        "token": "",
+        "prefix": "bearer"
+    },
+    "headers": [
+        {
+            "name": "Content-Type",
+            "value": "application/json"
+        }
+    ]
+}

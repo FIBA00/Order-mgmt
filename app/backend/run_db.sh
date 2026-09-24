@@ -1,0 +1,1 @@
+psql -h localhost -U rest_user -d restuarant_db

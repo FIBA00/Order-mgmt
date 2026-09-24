@@ -1,0 +1,16 @@
+{
+    "_type": "request",
+    "method": "GET",
+    "body": {
+        "mimeType": "No Body"
+    },
+    "url": "http://localhost:8000/api/auth/me",
+    "sortOrder": 2,
+    "parameters": [],
+    "pathParameters": [],
+    "authentication": {
+        "type": "bearer",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY3YTc1OWYyLTc0OTUtNDU4Mi1hNjVkLTY2OGZiY2FiNTgxOCIsImVtYWlsIjoiZnJhb2xidWx0aTBAZ21haWwuY29tIiwicm9sZSI6InBhdHJvbiIsInRva2VuVmVyc2lvbiI6MCwiaWF0IjoxNzg2Mjg1ODI2LCJleHAiOjE3ODYyOTMwMjZ9._56pSkmpo_ZoOK1Ox8Zccw1MQdtvupyQNmIfpSbKq2o",
+        "prefix": "bearer"
+    }
+}

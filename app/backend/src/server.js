@@ -1,19 +1,76 @@
-const path = require("node:path");
-const { openDatabase } = require("./db");
-const { createServices } = require("./services");
-const { createApp } = require("./app");
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import process from "node:process";
+import bodyParser from "body-parser";
+import os from "os";
 
-const port = Number(process.env.PORT || 4000);
-const databasePath = process.env.DATABASE_URL
-  ? path.resolve(process.env.DATABASE_URL)
-  : path.resolve(__dirname, "../data/app.sqlite");
+// ! internal imports
+import log from "./utils/logger.js";
+import RegisterRoutes from "./routes/main.route.js";
+import "./configs/env.config.js";
 
-const db = openDatabase(databasePath);
-const services = createServices(db);
-const app = createApp(services, {
-  jwtSecret: process.env.JWT_SECRET || "development-only-secret"
+if (!process.env.DATABASE_URL) {
+  console.error("ERROR: DATABASE_URL environment variable is required");
+  process.exit(1);
+}
+
+const app = express();
+
+app.get("/health", (_req, res) => {
+  res.status(200).json({
+    status: "ok",
+    service: "backend",
+    timestamp: new Date().toISOString(),
+  });
 });
+// env
+const PORT = process.env.PORT || 4000;
+const HOST = process.env.HOST || "0.0.0.0";
 
-app.listen(port, "127.0.0.1", () => {
-  console.log(`Restaurant API: http://127.0.0.1:${port}`);
+const CLIENT = process.env.CLIENT_URL || "http://localhost:5173";
+const REQUEST_LIMIT = process.env.REQUEST_LIMIT || "100kb";
+const SESSION_SECRET =
+  process.env.SESSION_SECRET || "82w9eisfdjnweoisdfnmpe;asdjn";
+const NODE_ENV = process.env.NODE_ENV || "local";
+
+app.use(express.json());
+app.use(function handleHeaders(req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", CLIENT);
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+  next();
+});
+app.use(
+  cors({
+    origin: CLIENT || "*",
+    credentials: true,
+  }),
+);
+app.use(
+  bodyParser.json({
+    limit: REQUEST_LIMIT || "100kb",
+  }),
+);
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+    limit: REQUEST_LIMIT || "100kb",
+  }),
+);
+app.use(
+  bodyParser.text({
+    limit: REQUEST_LIMIT || "100kb",
+  }),
+);
+app.use(cookieParser(SESSION_SECRET));
+
+RegisterRoutes(app);
+// registerAdminRoutes(app);
+
+app.listen(PORT, HOST, () => {
+  console.log(`Restaurant API: http://${HOST}:${PORT}`);
 });

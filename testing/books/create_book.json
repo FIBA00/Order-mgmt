@@ -1,0 +1,21 @@
+{
+    "_type": "request",
+    "method": "POST",
+    "body": {
+        "mimeType": "application/json",
+        "text": "{\n    \"title\": \"To Kill a Mockingbird\",\n    \"description\": \"A novel about racial injustice in the Deep South seen through the eyes of a child.\"\n    \n}"
+    },
+    "url": "http://localhost:8001/api/books/",
+    "sortOrder": 1,
+    "parameters": [],
+    "pathParameters": [],
+    "headers": [
+        {
+            "name": "Content-Type",
+            "value": "application/json"
+        }
+    ],
+    "authentication": {
+        "type": "bearer"
+    }
+}

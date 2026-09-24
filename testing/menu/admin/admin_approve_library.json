@@ -1,0 +1,23 @@
+{
+    "_type": "request",
+    "method": "POST",
+    "body": {
+        "mimeType": "application/json",
+        "text": "{\n    \"status\": \"approved\"\n}"
+    },
+    "url": "http://localhost:8001/api/admin/library/approve/1c211dc6-628f-40e7-8bf9-afaa8a8c83fc",
+    "sortOrder": 2,
+    "parameters": [],
+    "pathParameters": [],
+    "authentication": {
+        "type": "bearer",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNiMDliNDRkLTQ3NDgtNDAzNC04MjU0LTMzZWQ4OTBmNWNhMyIsImVtYWlsIjoiZnJhb2xidWx0aTFAZ21haWwuY29tIiwicm9sZSI6ImFkbWluIiwidG9rZW5WZXJzaW9uIjowLCJpYXQiOjE3ODYzMDQxMTQsImV4cCI6MTc4NjMxMTMxNH0.18Wj7cWq8bvJDavkI-izgdzFyiTbP_DLufly8H70FzU",
+        "prefix": "bearer"
+    },
+    "headers": [
+        {
+            "name": "Content-Type",
+            "value": "application/json"
+        }
+    ]
+}

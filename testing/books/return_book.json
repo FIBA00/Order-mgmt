@@ -1,0 +1,14 @@
+{
+    "_type": "request",
+    "method": "POST",
+    "body": {
+        "mimeType": "No Body"
+    },
+    "url": "http://localhost:8001/api/books/return/348934853nsjfn",
+    "sortOrder": 3,
+    "parameters": [],
+    "pathParameters": [],
+    "authentication": {
+        "type": "bearer"
+    }
+}

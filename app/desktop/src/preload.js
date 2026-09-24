@@ -2,7 +2,9 @@ const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("desktopAPI", {
   auth: {
-    login: credentials => ipcRenderer.invoke("auth:login", credentials)
+    login: credentials => ipcRenderer.invoke("auth:login", credentials),
+    logout: () => ipcRenderer.invoke("auth:logout"),
+    me: () => ipcRenderer.invoke("auth:me")
   },
 
   menu: {
