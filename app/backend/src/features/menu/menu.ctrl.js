@@ -27,7 +27,7 @@ export async function getMenus(req, res, next) {
         data: items,
       });
     } catch (error) {
-      console.error("Error while getting menu items:", error.message);
+      console.error("Error while getting menu items:", error.message, error.cause || error);
       return res.status(500).json({
         success: false,
         message: "Server error while getting menu items.",
@@ -46,7 +46,7 @@ export async function createMenu(req, res, next) {
       data: item,
     });
   } catch (error) {
-    console.error("Error while creating  menu items:", error.message);
+    console.error("Error while creating  menu items:", error.message, error.cause || error);
     return res.status(500).json({
       success: false,
       message: "Server error while creating menu items.",
@@ -68,7 +68,7 @@ export async function updateMenu(req, res, next) {
       data: item,
     });
   } catch (error) {
-    console.error("error while activate menu item: ", error.message);
+    console.error("error while activate menu item: ", error.message, error.cause || error);
     return res.status(500).json({
       success: false,
       message: "Server error while activate menu item !.",
@@ -87,7 +87,7 @@ export async function activateMenu(req, res, next) {
       data: item,
     });
   } catch (error) {
-    console.error("error while updating menu item: ", error.message);
+    console.error("error while updating menu item: ", error.message, error.cause || error);
     return res.status(500).json({
       success: false,
       message: "Server error while updating menu item !.",
