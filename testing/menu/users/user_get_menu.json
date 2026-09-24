@@ -4,7 +4,7 @@
     "body": {
         "mimeType": "No Body"
     },
-    "url": "http://localhost:8001/api/library",
+    "url": "http://localhost:8000/api/menu/",
     "sortOrder": 1,
     "parameters": [],
     "pathParameters": [],

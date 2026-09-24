@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import process from "node:process";
 import bodyParser from "body-parser";
 import os from "os";
-
+import morgan from "morgan"
 // ! internal imports
 import log from "./utils/logger.js";
 import RegisterRoutes from "./routes/main.route.js";
@@ -14,16 +14,6 @@ if (!process.env.DATABASE_URL) {
   console.error("ERROR: DATABASE_URL environment variable is required");
   process.exit(1);
 }
-
-const app = express();
-
-app.get("/health", (_req, res) => {
-  res.status(200).json({
-    status: "ok",
-    service: "backend",
-    timestamp: new Date().toISOString(),
-  });
-});
 // env
 const PORT = process.env.PORT || 4000;
 const HOST = process.env.HOST || "0.0.0.0";
@@ -34,6 +24,17 @@ const SESSION_SECRET =
   process.env.SESSION_SECRET || "82w9eisfdjnweoisdfnmpe;asdjn";
 const NODE_ENV = process.env.NODE_ENV || "local";
 
+const app = express();
+
+app.get("/health", (_req, res) => {
+  res.status(200).json({
+    status: "ok",
+    service: "backend",
+    timestamp: new Date().toISOString(),
+  });
+});
+
+app.use(morgan("dev", "color"))
 app.use(express.json());
 app.use(function handleHeaders(req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", CLIENT);

@@ -2,9 +2,9 @@
     "_type": "request",
     "method": "GET",
     "body": {
-        "mimeType": "application/graphql"
+        "mimeType": "No Body"
     },
-    "url": "http://localhost:8000/api/menu/pub",
+    "url": "http://localhost:8000/api/menu/",
     "sortOrder": 0,
     "parameters": [],
     "pathParameters": [],
@@ -13,10 +13,5 @@
         "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY3YTc1OWYyLTc0OTUtNDU4Mi1hNjVkLTY2OGZiY2FiNTgxOCIsImVtYWlsIjoiZnJhb2xidWx0aTBAZ21haWwuY29tIiwicm9sZSI6InBhdHJvbiIsInRva2VuVmVyc2lvbiI6MCwiaWF0IjoxNzg2Mjg4NTI0LCJleHAiOjE3ODYyOTU3MjR9.faOqW0qKAfQajXUtI6G8--jvPzQN309DFRGV_SM5au4",
         "prefix": "bearer"
     },
-    "headers": [
-        {
-            "name": "Content-Type",
-            "value": "application/json"
-        }
-    ]
+    "headers": []
 }
