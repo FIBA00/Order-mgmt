@@ -1,47 +1,47 @@
 src/
 │
 ├── database/
-│   │
-│   ├── database.js              ← selects DB + schema
-│   ├── migrate.js
-│   │
-│   └── schema/
-│       ├── sqlite/
-│       │   ├── index.js
-│       │   ├── users.js
-│       │   ├── menu-items.js
-│       │   ├── orders.js
-│       │   └── order-items.js
-│       │
-│       └── postgres/
-│           ├── index.js
-│           ├── users.js
-│           ├── menu-items.js
-│           ├── orders.js
-│           └── order-items.js
+│ │
+│ ├── database.js ← selects DB + schema
+│ ├── migrate.js
+│ │
+│ └── schema/
+│ ├── sqlite/
+│ │ ├── index.js
+│ │ ├── users.js
+│ │ ├── menu-items.js
+│ │ ├── orders.js
+│ │ └── order-items.js
+│ │
+│ └── postgres/
+│ ├── index.js
+│ ├── users.js
+│ ├── menu-items.js
+│ ├── orders.js
+│ └── order-items.js
 │
 ├── features/
-│   │
-│   ├── menu/
-│   │   ├── menu.repository.js    ← DB
-│   │   ├── menu.service.js       ← business logic
-│   │   ├── menu.ctrl.js          ← HTTP
-│   │   ├── menu.router.js
-│   │   └── menu.schema.js        ← Zod/API contract
-│   │
-│   ├── auth/
-│   │   ├── auth.repository.js
-│   │   ├── auth.service.js
-│   │   ├── auth.ctrl.js
-│   │   ├── auth.router.js
-│   │   └── auth.schema.js
-│   │
-│   └── orders/
-│       ├── orders.repository.js
-│       ├── orders.service.js
-│       ├── orders.ctrl.js
-│       ├── orders.router.js
-│       └── orders.schema.js
+│ │
+│ ├── menu/
+│ │ ├── menu.repository.js ← DB
+│ │ ├── menu.service.js ← business logic
+│ │ ├── menu.ctrl.js ← HTTP
+│ │ ├── menu.router.js
+│ │ └── menu.schema.js ← Zod/API contract
+│ │
+│ ├── auth/
+│ │ ├── auth.repository.js
+│ │ ├── auth.service.js
+│ │ ├── auth.ctrl.js
+│ │ ├── auth.router.js
+│ │ └── auth.schema.js
+│ │
+│ └── orders/
+│ ├── orders.repository.js
+│ ├── orders.service.js
+│ ├── orders.ctrl.js
+│ ├── orders.router.js
+│ └── orders.schema.js
 │
 ├── middlewares/
 ├── routes/
@@ -105,5 +105,4 @@ export function createSomethingService(repository) {
     update,
   };
 }
-
 ```

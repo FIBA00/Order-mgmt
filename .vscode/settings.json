@@ -2,5 +2,5 @@
 	"js/ts.updateImportsOnFileMove.enabled": "always",
 	"path-intellisense.extensionOnImport": true,
 	"chat.editor.copilotCli.hideExtensionHost": false,
-	"chat.disableAIFeatures": false
+	"chat.disableAIFeatures": true
 }

@@ -1,29 +1,32 @@
 import express from "express";
 
-import inputValidationBody from "../../middlewares/validation.middleware.js";
-import { requireRole } from "../../middlewares/auth.middleware.js";
-
-import { createMenuItemInputSchema, updateMenuItemInputSchema, } from "./menu.schema.js";
-
-import { menuService } from "../index.js";
+import { database, schema } from "../../database/database.js";
+import { createMenuRepository } from "./menu.repository.js";
+import { createMenuService } from "./menu.service.js";
 import { createMenuController } from "./menu.ctrl.js";
+import inputValidationBody from "../../middlewares/validation.middleware.js";
 
-const router = express.Router();
-const controller = createMenuController(menuService);
+import {
+  createMenuItemInputSchema,
+  updateMenuItemInputSchema,
+} from "./menu.schema.js";
 
-router.get("/", controller.getMenus);
-router.get("/pub", controller.getMenus);
-router.post(
+const menuRouter = express.Router();
+const repository = createMenuRepository({ db: database, schema, });
+const service = createMenuService(repository);
+const controller = createMenuController(service);
+
+menuRouter.get("/", controller.getMenus);
+menuRouter.get("/:id", controller.getMenu);
+menuRouter.post(
   "/",
-  requireRole("admin", "owner"),
   inputValidationBody(createMenuItemInputSchema),
   controller.createMenu,
 );
-router.patch(
+menuRouter.patch(
   "/:id",
-  requireRole("admin", "owner"),
   inputValidationBody(updateMenuItemInputSchema),
   controller.updateMenu,
 );
 
-export default router;
+export default menuRouter;

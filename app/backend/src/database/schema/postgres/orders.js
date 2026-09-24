@@ -1,20 +1,14 @@
-import {
-  pgTable,
-  serial,
-  text,
-  integer,
-  timestamp,
-  boolean,
-} from "drizzle-orm/pg-core";
-
-
+import { sql } from "drizzle-orm";
+import { pgTable, integer, text } from "drizzle-orm/pg-core";
+import { users } from "./users.js";
 export const orders = pgTable("orders", {
-  id: serial("id").primaryKey(),
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
   userId: integer("user_id")
     .notNull()
     .references(() => users.id),
-  status: text("status").notNull().default("open"),
+  status: text().notNull().default("open"),
   totalCents: integer("total_cents").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdAt: integer("created_at")
+    .notNull()
+    .default(sql`(extract(epoch from now()) * 1000)::integer`),
 });
-

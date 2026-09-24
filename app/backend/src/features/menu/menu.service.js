@@ -1,53 +1,50 @@
-export function createMenuService ( menuRepository )
-{
-  async function list ()
-  {
-    return menuRepository.findAll();
+export function createMenuService(repository) {
+  async function list() {
+    return repository.findAll();
   }
 
-  async function create ( { name, priceCents } )
-  {
-    return menuRepository.create( {
-      name,
-      priceCents,
-    } );
-  }
+  async function get(id) {
+    const item = await repository.findById(id);
 
-  async function update ( id, data )
-  {
-    const item = await menuRepository.findById( id );
-
-    if ( !item )
-    {
-      const error = new Error( "Menu item not found" );
-      error.statusCode = 404;
-      throw error;
+    if (!item) {
+      throw createError("Menu item not found", 404);
     }
 
-    return menuRepository.update( id, {
+    return item;
+  }
+
+  async function create(data) {
+    return repository.create({
       name: data.name,
       priceCents: data.priceCents,
-    } );
+    });
   }
 
-  async function setActive ( id, active )
-  {
-    const item = await menuRepository.findById( id );
+  async function update(id, data) {
+    await get(id);
 
-    if ( !item )
-    {
-      const error = new Error( "Menu item not found" );
-      error.statusCode = 404;
-      throw error;
-    }
+    return repository.update(id, data);
+  }
 
-    return menuRepository.setActive( id, active );
+  async function setActive(id, active) {
+    await get(id);
+
+    return repository.setActive(id, active);
   }
 
   return {
     list,
+    get,
     create,
     update,
     setActive,
   };
+}
+
+function createError(message, statusCode) {
+  const error = new Error(message);
+
+  error.statusCode = statusCode;
+
+  return error;
 }

@@ -1,18 +1,14 @@
-import {
-  pgTable,
-  serial,
-  text,
-  integer,
-  timestamp,
-  boolean,
-} from "drizzle-orm/pg-core";
-
-export const orders = pgTable("orders", {
-  id: serial("id").primaryKey(),
+import { sql } from "drizzle-orm";
+import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
+import { users } from "./users.js";
+export const orders = sqliteTable("orders", {
+  id: integer().primaryKey({ autoIncrement: true }),
   userId: integer("user_id")
     .notNull()
     .references(() => users.id),
-  status: text("status").notNull().default("open"),
+  status: text().notNull().default("open"),
   totalCents: integer("total_cents").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
+    .notNull()
+    .default(sql`(unixepoch() * 1000)`),
 });
