@@ -1,12 +1,12 @@
 {
     "_type": "request",
-    "method": "PATCH",
+    "method": "DELETE",
     "body": {
-        "mimeType": "application/json",
-        "text": "{\n    \"name\": \"mirinda\",\n    \"priceCents\": 45\n}"
+        "mimeType": "No Body",
+        "text": "{\n    \"name\": \"FraolLab\",\n    \"address\": \"Addis Ababa, 6 kilo\"\n}"
     },
-    "url": "http://localhost:8000/api/menu/1",
-    "sortOrder": 3,
+    "url": "http://localhost:8000/api/menu/3",
+    "sortOrder": 4,
     "parameters": [],
     "pathParameters": [],
     "authentication": {
@@ -14,10 +14,5 @@
         "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY3YTc1OWYyLTc0OTUtNDU4Mi1hNjVkLTY2OGZiY2FiNTgxOCIsImVtYWlsIjoiZnJhb2xidWx0aTBAZ21haWwuY29tIiwicm9sZSI6InBhdHJvbiIsInRva2VuVmVyc2lvbiI6MCwiaWF0IjoxNzg2Mjg4NTI0LCJleHAiOjE3ODYyOTU3MjR9.faOqW0qKAfQajXUtI6G8--jvPzQN309DFRGV_SM5au4",
         "prefix": "bearer"
     },
-    "headers": [
-        {
-            "name": "Content-Type",
-            "value": "application/json"
-        }
-    ]
+    "headers": []
 }

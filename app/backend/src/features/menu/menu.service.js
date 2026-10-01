@@ -5,11 +5,6 @@ export function createMenuService(repository) {
 
   async function get(id) {
     const item = await repository.findById(id);
-
-    if (!item) {
-      throw createError("Menu item not found", 404);
-    }
-
     return item;
   }
 
@@ -26,6 +21,16 @@ export function createMenuService(repository) {
     return repository.update(id, data);
   }
 
+  async function deleteMenu(id) {
+    const itemId = await get(id);
+
+    if (itemId === null) {
+      return null;
+    } else {
+      return repository.deleteMenu(id);
+    }
+  }
+
   async function setActive(id, active) {
     await get(id);
 
@@ -37,14 +42,13 @@ export function createMenuService(repository) {
     get,
     create,
     update,
+    deleteMenu,
     setActive,
   };
 }
 
 function createError(message, statusCode) {
   const error = new Error(message);
-
   error.statusCode = statusCode;
-
   return error;
 }

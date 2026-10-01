@@ -33,7 +33,15 @@ export function createMenuRepository({ db, schema }) {
   }
 
   async function create({ name, priceCents }) {
-    const [item] = await db
+    const [existingItem] = await db
+      .select({ name: menuItems.name })
+      .from(menuItems)
+      .where(eq(menuItems.name, name));
+
+    if (existingItem) {
+      return null;
+    }
+    const [newItem] = await db
       .insert(menuItems)
       .values({
         name,
@@ -47,7 +55,7 @@ export function createMenuRepository({ db, schema }) {
         createdAt: menuItems.createdAt,
       });
 
-    return item;
+    return newItem;
   }
 
   async function update(id, data) {
@@ -65,6 +73,14 @@ export function createMenuRepository({ db, schema }) {
 
     return item ?? null;
   }
+  async function deleteMenu(id) {
+    const [item] = await db
+      .delete(menuItems)
+      .where(eq(menuItems.id, id))
+      .returning();
+
+    return item ?? null;
+  }
 
   async function setActive(id, active) {
     return update(id, { active });
@@ -75,6 +91,7 @@ export function createMenuRepository({ db, schema }) {
     findById,
     create,
     update,
+    deleteMenu,
     setActive,
   };
 }

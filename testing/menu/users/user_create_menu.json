@@ -3,7 +3,7 @@
     "method": "POST",
     "body": {
         "mimeType": "application/json",
-        "text": "{\n    \"name\": \"FLab\",\n    \"priceCents\": 4\n}"
+        "text": "{\n    \"name\": \"cocacola\",\n    \"priceCents\": 50\n}"
     },
     "url": "http://localhost:8000/api/menu",
     "sortOrder": 2,
