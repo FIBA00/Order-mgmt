@@ -1,13 +1,11 @@
-// import authRoute from "../features/auth/auth.router.js";
-import menuRoute from "../features/menu/menu.router.js";
-
-// import userRoute from "./users/users.route.js";
+import authRouter from "../features/auth/auth.router.js";
+import menuRouter from "../features/menu/menu.router.js";
+import ordersRouter from "../features/orders/orders.router.js";
+import dashboardRouter from "../features/dashboard/dashboard.router.js";
 
 export default function RegisterRoutes(app) {
-  // app.use("/api/auth", authRoute);
-  app.use("/api/menu", menuRoute);
-
-  // app.use( "/api/user", userRoute )
-  // app.use( "/api/orders", createOrdersRouter( services.orders, authenticate ) );
-  // app.use( "/api/dashboard", createDashboardRouter( services.dashboard, authenticate ) );
+  app.use("/api/auth", authRouter);
+  app.use("/api/menu", menuRouter);
+  app.use("/api/orders", ordersRouter);
+  app.use("/api/dashboard", dashboardRouter);
 }

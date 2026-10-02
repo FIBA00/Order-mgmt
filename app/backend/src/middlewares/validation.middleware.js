@@ -3,9 +3,9 @@ export default function inputValidationBody(schema) {
     const result = schema.safeParse(req.body);
 
     if (!result.success) {
-      return res.status(402).json({
+      return res.status(400).json({
         success: false,
-        message: "VALIDATION FAILED !! ",
+        message: "Validation failed",
         errors: result.error.flatten(),
       });
     }

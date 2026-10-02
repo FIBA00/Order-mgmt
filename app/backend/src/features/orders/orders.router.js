@@ -1,42 +1,33 @@
-const { Router } = require("express");
-const { createOrderSchema, setStatusSchema } = require("./orders.schema");
+import express from "express";
 
-function createOrdersRouter(ordersService, authenticate) {
-  const router = Router();
+import { database, schema } from "../../database/database.js";
+import { createOrdersRepository } from "./orders.repository.js";
+import { createOrdersService } from "./orders.service.js";
+import { createOrdersController } from "./orders.ctrl.js";
+import inputValidationBody from "../../middlewares/validation.middleware.js";
+import { isLoggedIn } from "../../middlewares/auth.middleware.js";
 
-  router.get("/", authenticate, async (_req, res, next) => {
-    try {
-      const ordersList = await ordersService.list();
-      res.json({ orders: ordersList });
-    } catch (err) {
-      next(err);
-    }
-  });
+import { createOrderSchema, setStatusSchema } from "./orders.schema.js";
 
-  router.post("/", authenticate, async (req, res, next) => {
-    try {
-      const input = createOrderSchema.parse(req.body);
-      const order = await ordersService.create(req.user.id, input.items);
-      res.status(201).json({ order });
-    } catch (err) {
-      next(err);
-    }
-  });
+const ordersRouter = express.Router();
+const repository = createOrdersRepository({ db: database, schema });
+const service = createOrdersService(repository);
+const controller = createOrdersController(service);
 
-  router.patch("/:id/status", authenticate, async (req, res, next) => {
-    try {
-      const { status } = setStatusSchema.parse(req.body);
-      const order = await ordersService.setStatus(
-        Number(req.params.id),
-        status,
-      );
-      res.json({ order });
-    } catch (err) {
-      next(err);
-    }
-  });
+ordersRouter.get("/", isLoggedIn, controller.getOrders);
+ordersRouter.get("/:id", isLoggedIn, controller.getOrder);
+ordersRouter.post(
+  "/",
+  isLoggedIn,
+  inputValidationBody(createOrderSchema),
+  controller.createOrder,
+);
+ordersRouter.patch(
+  "/:id/status",
+  isLoggedIn,
+  inputValidationBody(setStatusSchema),
+  controller.setStatus,
+);
 
-  return router;
-}
-
-module.exports = { createOrdersRouter };
+export { createOrdersRepository, createOrdersService, createOrdersController };
+export default ordersRouter;

@@ -1,18 +1,23 @@
-const { z } = require("zod");
+import { z } from "zod";
 
-const createOrderSchema = z.object({
-  items: z
-    .array(
-      z.object({
-        menuItemId: z.number().int(),
-        quantity: z.number().int().positive(),
-      }),
-    )
-    .min(1),
+export const orderItemInputSchema = z.object({
+  menuItemId: z.number().int(),
+  quantity: z.number().int().positive(),
 });
 
-const setStatusSchema = z.object({
+export const createOrderSchema = z.object({
+  items: z.array(orderItemInputSchema).min(1),
+});
+
+export const setStatusSchema = z.object({
   status: z.enum(["open", "paid", "cancelled"]),
 });
 
-module.exports = { createOrderSchema, setStatusSchema };
+export const orderResponse = z.object({
+  id: z.number().int(),
+  userId: z.number().int().optional(),
+  status: z.string(),
+  totalCents: z.number().int(),
+  createdAt: z.any().optional(),
+  username: z.string().optional(),
+});

@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import crypto from "node:crypto";
 import { eq } from "drizzle-orm";
 import process from "node:process";
 
@@ -10,126 +11,147 @@ import log from "../utils/logger.js";
 
 const SECRET =
   process.env.JWT_SECRET || "sidojfijs90fosjdf094jf3094fjisidfjs0fojsvmidj";
-const NODE_ENV = process.env.NODE_ENV || "production";
+const NODE_ENV = process.env.NODE_ENV || "development";
 const { users } = schema;
 
 export function setAuthCookie(res, token) {
   res.cookie("accessToken", token, {
     httpOnly: true,
-    secure: NODE_ENV,
+    secure: NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 2 * 60 * 60 * 1000,
+    maxAge: 8 * 60 * 60 * 1000,
   });
 }
 
 export function clearAuthCookie(res) {
-  res.clearAuthCookie("accessToken");
+  res.clearCookie("accessToken");
 }
 
 export function generateToken(user) {
-  try {
-    return jwt.sign(
-      {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-        tokenVersion: user.tokenVersion,
-      },
-      SECRET,
-      { expiresIn: "2h" },
-    );
-  } catch (error) {
-    log.error("Error while generating token: ", error.message);
-  }
+  return jwt.sign(
+    {
+      id: user.id,
+      username: user.username,
+      role: user.role || "cashier",
+    },
+    SECRET,
+    { expiresIn: "8h" },
+  );
 }
 
 export function verifyToken(token) {
   try {
-    if (!SECRET) {
-      throw new Error(
-        "JWT secret is missing. set JWT_SECRET in your .env file.",
-      );
-    }
     return jwt.verify(token, SECRET);
   } catch (error) {
-    log.error("Error while verifying token: ", error.message);
+    log.error("Error while verifying token: " + error.message);
+    return null;
   }
 }
 
 export async function authenticateToken(token) {
   try {
     const decoded = verifyToken(token);
-    const [currentUser] = await database
-      .select()
-      .from(users)
-      .where(eq(users.id, decoded.id));
-    if (!currentUser || currentUser.tokenVersion !== decoded.tokenVersion) {
+    if (!decoded || !decoded.id) {
       return null;
     }
-    return currentUser;
+    const [currentUser] = await database
+      .select({
+        id: users.id,
+        username: users.username,
+        role: users.role,
+        createdAt: users.createdAt,
+      })
+      .from(users)
+      .where(eq(users.id, decoded.id))
+      .limit(1);
+
+    return currentUser ?? null;
   } catch (error) {
-    log.error("error while authenticating token: ", error.message);
+    log.error("Error while authenticating token: " + error.message);
+    return null;
   }
 }
 
 export async function isLoggedIn(req, res, next) {
   try {
-    const token = req.cookies?.accessToken;
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: "No Token Provided",
-      });
+    let token = null;
+
+    // Check Authorization: Bearer <token>
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.toLowerCase().startsWith("bearer ")) {
+      token = authHeader.slice(7).trim();
+    } else if (req.cookies?.accessToken) {
+      token = req.cookies.accessToken;
     }
-    try {
-      const currentUser = await authenticateToken(token);
-      if (!currentUser) {
-        return res.status(401).json({
-          success: false,
-          message: "Invalid or expired token.",
-        });
-      }
-      req.user = currentUser;
-      return next();
-    } catch (error) {
-      if (error.name === "TokenExpiredError") {
-        return res.status(401).json({
-          success: false,
-          message: "Token Expired",
-        });
-      }
-      log.error("Error while cecking auth token: ", error.message);
+
+    if (!token) {
       return res.status(401).json({
         success: false,
         message: "No token provided",
       });
     }
+
+    const currentUser = await authenticateToken(token);
+    if (!currentUser) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid or expired token.",
+      });
+    }
+
+    req.user = currentUser;
+    next();
   } catch (error) {
-    log.error("Error while checking user is logged in:", error.message);
+    log.error("Error in isLoggedIn middleware: " + error.message);
+    return res.status(401).json({
+      success: false,
+      message: "Authentication failed",
+    });
   }
 }
 
-export const isAdmin = function (req, res, next) {
-  try {
-    if (req.user.role !== "admin") {
-      return res.status(403).json({
-        success: false,
-        message: "Access denied admins only",
-      });
-    }
-    next();
-  } catch (error) {
-    log.error("Error while checking is admin: ", error.message);
+export function isAdmin(req, res, next) {
+  if (!req.user || req.user.role !== "admin") {
+    return res.status(403).json({
+      success: false,
+      message: "Access denied. Admins only.",
+    });
   }
-};
+  next();
+}
 
-export async function comparePassword(password, hashedPassword) {
-  return await bcrypt.compare(password, hashedPassword);
+export async function hashPassword(password) {
+  return await bcrypt.hash(password, 10);
+}
+
+export async function comparePassword(password, stored) {
+  if (!password || !stored) return false;
+
+  // bcrypt check
+  if (
+    stored.startsWith("$2a$") ||
+    stored.startsWith("$2b$") ||
+    stored.startsWith("$2y$")
+  ) {
+    return await bcrypt.compare(password, stored);
+  }
+
+  // scrypt legacy check (salt:hash)
+  if (stored.includes(":")) {
+    const [salt, expected] = stored.split(":");
+    const actual = crypto.scryptSync(password, salt, 64).toString("hex");
+    return crypto.timingSafeEqual(
+      Buffer.from(actual, "hex"),
+      Buffer.from(expected, "hex"),
+    );
+  }
+
+  return false;
 }
 
 export function requireRole(...allowedRoles) {
   return function (req, res, next) {
-    if (!allowedRoles.includes(req.user.role)) {
+    if (!req.user || !allowedRoles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
         message: `Access denied. Requires role: ${allowedRoles.join(" or ")}`,
@@ -140,11 +162,14 @@ export function requireRole(...allowedRoles) {
 }
 
 export default {
+  setAuthCookie,
+  clearAuthCookie,
   generateToken,
   verifyToken,
+  authenticateToken,
   isLoggedIn,
   isAdmin,
-  authenticateToken,
+  hashPassword,
   comparePassword,
   requireRole,
 };
