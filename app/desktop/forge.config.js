@@ -8,6 +8,6 @@
 // See docs/07-packaging.md and docs/09-updates.md.
 module.exports = {
   packagerConfig: {
-    asar: true
-  }
+    asar: true,
+  },
 };

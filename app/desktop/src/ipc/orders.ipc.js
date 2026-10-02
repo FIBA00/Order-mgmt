@@ -16,11 +16,11 @@ function registerOrdersIpc(services) {
           .array(
             z.object({
               menuItemId: z.number().int(),
-              quantity: z.number().int().positive()
-            })
+              quantity: z.number().int().positive(),
+            }),
           )
           .min(1),
-        note: z.string().optional()
+        note: z.string().optional(),
       })
       .parse(input);
 
@@ -32,7 +32,7 @@ function registerOrdersIpc(services) {
     const parsed = z
       .object({
         id: z.number().int(),
-        status: z.enum(["open", "paid", "cancelled"])
+        status: z.enum(["open", "paid", "cancelled"]),
       })
       .parse(input);
 

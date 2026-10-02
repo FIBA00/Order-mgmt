@@ -11,7 +11,7 @@ function configureAutoUpdater() {
       .showMessageBox(win, {
         type: "info",
         title: "Update available",
-        message: "A new version is available. Download it now?"
+        message: "A new version is available. Download it now?",
       })
       .then(({ response }) => {
         if (response === 0) autoUpdater.downloadUpdate();
@@ -24,21 +24,21 @@ function configureAutoUpdater() {
       .showMessageBox(win, {
         type: "info",
         title: "Update ready",
-        message: "The update is downloaded. Restart and install it now?"
+        message: "The update is downloaded. Restart and install it now?",
       })
       .then(({ response }) => {
         if (response === 0) autoUpdater.quitAndInstall();
       });
   });
 
-  autoUpdater.on("error", error => {
+  autoUpdater.on("error", (error) => {
     console.error("Auto update error:", error);
   });
 }
 
 function checkForUpdatesIfPackaged(isPackaged) {
   if (isPackaged) {
-    autoUpdater.checkForUpdates().catch(error => {
+    autoUpdater.checkForUpdates().catch((error) => {
       console.error("Initial update check failed:", error.message);
     });
   }
@@ -46,5 +46,5 @@ function checkForUpdatesIfPackaged(isPackaged) {
 
 module.exports = {
   configureAutoUpdater,
-  checkForUpdatesIfPackaged
+  checkForUpdatesIfPackaged,
 };

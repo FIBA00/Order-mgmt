@@ -1,9 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {
-  createTestServer,
-  createTestToken,
-} from "../helpers/test-server.js";
+import { createTestServer, createTestToken } from "../helpers/test-server.js";
 
 test("Auth Module", async (t) => {
   const { baseUrl, close } = createTestServer();

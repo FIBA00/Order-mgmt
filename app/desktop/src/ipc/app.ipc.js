@@ -5,7 +5,7 @@ function registerAppIpc() {
   ipcMain.handle("app:get-info", () => ({
     version: app.getVersion(),
     userDataPath: app.getPath("userData"),
-    isPackaged: app.isPackaged
+    isPackaged: app.isPackaged,
   }));
 
   ipcMain.handle("app:check-for-updates", async () => {
@@ -18,7 +18,7 @@ function registerAppIpc() {
       return {
         status: result?.updateInfo?.version
           ? "update-check-complete"
-          : "no-update"
+          : "no-update",
       };
     } catch (error) {
       return { status: "failed", error: error.message };

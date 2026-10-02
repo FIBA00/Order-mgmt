@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import process from "node:process";
 import bodyParser from "body-parser";
 import os from "os";
-import morgan from "morgan"
+import morgan from "morgan";
 // ! internal imports
 import log from "./utils/logger.js";
 import RegisterRoutes from "./routes/main.route.js";
@@ -34,7 +34,7 @@ app.get("/health", (_req, res) => {
   });
 });
 
-app.use(morgan("dev", "color"))
+app.use(morgan("dev", "color"));
 app.use(express.json());
 app.use(function handleHeaders(req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", CLIENT);

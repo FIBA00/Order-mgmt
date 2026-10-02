@@ -1,6 +1,7 @@
 # User reports , Tests, Features, and Errors
 
 ## Testing report
+
 - [UI FRONTEND] [RESOLVED] while testing the frontend initially the bakcend and frontend was not synced so , when default order items where created in the frontend using default datas it conflicted with the backend, where item number does not exist so the solution is removing any default data source in the frontend and wait for the backend to send the data or created by the user on the frontend.
   - **Resolution**: Removed hardcoded `SEED_MENU` and default fallback IDs (1-5) from `client.js`. Implemented automatic legacy cache sanitization for previously cached mock items in `localStorage`. Updated `MenuList.jsx` to render a clean prompt waiting for backend synchronization.
 
@@ -13,8 +14,8 @@
 - [backend]- while testing frontend the user wants to delete and edit the menu items but cors problem occured here is some logs: `814 Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://localhost:8000/api/menu/4. (Reason: Did not find method in CORS header ‘Access-Control-Allow-Methods’). 
 22:53:58.815 Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://localhost:8000/api/menu/4. (Reason: CORS request did not succeed). Status code: (null). `
 
-
 ## Feature suggestion
+
 - [ui] implement the signup on initial setup (Planned for Phase 2)
 - [ui] add staff account creation under admin account so the admin needs its own dashboard for managing, shops, staff, later on finance and ledgers (Planned for Phase 2)
 - [backend] for above ui features we need routes and database relations and schemas (Registered in sync.md)

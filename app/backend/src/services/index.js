@@ -70,13 +70,25 @@ function createServices(db) {
       },
       update(id, updates) {
         if (updates.name !== undefined && updates.priceCents !== undefined) {
-          db.prepare("UPDATE menu_items SET name = ?, price_cents = ? WHERE id = ?").run(updates.name, updates.priceCents, id);
+          db.prepare(
+            "UPDATE menu_items SET name = ?, price_cents = ? WHERE id = ?",
+          ).run(updates.name, updates.priceCents, id);
         } else if (updates.name !== undefined) {
-          db.prepare("UPDATE menu_items SET name = ? WHERE id = ?").run(updates.name, id);
+          db.prepare("UPDATE menu_items SET name = ? WHERE id = ?").run(
+            updates.name,
+            id,
+          );
         } else if (updates.priceCents !== undefined) {
-          db.prepare("UPDATE menu_items SET price_cents = ? WHERE id = ?").run(updates.priceCents, id);
+          db.prepare("UPDATE menu_items SET price_cents = ? WHERE id = ?").run(
+            updates.priceCents,
+            id,
+          );
         }
-        return db.prepare("SELECT id, name, price_cents AS priceCents, active FROM menu_items WHERE id = ?").get(id);
+        return db
+          .prepare(
+            "SELECT id, name, price_cents AS priceCents, active FROM menu_items WHERE id = ?",
+          )
+          .get(id);
       },
       delete(id) {
         return db.prepare("DELETE FROM menu_items WHERE id = ?").run(id);
@@ -153,10 +165,7 @@ function createServices(db) {
         if (!["open", "paid", "cancelled"].includes(status)) {
           throw new Error("Invalid order status");
         }
-        db.prepare("UPDATE orders SET status = ? WHERE id = ?").run(
-          status,
-          id,
-        );
+        db.prepare("UPDATE orders SET status = ? WHERE id = ?").run(status, id);
       },
     },
 

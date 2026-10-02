@@ -5,12 +5,15 @@
 The desktop application (`@restaurant/desktop`) has been completely restructured into a modular, production-ready architecture with separation of concerns. Packaging succeeds fully offline utilizing the existing cached Electron binary under `~/.cache/electron`.
 
 ### 1. Offline Packaging & Cache Optimization
+
 - **Zero Network Binary Downloads**: Configured `ELECTRON_CACHE=/home/fraold/.cache/electron` and set `"npmRebuild": false` in `app/desktop/package.json`.
 - **Prebuilt Native Loading**: Electron v39.8.10 directly loads the existing `better-sqlite3` native addon from `node_modules` without triggering remote node-gyp header downloads.
 - **Standalone Packaging**: Successfully packages into `app/desktop/dist/linux-unpacked/restaurant-order-manager` with full ASAR bundling and unpacked native libraries (`app.asar.unpacked/node_modules/better-sqlite3`).
 
 ### 2. Modular Architecture & Separation of Concerns
+
 The desktop codebase has been refactored into domain-segregated modules following industry standards:
+
 - `src/main.js`: Concise, readable application orchestrator (~40 lines).
 - `src/config/app.config.js`: Centralized path resolution for backend sources, frontend assets, database locations, and default window geometry.
 - `src/db/local-db.js`: Local SQLite lifecycle management and **First-Run Auto-Seeder** (automatically inserts initial `admin` account with hashed credentials and seed menu items if tables are empty).
@@ -27,6 +30,7 @@ The desktop codebase has been refactored into domain-segregated modules followin
 - `src/preload.js`: Context bridge exposing `window.desktopAPI` with complete IPC parity (`menu.delete`, `orders.setStatus`, `printer.list`, `printer.print`).
 
 ### 3. Automated Desktop Test Suite (`test/`)
+
 - Implemented headless native test runner (`node --test 'test/**/*.test.js'`) with mock Electron lifecycle:
   - `test/helpers/mock-electron.js`: Mock IPC and app runtime for unit and integration testing.
   - `test/config.test.js` (4 tests): Path resolutions and window geometry validation.
@@ -38,18 +42,18 @@ The desktop codebase has been refactored into domain-segregated modules followin
 
 ## Activity Log
 
-| Date | Task | Commit Message |
-| :--- | :--- | :--- |
-| 2026-10-02 | Initial Handoff & Desktop Codebase Audit | docs: desktop initial handoff audit and backlog report |
-| 2026-10-02 | Resolve packaging rebuild timeout using cached electron | fix(desktop): configure npmRebuild false and use cached electron zip |
-| 2026-10-02 | Implement first-run database seeder for admin & menu | feat(desktop): auto-seed default admin and menu items on startup |
-| 2026-10-02 | Achieve IPC API parity (menu:delete, orders note & setStatus) | feat(desktop): add menu delete and normalize orders IPC |
-| 2026-10-02 | Refactor desktop codebase into modular domain architecture | refactor(desktop): modular architecture with domain IPC and db seeder |
-| 2026-10-02 | Verify offline packaging into dist/linux-unpacked | chore(desktop): verify successful packaging into standalone executable |
-| 2026-10-02 | Implement native receipt printer IPC & POS shortcuts | feat(desktop): add printer IPC channel and POS application menu shortcuts |
-| 2026-10-02 | Build automated test suite for desktop package | test(desktop): add unit and IPC integration tests with mock electron |
-| 2026-10-02 | Fix standalone exe bcrypt & sqlite ABI mismatch | fix(desktop): resolve standalone bcrypt and sqlite ABI 140 errors |
-| 2026-10-02 | Add persistent home directory logger & fix ELF corruption | feat(desktop): persistent log to ~/.restaurant-order-manager.log and verified ELF binary |
+| Date       | Task                                                          | Commit Message                                                                           |
+| :--------- | :------------------------------------------------------------ | :--------------------------------------------------------------------------------------- |
+| 2026-10-02 | Initial Handoff & Desktop Codebase Audit                      | docs: desktop initial handoff audit and backlog report                                   |
+| 2026-10-02 | Resolve packaging rebuild timeout using cached electron       | fix(desktop): configure npmRebuild false and use cached electron zip                     |
+| 2026-10-02 | Implement first-run database seeder for admin & menu          | feat(desktop): auto-seed default admin and menu items on startup                         |
+| 2026-10-02 | Achieve IPC API parity (menu:delete, orders note & setStatus) | feat(desktop): add menu delete and normalize orders IPC                                  |
+| 2026-10-02 | Refactor desktop codebase into modular domain architecture    | refactor(desktop): modular architecture with domain IPC and db seeder                    |
+| 2026-10-02 | Verify offline packaging into dist/linux-unpacked             | chore(desktop): verify successful packaging into standalone executable                   |
+| 2026-10-02 | Implement native receipt printer IPC & POS shortcuts          | feat(desktop): add printer IPC channel and POS application menu shortcuts                |
+| 2026-10-02 | Build automated test suite for desktop package                | test(desktop): add unit and IPC integration tests with mock electron                     |
+| 2026-10-02 | Fix standalone exe bcrypt & sqlite ABI mismatch               | fix(desktop): resolve standalone bcrypt and sqlite ABI 140 errors                        |
+| 2026-10-02 | Add persistent home directory logger & fix ELF corruption     | feat(desktop): persistent log to ~/.restaurant-order-manager.log and verified ELF binary |
 
 ---
 

@@ -20,12 +20,12 @@ const windowConfig = {
   width: 1200,
   height: 800,
   minWidth: 960,
-  minHeight: 640
+  minHeight: 640,
 };
 
 module.exports = {
   getBackendSrcDir,
   getFrontendIndexPath,
   getDatabasePath,
-  windowConfig
+  windowConfig,
 };

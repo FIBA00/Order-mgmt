@@ -1,9 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {
-  createTestServer,
-  createTestToken,
-} from "../helpers/test-server.js";
+import { createTestServer, createTestToken } from "../helpers/test-server.js";
 
 test("Orders Module", async (t) => {
   const { baseUrl, close } = createTestServer();
@@ -12,7 +9,11 @@ test("Orders Module", async (t) => {
     await close();
   });
 
-  const authToken = createTestToken({ id: 1, username: "admin", role: "admin" });
+  const authToken = createTestToken({
+    id: 1,
+    username: "admin",
+    role: "admin",
+  });
   let createdOrderId = null;
   let testMenuItem = null;
 
@@ -25,7 +26,10 @@ test("Orders Module", async (t) => {
     const newMenuRes = await fetch(`${baseUrl}/api/menu`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: `OrderItem_${Date.now()}`, priceCents: 500 }),
+      body: JSON.stringify({
+        name: `OrderItem_${Date.now()}`,
+        priceCents: 500,
+      }),
     });
     const newMenuData = await newMenuRes.json();
     testMenuItem = newMenuData.data;
@@ -87,26 +91,29 @@ test("Orders Module", async (t) => {
     assert.equal(res.status, 400);
   });
 
-  await t.test("creates order with computed total and default open status", async () => {
-    const quantity = 3;
-    const res = await fetch(`${baseUrl}/api/orders`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authToken}`,
-      },
-      body: JSON.stringify({
-        items: [{ menuItemId: testMenuItem.id, quantity }],
-      }),
-    });
-    assert.equal(res.status, 201);
-    const body = await res.json();
-    assert.equal(body.success, true);
-    const order = body.order || body.data;
-    assert.equal(order.status, "open");
-    assert.equal(order.totalCents, testMenuItem.priceCents * quantity);
-    createdOrderId = order.id;
-  });
+  await t.test(
+    "creates order with computed total and default open status",
+    async () => {
+      const quantity = 3;
+      const res = await fetch(`${baseUrl}/api/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({
+          items: [{ menuItemId: testMenuItem.id, quantity }],
+        }),
+      });
+      assert.equal(res.status, 201);
+      const body = await res.json();
+      assert.equal(body.success, true);
+      const order = body.order || body.data;
+      assert.equal(order.status, "open");
+      assert.equal(order.totalCents, testMenuItem.priceCents * quantity);
+      createdOrderId = order.id;
+    },
+  );
 
   await t.test("lists orders with user information", async () => {
     const res = await fetch(`${baseUrl}/api/orders`, {

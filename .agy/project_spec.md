@@ -5,7 +5,6 @@
 Simple menu management system for resturants and cafes local desktop app.
 ---
 
-
 ## 2. System Architecture & Workflows
 
 ### 4.1 Offline-First Workflow & Data Sync
@@ -16,8 +15,7 @@ Simple menu management system for resturants and cafes local desktop app.
 
 ### 4.2 Technology Stack
 
-- **Frontend**: React.js, Tailwind CSS,  JavaScript
+- **Frontend**: React.js, Tailwind CSS, JavaScript
 - **Backend**: Express Js / Node.js Express API, JSON REST APIs
 - **Database**: Postgresql / Relational Database/ Mobile version sqlite
 - **Desktop**: sqlite database with the react native
-

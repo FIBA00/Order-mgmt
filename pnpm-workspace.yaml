@@ -1,5 +1,5 @@
 packages:
-  - 'app/*'
+  - "app/*"
 allowBuilds:
   bcrypt: false
   better-sqlite3: true

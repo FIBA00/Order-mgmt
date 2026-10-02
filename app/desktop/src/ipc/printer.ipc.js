@@ -23,15 +23,18 @@ function registerPrinterIpc() {
         {
           silent: Boolean(options.silent),
           printBackground: options.printBackground !== false,
-          deviceName: options.deviceName || ""
+          deviceName: options.deviceName || "",
         },
         (success, failureReason) => {
           if (success) {
             resolve({ ok: true });
           } else {
-            resolve({ ok: false, error: failureReason || "Print operation cancelled" });
+            resolve({
+              ok: false,
+              error: failureReason || "Print operation cancelled",
+            });
           }
-        }
+        },
       );
     });
   });

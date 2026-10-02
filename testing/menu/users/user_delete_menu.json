@@ -1,18 +1,18 @@
 {
-    "_type": "request",
-    "method": "DELETE",
-    "body": {
-        "mimeType": "No Body",
-        "text": "{\n    \"name\": \"FraolLab\",\n    \"address\": \"Addis Ababa, 6 kilo\"\n}"
-    },
-    "url": "http://localhost:8000/api/menu/3",
-    "sortOrder": 4,
-    "parameters": [],
-    "pathParameters": [],
-    "authentication": {
-        "type": "bearer",
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY3YTc1OWYyLTc0OTUtNDU4Mi1hNjVkLTY2OGZiY2FiNTgxOCIsImVtYWlsIjoiZnJhb2xidWx0aTBAZ21haWwuY29tIiwicm9sZSI6InBhdHJvbiIsInRva2VuVmVyc2lvbiI6MCwiaWF0IjoxNzg2Mjg4NTI0LCJleHAiOjE3ODYyOTU3MjR9.faOqW0qKAfQajXUtI6G8--jvPzQN309DFRGV_SM5au4",
-        "prefix": "bearer"
-    },
-    "headers": []
+  "_type": "request",
+  "method": "DELETE",
+  "body": {
+    "mimeType": "No Body",
+    "text": "{\n    \"name\": \"FraolLab\",\n    \"address\": \"Addis Ababa, 6 kilo\"\n}"
+  },
+  "url": "http://localhost:8000/api/menu/3",
+  "sortOrder": 4,
+  "parameters": [],
+  "pathParameters": [],
+  "authentication": {
+    "type": "bearer",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY3YTc1OWYyLTc0OTUtNDU4Mi1hNjVkLTY2OGZiY2FiNTgxOCIsImVtYWlsIjoiZnJhb2xidWx0aTBAZ21haWwuY29tIiwicm9sZSI6InBhdHJvbiIsInRva2VuVmVyc2lvbiI6MCwiaWF0IjoxNzg2Mjg4NTI0LCJleHAiOjE3ODYyOTU3MjR9.faOqW0qKAfQajXUtI6G8--jvPzQN309DFRGV_SM5au4",
+    "prefix": "bearer"
+  },
+  "headers": []
 }

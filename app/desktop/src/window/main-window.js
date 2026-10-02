@@ -1,6 +1,9 @@
 const path = require("node:path");
 const { app, BrowserWindow, shell, Menu } = require("electron");
-const { windowConfig, getFrontendIndexPath } = require("../config/app.config.js");
+const {
+  windowConfig,
+  getFrontendIndexPath,
+} = require("../config/app.config.js");
 
 let mainWindow = null;
 
@@ -18,11 +21,11 @@ function setupApplicationMenu(win) {
             if (win && win.webContents) {
               win.webContents.print({ silent: false, printBackground: true });
             }
-          }
+          },
         },
         { type: "separator" },
-        { role: "quit" }
-      ]
+        { role: "quit" },
+      ],
     },
     {
       label: "View",
@@ -37,7 +40,7 @@ function setupApplicationMenu(win) {
             if (win) {
               win.setFullScreen(!win.isFullScreen());
             }
-          }
+          },
         },
         { role: "resetZoom" },
         { role: "zoomIn" },
@@ -48,16 +51,16 @@ function setupApplicationMenu(win) {
               {
                 label: "Toggle Developer Tools",
                 accelerator: "F12",
-                click: () => win && win.webContents.toggleDevTools()
-              }
+                click: () => win && win.webContents.toggleDevTools(),
+              },
             ]
-          : [])
-      ]
+          : []),
+      ],
     },
     {
       label: "Window",
-      submenu: [{ role: "minimize" }, { role: "close" }]
-    }
+      submenu: [{ role: "minimize" }, { role: "close" }],
+    },
   ];
 
   const menu = Menu.buildFromTemplate(template);
@@ -71,8 +74,8 @@ function createMainWindow() {
       preload: path.join(__dirname, "..", "preload.js"),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false
-    }
+      sandbox: false,
+    },
   });
 
   setupApplicationMenu(mainWindow);
@@ -111,5 +114,5 @@ function getMainWindow() {
 
 module.exports = {
   createMainWindow,
-  getMainWindow
+  getMainWindow,
 };

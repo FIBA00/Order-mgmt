@@ -9,13 +9,14 @@ function setupElectronMock() {
     },
     removeHandler(channel) {
       handlers.delete(channel);
-    }
+    },
   };
 
   const mockApp = {
     isPackaged: false,
     getVersion: () => "0.1.0",
-    getPath: name => (name === "userData" ? "/tmp/test-desktop-userdata" : "/tmp")
+    getPath: (name) =>
+      name === "userData" ? "/tmp/test-desktop-userdata" : "/tmp",
   };
 
   require.cache[electronPath] = {
@@ -27,8 +28,8 @@ function setupElectronMock() {
       app: mockApp,
       BrowserWindow: class {},
       dialog: {},
-      shell: { openExternal: () => {} }
-    }
+      shell: { openExternal: () => {} },
+    },
   };
 
   function invoke(channel, ...args) {
@@ -47,7 +48,7 @@ function setupElectronMock() {
   return {
     handlers,
     invoke,
-    clearHandlers
+    clearHandlers,
   };
 }
 

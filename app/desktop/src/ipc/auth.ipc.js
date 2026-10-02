@@ -23,7 +23,7 @@ function registerAuthIpc(services) {
     const input = z
       .object({
         username: z.string().min(1),
-        password: z.string().min(1)
+        password: z.string().min(1),
       })
       .parse(credentials);
 
@@ -43,5 +43,5 @@ function registerAuthIpc(services) {
 module.exports = {
   registerAuthIpc,
   requireAuth,
-  requireAdmin
+  requireAdmin,
 };

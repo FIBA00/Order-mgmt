@@ -9,11 +9,15 @@
     "start": "concurrently -n \"backend,vite,electron\" -c \"yellow,blue,green\" \"pnpm dev:backend\" \"pnpm dev:frontend\" \"pnpm dev:electron\"",
     "build:frontend": "cross-env NODE_ENV=production pnpm --filter @restaurant/frontend build",
     "build:electron": "cross-env NODE_ENV=production pnpm --filter @restaurant/desktop package",
-    "build": "pnpm build:frontend && pnpm build:electron"
+    "build": "pnpm build:frontend && pnpm build:electron",
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "concurrently": "^9.2.4",
     "cross-env": "^7.0.3",
     "wait-on": "^8.0.1"
+  },
+  "dependencies": {
+    "prettier": "^3.9.8"
   }
 }

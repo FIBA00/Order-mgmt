@@ -47,19 +47,22 @@ test("Menu Module", async (t) => {
     assert.equal(body.data.name, uniqueItemName);
   });
 
-  await t.test("rejects creating duplicate menu item with same name", async () => {
-    const res = await fetch(`${baseUrl}/api/menu`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: uniqueItemName,
-        priceCents: 500,
-      }),
-    });
-    assert.equal(res.status, 409);
-    const body = await res.json();
-    assert.equal(body.success, false);
-  });
+  await t.test(
+    "rejects creating duplicate menu item with same name",
+    async () => {
+      const res = await fetch(`${baseUrl}/api/menu`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: uniqueItemName,
+          priceCents: 500,
+        }),
+      });
+      assert.equal(res.status, 409);
+      const body = await res.json();
+      assert.equal(body.success, false);
+    },
+  );
 
   await t.test("rejects creating menu item with invalid price", async () => {
     const res = await fetch(`${baseUrl}/api/menu`, {

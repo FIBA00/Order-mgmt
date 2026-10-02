@@ -39,25 +39,33 @@
       {
         "from": "../backend/src",
         "to": "backend/src",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       },
       {
         "from": "../frontend/dist",
         "to": "frontend/dist",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       }
     ],
     "extraMetadata": {
       "name": "restaurant-order-manager"
     },
     "linux": {
-      "target": ["dir"]
+      "target": [
+        "dir"
+      ]
     },
     "win": {
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ]
     },

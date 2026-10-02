@@ -57,22 +57,20 @@ export function createMenuController(service) {
       next(error);
     }
   }
-    async function deleteMenu(req, res, next) {
+  async function deleteMenu(req, res, next) {
     try {
       const item = await service.deleteMenu(Number(req.params.id));
-      if (!item){
+      if (!item) {
         res.status(404).json({
           success: false,
           message: "Error: Menu item DOES NOT exist with given ID.",
         });
       } else {
-
-      res.status(203).json({
-        success: true,
-        data: item,
-      });
+        res.status(203).json({
+          success: true,
+          data: item,
+        });
       }
-
     } catch (error) {
       next(error);
     }

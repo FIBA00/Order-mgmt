@@ -4,7 +4,10 @@ const { getBackendSrcDir, getDatabasePath } = require("./config/app.config.js");
 const { initLocalDatabase } = require("./db/local-db.js");
 const { registerAllIpc } = require("./ipc/index.js");
 const { createMainWindow } = require("./window/main-window.js");
-const { configureAutoUpdater, checkForUpdatesIfPackaged } = require("./updater/auto-updater.js");
+const {
+  configureAutoUpdater,
+  checkForUpdatesIfPackaged,
+} = require("./updater/auto-updater.js");
 
 // Initialize persistent home directory logging
 initFileLogger(app);
@@ -39,7 +42,7 @@ app
       }
     });
   })
-  .catch(err => {
+  .catch((err) => {
     console.error("Electron startup error:", err);
   });
 

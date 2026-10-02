@@ -7,7 +7,7 @@ const { setupElectronMock } = require("./helpers/mock-electron.js");
 const { initLocalDatabase } = require("../src/db/local-db.js");
 const { getBackendSrcDir } = require("../src/config/app.config.js");
 
-test("Desktop IPC Handlers & Security Guards", async t => {
+test("Desktop IPC Handlers & Security Guards", async (t) => {
   const { invoke, clearHandlers } = setupElectronMock();
   const { registerAllIpc } = require("../src/ipc/index.js");
 
@@ -28,17 +28,21 @@ test("Desktop IPC Handlers & Security Guards", async t => {
     }
   });
 
-  await t.test("rejects unauthenticated access to protected IPC channels", async () => {
-    assert.throws(() => invoke("auth:me"), /Authentication required/);
-    assert.throws(() => invoke("menu:list"), /Authentication required/);
-    assert.throws(() => invoke("orders:list"), /Authentication required/);
-    assert.throws(() => invoke("dashboard:today"), /Authentication required/);
-  });
+  await t.test(
+    "rejects unauthenticated access to protected IPC channels",
+    async () => {
+      assert.throws(() => invoke("auth:me"), /Authentication required/);
+      assert.throws(() => invoke("menu:list"), /Authentication required/);
+      assert.throws(() => invoke("orders:list"), /Authentication required/);
+      assert.throws(() => invoke("dashboard:today"), /Authentication required/);
+    },
+  );
 
   await t.test("rejects login with invalid credentials", async () => {
     assert.throws(
-      () => invoke("auth:login", { username: "admin", password: "wrongpassword" }),
-      /Invalid username or password/
+      () =>
+        invoke("auth:login", { username: "admin", password: "wrongpassword" }),
+      /Invalid username or password/,
     );
   });
 
@@ -46,24 +50,33 @@ test("Desktop IPC Handlers & Security Guards", async t => {
     assert.throws(() => invoke("auth:login", { username: "" }), /invalid/i);
   });
 
-  await t.test("authenticates user and enables access to protected channels", async () => {
-    const user = invoke("auth:login", { username: "admin", password: "admin123" });
-    assert.ok(user);
-    assert.equal(user.username, "admin");
-    assert.equal(user.role, "admin");
+  await t.test(
+    "authenticates user and enables access to protected channels",
+    async () => {
+      const user = invoke("auth:login", {
+        username: "admin",
+        password: "admin123",
+      });
+      assert.ok(user);
+      assert.equal(user.username, "admin");
+      assert.equal(user.role, "admin");
 
-    const me = invoke("auth:me");
-    assert.equal(me.username, "admin");
+      const me = invoke("auth:me");
+      assert.equal(me.username, "admin");
 
-    const menu = invoke("menu:list");
-    assert.ok(Array.isArray(menu));
-    assert.equal(menu.length, 5);
-  });
+      const menu = invoke("menu:list");
+      assert.ok(Array.isArray(menu));
+      assert.equal(menu.length, 5);
+    },
+  );
 
   let createdItemId = null;
 
   await t.test("creates and deletes menu item via admin IPC", async () => {
-    const newItem = invoke("menu:create", { name: "Matcha Latte", priceCents: 520 });
+    const newItem = invoke("menu:create", {
+      name: "Matcha Latte",
+      priceCents: 520,
+    });
     assert.ok(newItem);
     assert.equal(newItem.name, "Matcha Latte");
     assert.equal(newItem.priceCents, 520);
@@ -87,7 +100,7 @@ test("Desktop IPC Handlers & Security Guards", async t => {
 
     const order = invoke("orders:create", {
       items: [{ menuItemId: item.id, quantity: 2 }],
-      note: "Table 4"
+      note: "Table 4",
     });
     assert.ok(order);
     assert.equal(order.status, "open");
@@ -97,8 +110,15 @@ test("Desktop IPC Handlers & Security Guards", async t => {
     const ordersList = invoke("orders:list");
     assert.ok(ordersList.length >= 1);
 
-    const updateResult = invoke("orders:set-status", { id: createdOrderId, status: "paid" });
-    assert.deepEqual(updateResult, { ok: true, id: createdOrderId, status: "paid" });
+    const updateResult = invoke("orders:set-status", {
+      id: createdOrderId,
+      status: "paid",
+    });
+    assert.deepEqual(updateResult, {
+      ok: true,
+      id: createdOrderId,
+      status: "paid",
+    });
   });
 
   await t.test("retrieves dashboard metrics via IPC", async () => {
@@ -114,11 +134,14 @@ test("Desktop IPC Handlers & Security Guards", async t => {
     assert.ok(info.userDataPath);
   });
 
-  await t.test("logs out user and revokes access to protected channels", async () => {
-    const logoutResult = invoke("auth:logout");
-    assert.deepEqual(logoutResult, { ok: true });
+  await t.test(
+    "logs out user and revokes access to protected channels",
+    async () => {
+      const logoutResult = invoke("auth:logout");
+      assert.deepEqual(logoutResult, { ok: true });
 
-    assert.throws(() => invoke("auth:me"), /Authentication required/);
-    assert.throws(() => invoke("orders:list"), /Authentication required/);
-  });
+      assert.throws(() => invoke("auth:me"), /Authentication required/);
+      assert.throws(() => invoke("orders:list"), /Authentication required/);
+    },
+  );
 });

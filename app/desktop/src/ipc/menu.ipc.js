@@ -13,7 +13,7 @@ function registerMenuIpc(services) {
     const parsed = z
       .object({
         name: z.string().min(1),
-        priceCents: z.number().int().nonnegative()
+        priceCents: z.number().int().nonnegative(),
       })
       .parse(input);
     return services.menu.create(parsed.name, parsed.priceCents);

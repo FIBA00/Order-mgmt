@@ -30,7 +30,10 @@ function appendLog(level, message, meta = "") {
 function initFileLogger(app) {
   // Rotate if log file is larger than 5MB
   try {
-    if (fs.existsSync(LOG_FILE) && fs.statSync(LOG_FILE).size > 5 * 1024 * 1024) {
+    if (
+      fs.existsSync(LOG_FILE) &&
+      fs.statSync(LOG_FILE).size > 5 * 1024 * 1024
+    ) {
       fs.renameSync(LOG_FILE, `${LOG_FILE}.old`);
     }
   } catch {}
@@ -40,18 +43,18 @@ function initFileLogger(app) {
     platform: process.platform,
     arch: process.arch,
     node: process.versions.node,
-    electron: process.versions.electron
+    electron: process.versions.electron,
   });
 
-  process.on("uncaughtException", err => {
+  process.on("uncaughtException", (err) => {
     appendLog("FATAL", "Uncaught Exception in main process", err);
   });
 
-  process.on("unhandledRejection", reason => {
+  process.on("unhandledRejection", (reason) => {
     appendLog("ERROR", "Unhandled Promise Rejection in main process", reason);
   });
 
-  process.on("exit", code => {
+  process.on("exit", (code) => {
     appendLog("INFO", `Application exiting with code ${code}`);
   });
 
@@ -64,8 +67,14 @@ function initFileLogger(app) {
     appendLog(
       "ERROR",
       args
-        .map(a => (a instanceof Error ? a.stack : typeof a === "object" ? JSON.stringify(a) : a))
-        .join(" ")
+        .map((a) =>
+          a instanceof Error
+            ? a.stack
+            : typeof a === "object"
+              ? JSON.stringify(a)
+              : a,
+        )
+        .join(" "),
     );
     origError.apply(console, args);
   };
@@ -73,7 +82,9 @@ function initFileLogger(app) {
   console.warn = (...args) => {
     appendLog(
       "WARN",
-      args.map(a => (typeof a === "object" ? JSON.stringify(a) : a)).join(" ")
+      args
+        .map((a) => (typeof a === "object" ? JSON.stringify(a) : a))
+        .join(" "),
     );
     origWarn.apply(console, args);
   };
@@ -81,7 +92,9 @@ function initFileLogger(app) {
   console.log = (...args) => {
     appendLog(
       "INFO",
-      args.map(a => (typeof a === "object" ? JSON.stringify(a) : a)).join(" ")
+      args
+        .map((a) => (typeof a === "object" ? JSON.stringify(a) : a))
+        .join(" "),
     );
     origLog.apply(console, args);
   };
@@ -92,5 +105,5 @@ function initFileLogger(app) {
 module.exports = {
   LOG_FILE,
   appendLog,
-  initFileLogger
+  initFileLogger,
 };

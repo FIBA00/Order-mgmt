@@ -5,7 +5,9 @@
 The backend application (`@restaurant/backend`) has been fully modernized, remediated, and verified against `project_spec.md` and `arch.md`. All feature modules (`menu`, `auth`, `orders`, `dashboard`) follow a clean, functional NestJS-inspired separation of concerns pattern (Schema/DTO -> Repository -> Service -> Controller -> Router/Module) with dependency injection and dual-dialect database support (SQLite & PostgreSQL).
 
 ### 1. Architectural Pattern & Separation of Concerns
+
 All feature domains in `src/features/` adhere to a consistent 5-layer separation:
+
 - **`*.schema.js` (DTOs & Validation Contracts)**: Zod schemas defining request validation contracts (`create*InputSchema`, `update*InputSchema`) and response envelope shapes.
 - **`*.repository.js` (Data Access Layer / DAO)**: Factory `create*Repository({ db, schema })` encapsulating all Drizzle ORM queries, joins, and database mutations. Completely decoupled from HTTP transport.
 - **`*.service.js` (Business & Domain Logic)**: Factory `create*Service(repository)` enforcing business rules, total calculation, availability checks, password hashing/verification, and error creation (`statusCode`).
@@ -13,6 +15,7 @@ All feature domains in `src/features/` adhere to a consistent 5-layer separation
 - **`*.router.js` (Assembler / Module)**: Wires together Repository -> Service -> Controller with middlewares (`inputValidationBody`, `isLoggedIn`, `isAdmin`), maps routes, and exports both the configured router and individual factories.
 
 ### 2. Feature Domains Overview
+
 - **`menu`**:
   - `GET /api/menu`: Lists all menu items.
   - `GET /api/menu/:id`: Retrieves single item by ID.
@@ -32,12 +35,15 @@ All feature domains in `src/features/` adhere to a consistent 5-layer separation
   - `GET /api/dashboard` & `GET /api/dashboard/today`: Computes today's total order count and paid order revenue using dialect-agnostic ANSI SQL (`coalesce(sum(case when ...))`), working identically on SQLite and PostgreSQL.
 
 ### 3. Middleware & Security Transport
+
 - **`isLoggedIn`**: Updated in `src/middlewares/auth.middleware.js` to extract tokens from both `Authorization: Bearer <token>` HTTP header and `req.cookies.accessToken`.
 - **`inputValidationBody`**: Updated in `src/middlewares/validation.middleware.js` to return HTTP 400 Bad Request on schema failures with flattened error details.
 - **`Desktop Compatibility`**: Created CommonJS compatibility adapters in `src/db/` and `src/services/` exposing `openDatabase` and `createServices` for Electron IPC offline mode.
 
 ### 4. Modular Test Suite Architecture (`test/`)
+
 Tests have been partitioned into dedicated domain folders within `test/` instead of a single crammed file:
+
 - **`test/helpers/test-server.js`**: Shared ephemeral Express test server lifecycle and JWT test token generator.
 - **`test/auth/auth.test.js`** (10 tests): Signup, login, duplicate detection, wrong password, auth cookies, and `/me` Bearer token verification.
 - **`test/menu/menu.test.js`** (8 tests): Listing, creation, ID lookup, duplicate name prevention, price validation, updates, and deletion.
@@ -49,17 +55,17 @@ Tests have been partitioned into dedicated domain folders within `test/` instead
 
 ## Activity Log
 
-| Date | Task | Commit Message |
-| :--- | :--- | :--- |
-| 2026-10-02 | Initial Handoff & Backend Codebase Audit | docs(backend): initial handoff audit and current state report |
-| 2026-10-02 | Auth Feature Remediation & Layered Architecture | feat(backend): implement auth repository, service, controller, and router |
-| 2026-10-02 | Bearer Token & Cookie Auth Middleware | feat(backend): support Authorization header and cookie tokens in auth middleware |
-| 2026-10-02 | Orders Feature Modernization to ESM & 5-Layer Pattern | feat(backend): implement orders repository, service, controller, and router |
-| 2026-10-02 | Dialect-Agnostic Dashboard Feature | feat(backend): implement dashboard repository, service, controller, and router |
-| 2026-10-02 | Route Registration & Cross-Agent Integration | feat(backend): mount auth, orders, and dashboard routes in main.route.js |
-| 2026-10-02 | Desktop IPC Database and Services Compatibility Layer | feat(backend): add db and services adapter packages for Electron IPC |
-| 2026-10-02 | Automated Test Suite Modernization to ESM | test(backend): modernize test/api.test.js with node:test and verify all routes |
-| 2026-10-02 | Modular Domain Test Suite Architecture | test(backend): partition test suite into modular folders under test/ |
+| Date       | Task                                                  | Commit Message                                                                   |
+| :--------- | :---------------------------------------------------- | :------------------------------------------------------------------------------- |
+| 2026-10-02 | Initial Handoff & Backend Codebase Audit              | docs(backend): initial handoff audit and current state report                    |
+| 2026-10-02 | Auth Feature Remediation & Layered Architecture       | feat(backend): implement auth repository, service, controller, and router        |
+| 2026-10-02 | Bearer Token & Cookie Auth Middleware                 | feat(backend): support Authorization header and cookie tokens in auth middleware |
+| 2026-10-02 | Orders Feature Modernization to ESM & 5-Layer Pattern | feat(backend): implement orders repository, service, controller, and router      |
+| 2026-10-02 | Dialect-Agnostic Dashboard Feature                    | feat(backend): implement dashboard repository, service, controller, and router   |
+| 2026-10-02 | Route Registration & Cross-Agent Integration          | feat(backend): mount auth, orders, and dashboard routes in main.route.js         |
+| 2026-10-02 | Desktop IPC Database and Services Compatibility Layer | feat(backend): add db and services adapter packages for Electron IPC             |
+| 2026-10-02 | Automated Test Suite Modernization to ESM             | test(backend): modernize test/api.test.js with node:test and verify all routes   |
+| 2026-10-02 | Modular Domain Test Suite Architecture                | test(backend): partition test suite into modular folders under test/             |
 
 ---
 
