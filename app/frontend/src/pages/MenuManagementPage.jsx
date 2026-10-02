@@ -43,7 +43,7 @@ export default function MenuManagementPage({ user, onLogout }) {
   // Categories list
   const categories = useMemo(() => {
     const set = new Set();
-    items.forEach(i => {
+    items.forEach((i) => {
       if (i.category) set.add(i.category);
     });
     return set.size ? ["all", ...Array.from(set)] : ["all"];
@@ -51,10 +51,11 @@ export default function MenuManagementPage({ user, onLogout }) {
 
   // Filtered items
   const filteredItems = useMemo(() => {
-    return items.filter(item => {
+    return items.filter((item) => {
       if (
         selectedCategory !== "all" &&
-        (item.category || "Food").toLowerCase() !== selectedCategory.toLowerCase()
+        (item.category || "Food").toLowerCase() !==
+          selectedCategory.toLowerCase()
       ) {
         return false;
       }
@@ -88,7 +89,7 @@ export default function MenuManagementPage({ user, onLogout }) {
       await api.menu.create({
         name: newName.trim(),
         priceCents: Math.round(priceNum * 100),
-        category: newCategory.trim() || "Food"
+        category: newCategory.trim() || "Food",
       });
       setNewName("");
       setNewPrice("");
@@ -223,7 +224,7 @@ export default function MenuManagementPage({ user, onLogout }) {
             <input
               type="text"
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="Search items by name or category…"
               className="w-full bg-stone-50 dark:bg-stone-800/80 border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 transition"
             />
@@ -239,7 +240,7 @@ export default function MenuManagementPage({ user, onLogout }) {
 
           {categories.length > 1 && (
             <div className="flex items-center gap-1.5 overflow-x-auto text-xs pb-1 sm:pb-0">
-              {categories.map(cat => (
+              {categories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
@@ -271,7 +272,8 @@ export default function MenuManagementPage({ user, onLogout }) {
                 No menu items yet
               </h3>
               <p className="text-xs text-stone-500 dark:text-stone-400 mb-4 max-w-sm mx-auto">
-                Get started by adding your first food, drink, or dessert item to the menu catalog.
+                Get started by adding your first food, drink, or dessert item to
+                the menu catalog.
               </p>
               <button
                 onClick={() => setShowCreateModal(true)}
@@ -294,11 +296,13 @@ export default function MenuManagementPage({ user, onLogout }) {
                     <th className="py-3 px-4 font-semibold">Category</th>
                     <th className="py-3 px-4 font-semibold">Price</th>
                     <th className="py-3 px-4 font-semibold">Status</th>
-                    <th className="py-3 px-4 font-semibold text-right">Actions</th>
+                    <th className="py-3 px-4 font-semibold text-right">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100 dark:divide-stone-800">
-                  {filteredItems.map(item => (
+                  {filteredItems.map((item) => (
                     <tr
                       key={item.id}
                       className="hover:bg-stone-50/50 dark:hover:bg-stone-800/30 transition"
@@ -361,7 +365,7 @@ export default function MenuManagementPage({ user, onLogout }) {
       {showCreateModal && (
         <div
           className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4"
-          onClick={e => {
+          onClick={(e) => {
             if (e.target === e.currentTarget) setShowCreateModal(false);
           }}
         >
@@ -386,7 +390,7 @@ export default function MenuManagementPage({ user, onLogout }) {
                 <input
                   type="text"
                   value={newName}
-                  onChange={e => setNewName(e.target.value)}
+                  onChange={(e) => setNewName(e.target.value)}
                   placeholder="e.g. Iced Vanilla Latte"
                   className="w-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500"
                   required
@@ -403,7 +407,7 @@ export default function MenuManagementPage({ user, onLogout }) {
                     step="0.01"
                     min="0.01"
                     value={newPrice}
-                    onChange={e => setNewPrice(e.target.value)}
+                    onChange={(e) => setNewPrice(e.target.value)}
                     placeholder="4.75"
                     className="w-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500"
                     required
@@ -417,7 +421,7 @@ export default function MenuManagementPage({ user, onLogout }) {
                   <input
                     type="text"
                     value={newCategory}
-                    onChange={e => setNewCategory(e.target.value)}
+                    onChange={(e) => setNewCategory(e.target.value)}
                     placeholder="Drinks, Food, Desserts"
                     className="w-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500"
                   />

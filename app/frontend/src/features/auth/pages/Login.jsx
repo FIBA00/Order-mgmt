@@ -33,7 +33,9 @@ export default function LoginPage({ onLogin, error }) {
         </div>
 
         <p className="text-xs text-stone-500 dark:text-stone-400 mb-6">
-          {isDesktop ? "Desktop · Local SQLite" : "Web · Local API & Offline Cache"}
+          {isDesktop
+            ? "Desktop · Local SQLite"
+            : "Web · Local API & Offline Cache"}
         </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -45,7 +47,7 @@ export default function LoginPage({ onLogin, error }) {
               className="w-full bg-white dark:bg-stone-800 border border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 transition"
               placeholder="Username"
               value={username}
-              onChange={e => setUsername(e.target.value)}
+              onChange={(e) => setUsername(e.target.value)}
               required
             />
           </div>
@@ -59,7 +61,7 @@ export default function LoginPage({ onLogin, error }) {
               type="password"
               placeholder="Password"
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
@@ -80,7 +82,14 @@ export default function LoginPage({ onLogin, error }) {
 
         <div className="mt-6 pt-4 border-t border-stone-100 dark:border-stone-800 text-center">
           <p className="text-xs text-stone-400 dark:text-stone-500">
-            Demo credentials: <span className="font-mono text-stone-600 dark:text-stone-300">admin</span> / <span className="font-mono text-stone-600 dark:text-stone-300">admin123</span>
+            Demo credentials:{" "}
+            <span className="font-mono text-stone-600 dark:text-stone-300">
+              admin
+            </span>{" "}
+            /{" "}
+            <span className="font-mono text-stone-600 dark:text-stone-300">
+              admin123
+            </span>
           </p>
         </div>
       </div>

@@ -8,7 +8,7 @@ export default function MenuList({
   isAdmin = false,
   onCreateItem,
   onEditItem,
-  onDeleteItem
+  onDeleteItem,
 }) {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -22,7 +22,7 @@ export default function MenuList({
   // Extract unique categories
   const categories = useMemo(() => {
     const set = new Set();
-    items.forEach(item => {
+    items.forEach((item) => {
       if (item.category) set.add(item.category);
     });
     return ["all", ...Array.from(set)];
@@ -30,10 +30,11 @@ export default function MenuList({
 
   // Filter items by category and search term
   const filteredItems = useMemo(() => {
-    return items.filter(item => {
+    return items.filter((item) => {
       if (
         selectedCategory !== "all" &&
-        (item.category || "Food").toLowerCase() !== selectedCategory.toLowerCase()
+        (item.category || "Food").toLowerCase() !==
+          selectedCategory.toLowerCase()
       ) {
         return false;
       }
@@ -57,7 +58,7 @@ export default function MenuList({
       await onCreateItem({
         name: name.trim(),
         priceCents: Math.round(priceNum * 100),
-        category: category.trim() || "Food"
+        category: category.trim() || "Food",
       });
       setName("");
       setPriceStr("");
@@ -75,7 +76,7 @@ export default function MenuList({
           <input
             type="text"
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search menu items…"
             className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-900 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 shadow-2xs transition"
           />
@@ -104,7 +105,7 @@ export default function MenuList({
       {/* Category Pills */}
       {categories.length > 2 && (
         <div className="flex gap-1.5 overflow-x-auto pb-1 text-xs">
-          {categories.map(cat => (
+          {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
@@ -133,7 +134,7 @@ export default function MenuList({
             <input
               type="text"
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Iced Latte"
               className="w-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500"
               required
@@ -148,7 +149,7 @@ export default function MenuList({
               step="0.01"
               min="0.01"
               value={priceStr}
-              onChange={e => setPriceStr(e.target.value)}
+              onChange={(e) => setPriceStr(e.target.value)}
               placeholder="4.50"
               className="w-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500"
               required
@@ -161,7 +162,7 @@ export default function MenuList({
             <input
               type="text"
               value={category}
-              onChange={e => setCategory(e.target.value)}
+              onChange={(e) => setCategory(e.target.value)}
               placeholder="Food, Drinks"
               className="w-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500"
             />
@@ -179,7 +180,8 @@ export default function MenuList({
       {/* Menu Catalog Grid */}
       {!items.length ? (
         <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-8 text-center text-stone-400 dark:text-stone-600 text-sm">
-          No menu items available yet. Add an item using the button above or wait for backend sync.
+          No menu items available yet. Add an item using the button above or
+          wait for backend sync.
         </div>
       ) : !filteredItems.length ? (
         <p className="text-stone-400 dark:text-stone-600 text-sm py-4">
@@ -187,7 +189,7 @@ export default function MenuList({
         </p>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {filteredItems.map(item => (
+          {filteredItems.map((item) => (
             <div
               key={item.id}
               onClick={() => onSelectItem(item)}
@@ -205,7 +207,7 @@ export default function MenuList({
                       <button
                         type="button"
                         title="Edit item"
-                        onClick={e => {
+                        onClick={(e) => {
                           e.stopPropagation();
                           setEditingItem(item);
                         }}
@@ -218,7 +220,7 @@ export default function MenuList({
                       <button
                         type="button"
                         title="Delete item"
-                        onClick={e => {
+                        onClick={(e) => {
                           e.stopPropagation();
                           onDeleteItem(item.id);
                         }}

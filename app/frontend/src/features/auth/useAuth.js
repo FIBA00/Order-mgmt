@@ -24,7 +24,7 @@ export function useAuth() {
     if (api.auth?.me) {
       api.auth
         .me()
-        .then(current => {
+        .then((current) => {
           if (current) setUser(current);
         })
         .catch(() => {

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 export default function EditMenuItemModal({ item, onSave, onClose }) {
   const [name, setName] = useState(item?.name || "");
   const [priceStr, setPriceStr] = useState(
-    item?.priceCents !== undefined ? (item.priceCents / 100).toFixed(2) : ""
+    item?.priceCents !== undefined ? (item.priceCents / 100).toFixed(2) : "",
   );
   const [category, setCategory] = useState(item?.category || "Food");
   const [submitting, setSubmitting] = useState(false);
@@ -35,7 +35,7 @@ export default function EditMenuItemModal({ item, onSave, onClose }) {
       await onSave(item.id, {
         name: name.trim(),
         priceCents: Math.round(priceNum * 100),
-        category: category.trim() || "Food"
+        category: category.trim() || "Food",
       });
       onClose();
     } catch (err) {
@@ -47,7 +47,7 @@ export default function EditMenuItemModal({ item, onSave, onClose }) {
   return (
     <div
       className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4"
-      onClick={e => {
+      onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
@@ -72,7 +72,7 @@ export default function EditMenuItemModal({ item, onSave, onClose }) {
             <input
               type="text"
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Cappuccino"
               className="w-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500"
               required
@@ -89,7 +89,7 @@ export default function EditMenuItemModal({ item, onSave, onClose }) {
                 step="0.01"
                 min="0.01"
                 value={priceStr}
-                onChange={e => setPriceStr(e.target.value)}
+                onChange={(e) => setPriceStr(e.target.value)}
                 placeholder="4.50"
                 className="w-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500"
                 required
@@ -103,7 +103,7 @@ export default function EditMenuItemModal({ item, onSave, onClose }) {
               <input
                 type="text"
                 value={category}
-                onChange={e => setCategory(e.target.value)}
+                onChange={(e) => setCategory(e.target.value)}
                 placeholder="Drinks, Food"
                 className="w-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500"
               />

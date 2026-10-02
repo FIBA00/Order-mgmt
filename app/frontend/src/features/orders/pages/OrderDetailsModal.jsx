@@ -3,24 +3,26 @@ import { money } from "../../../utils/money.js";
 const STATUS_STYLES = {
   open: "bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-800",
   paid: "bg-green-50 dark:bg-green-950/50 text-green-800 dark:text-green-300 border-green-200 dark:border-green-800",
-  cancelled: "bg-red-50 dark:bg-red-950/50 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800"
+  cancelled:
+    "bg-red-50 dark:bg-red-950/50 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800",
 };
 
 export default function OrderDetailsModal({
   order,
   menuItems = [],
   onClose,
-  onSetStatus
+  onSetStatus,
 }) {
   if (!order) return null;
 
   // Resolve item names and prices from menu catalog if line only has menuItemId
-  const items = (order.items || []).map(line => {
-    const menuItem = menuItems.find(m => m.id === line.menuItemId);
+  const items = (order.items || []).map((line) => {
+    const menuItem = menuItems.find((m) => m.id === line.menuItemId);
     return {
-      name: line.name || (menuItem ? menuItem.name : `Item #${line.menuItemId}`),
+      name:
+        line.name || (menuItem ? menuItem.name : `Item #${line.menuItemId}`),
       priceCents: line.priceCents || (menuItem ? menuItem.priceCents : 0),
-      quantity: line.quantity || 1
+      quantity: line.quantity || 1,
     };
   });
 
@@ -96,7 +98,10 @@ export default function OrderDetailsModal({
                   </tr>
                 ) : (
                   items.map((item, idx) => (
-                    <tr key={idx} className="hover:bg-stone-50/50 dark:hover:bg-stone-800/40">
+                    <tr
+                      key={idx}
+                      className="hover:bg-stone-50/50 dark:hover:bg-stone-800/40"
+                    >
                       <td className="py-2.5 px-3 font-medium text-stone-800 dark:text-stone-200">
                         {item.name}
                       </td>

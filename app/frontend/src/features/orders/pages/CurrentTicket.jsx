@@ -7,13 +7,13 @@ export default function CurrentTicket({
   onRemove,
   onClear,
   onSubmit,
-  submitting = false
+  submitting = false,
 }) {
   const [note, setNote] = useState("");
 
   const subtotalCents = items.reduce(
     (sum, line) => sum + (line.priceCents || 0) * (line.quantity || 1),
-    0
+    0,
   );
 
   async function handlePlaceOrder(e) {
@@ -49,7 +49,7 @@ export default function CurrentTicket({
             </p>
           </div>
         ) : (
-          items.map(item => (
+          items.map((item) => (
             <div
               key={item.menuItemId}
               className="flex items-center justify-between text-sm py-1.5 border-b border-stone-50 dark:border-stone-800/50"
@@ -108,7 +108,7 @@ export default function CurrentTicket({
           <input
             type="text"
             value={note}
-            onChange={e => setNote(e.target.value)}
+            onChange={(e) => setNote(e.target.value)}
             placeholder="e.g. Table 4 or Takeaway"
             className="w-full border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500"
           />

@@ -24,7 +24,8 @@ export default function Homepage() {
           Restaurant Order Manager
         </h1>
         <p className="text-stone-500 dark:text-stone-400 mb-6 text-xs leading-relaxed">
-          Fast, minimal order and menu management system crafted for cafes, bistros, and restaurants. Works completely offline.
+          Fast, minimal order and menu management system crafted for cafes,
+          bistros, and restaurants. Works completely offline.
         </p>
         <Link
           to="/login"

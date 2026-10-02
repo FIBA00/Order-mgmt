@@ -6,7 +6,7 @@ describe("Order Calculation & Filtering", () => {
   const sampleMenu = [
     { id: 1, name: "Espresso", priceCents: 350 },
     { id: 2, name: "Croissant", priceCents: 300 },
-    { id: 3, name: "Avocado Toast", priceCents: 850 }
+    { id: 3, name: "Avocado Toast", priceCents: 850 },
   ];
 
   test("calculateOrderTotal returns 0 for empty cart", () => {
@@ -22,7 +22,7 @@ describe("Order Calculation & Filtering", () => {
     const items = [
       { menuItemId: 1, quantity: 1 }, // 350
       { menuItemId: 2, quantity: 2 }, // 600
-      { menuItemId: 3, quantity: 1 }  // 850
+      { menuItemId: 3, quantity: 1 }, // 850
     ];
     assert.equal(calculateOrderTotal(items, sampleMenu), 1800);
   });
@@ -31,7 +31,7 @@ describe("Order Calculation & Filtering", () => {
     const orders = [
       { id: 101, status: "open" },
       { id: 102, status: "paid" },
-      { id: 103, status: "cancelled" }
+      { id: 103, status: "cancelled" },
     ];
 
     assert.equal(filterOrders(orders, { status: "open" }).length, 1);
@@ -42,7 +42,7 @@ describe("Order Calculation & Filtering", () => {
   test("filterOrders filters by ID search query", () => {
     const orders = [
       { id: 101, status: "open" },
-      { id: 202, status: "paid" }
+      { id: 202, status: "paid" },
     ];
 
     const result = filterOrders(orders, { search: "202" });

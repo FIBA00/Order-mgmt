@@ -24,10 +24,10 @@ export default function DashboardPage({ user, onLogout }) {
   const [selectedOrder, setSelectedOrder] = useState(null);
 
   const [isOnline, setIsOnline] = useState(
-    typeof navigator !== "undefined" ? navigator.onLine : true
+    typeof navigator !== "undefined" ? navigator.onLine : true,
   );
   const [pendingSyncCount, setPendingSyncCount] = useState(
-    api.sync ? api.sync.getPendingCount() : 0
+    api.sync ? api.sync.getPendingCount() : 0,
   );
   const [syncing, setSyncing] = useState(false);
 
@@ -36,7 +36,7 @@ export default function DashboardPage({ user, onLogout }) {
       const [items, orderList, today] = await Promise.all([
         api.menu.list(),
         api.orders.list(),
-        api.dashboard.today()
+        api.dashboard.today(),
       ]);
       setMenu(items);
       setOrders(orderList);
@@ -77,7 +77,9 @@ export default function DashboardPage({ user, onLogout }) {
     try {
       const synced = await api.sync.syncNow();
       if (synced > 0) {
-        setMessage(`Synchronized ${synced} offline order(s) with central server.`);
+        setMessage(
+          `Synchronized ${synced} offline order(s) with central server.`,
+        );
       }
       await refresh();
     } catch (err) {
@@ -90,11 +92,11 @@ export default function DashboardPage({ user, onLogout }) {
   // ── POS Ticket / Cart Operations ─────────────────────────────────────────────
 
   function handleAddToTicket(item) {
-    setTicketItems(prev => {
-      const existing = prev.find(i => i.menuItemId === item.id);
+    setTicketItems((prev) => {
+      const existing = prev.find((i) => i.menuItemId === item.id);
       if (existing) {
-        return prev.map(i =>
-          i.menuItemId === item.id ? { ...i, quantity: i.quantity + 1 } : i
+        return prev.map((i) =>
+          i.menuItemId === item.id ? { ...i, quantity: i.quantity + 1 } : i,
         );
       }
       return [
@@ -103,16 +105,16 @@ export default function DashboardPage({ user, onLogout }) {
           menuItemId: item.id,
           name: item.name,
           priceCents: item.priceCents,
-          quantity: 1
-        }
+          quantity: 1,
+        },
       ];
     });
   }
 
   function handleUpdateTicketQuantity(menuItemId, delta) {
-    setTicketItems(prev => {
+    setTicketItems((prev) => {
       return prev
-        .map(i => {
+        .map((i) => {
           if (i.menuItemId === menuItemId) {
             const newQty = i.quantity + delta;
             return newQty > 0 ? { ...i, quantity: newQty } : null;
@@ -124,7 +126,7 @@ export default function DashboardPage({ user, onLogout }) {
   }
 
   function handleRemoveFromTicket(menuItemId) {
-    setTicketItems(prev => prev.filter(i => i.menuItemId !== menuItemId));
+    setTicketItems((prev) => prev.filter((i) => i.menuItemId !== menuItemId));
   }
 
   function handleClearTicket() {
@@ -136,13 +138,13 @@ export default function DashboardPage({ user, onLogout }) {
     setPlacingOrder(true);
     try {
       const payload = {
-        items: ticketItems.map(i => ({
+        items: ticketItems.map((i) => ({
           menuItemId: i.menuItemId,
           quantity: i.quantity,
           name: i.name,
-          priceCents: i.priceCents
+          priceCents: i.priceCents,
         })),
-        note: note || undefined
+        note: note || undefined,
       };
       await api.orders.create(payload);
       setTicketItems([]);
@@ -162,7 +164,7 @@ export default function DashboardPage({ user, onLogout }) {
       await api.orders.setStatus(id, status);
       await refresh();
       if (selectedOrder && selectedOrder.id === id) {
-        setSelectedOrder(prev => (prev ? { ...prev, status } : null));
+        setSelectedOrder((prev) => (prev ? { ...prev, status } : null));
       }
       setMessage(`Order #${id} marked as ${status}.`);
     } catch (err) {
@@ -184,7 +186,7 @@ export default function DashboardPage({ user, onLogout }) {
     try {
       await api.menu.update(id, input);
       await refresh();
-      setMessage(`Updated menu item "${input.name || 'item'}".`);
+      setMessage(`Updated menu item "${input.name || "item"}".`);
     } catch (err) {
       setMessage(err.message);
     }
@@ -202,7 +204,7 @@ export default function DashboardPage({ user, onLogout }) {
 
   // Derived metrics
   const openOrdersCount = useMemo(() => {
-    return orders.filter(o => o.status === "open").length;
+    return orders.filter((o) => o.status === "open").length;
   }, [orders]);
 
   const averageOrderValue = useMemo(() => {

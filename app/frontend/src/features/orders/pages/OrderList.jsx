@@ -5,14 +5,11 @@ import { filterOrders } from "../../../utils/order.js";
 const STATUS_STYLES = {
   open: "bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800",
   paid: "bg-green-50 dark:bg-green-950/50 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-800",
-  cancelled: "bg-red-50 dark:bg-red-950/50 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800"
+  cancelled:
+    "bg-red-50 dark:bg-red-950/50 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800",
 };
 
-export default function OrderList({
-  orders = [],
-  onSetStatus,
-  onSelectOrder
-}) {
+export default function OrderList({ orders = [], onSetStatus, onSelectOrder }) {
   const [statusFilter, setStatusFilter] = useState("all");
   const [search, setSearch] = useState("");
 
@@ -21,7 +18,7 @@ export default function OrderList({
   }, [orders, statusFilter, search]);
 
   const openCount = useMemo(() => {
-    return orders.filter(o => o.status === "open").length;
+    return orders.filter((o) => o.status === "open").length;
   }, [orders]);
 
   if (!orders.length) {
@@ -94,7 +91,7 @@ export default function OrderList({
           <input
             type="text"
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search order # or note…"
             className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-900 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 shadow-2xs"
           />
@@ -116,7 +113,7 @@ export default function OrderList({
             No orders match the current filter.
           </p>
         ) : (
-          filteredOrders.slice(0, 30).map(order => (
+          filteredOrders.slice(0, 30).map((order) => (
             <div
               key={order.id}
               onClick={() => onSelectOrder && onSelectOrder(order)}
@@ -156,7 +153,7 @@ export default function OrderList({
 
               <div
                 className="flex items-center gap-2"
-                onClick={e => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
               >
                 {order.status === "open" && onSetStatus && (
                   <div className="flex gap-1.5">

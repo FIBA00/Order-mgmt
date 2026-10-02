@@ -21,7 +21,8 @@ export default function SignUpPage() {
           Staff Registration
         </h1>
         <p className="text-xs text-stone-500 dark:text-stone-400 mb-6 leading-relaxed">
-          Staff and cashier accounts are securely provisioned by your system administrator.
+          Staff and cashier accounts are securely provisioned by your system
+          administrator.
         </p>
         <Link
           to="/login"
