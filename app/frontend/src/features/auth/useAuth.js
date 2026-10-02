@@ -1,5 +1,8 @@
+// ! built-in imports
 import { useState, useEffect } from "react";
-import { api, setSessionExpiredHandler } from "../../api/client";
+
+// ! internal imports
+import { api, setSessionExpiredHandler } from "../../api/client.js";
 
 export function useAuth() {
   const [user, setUser] = useState(null);
