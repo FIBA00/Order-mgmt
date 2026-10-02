@@ -5,6 +5,7 @@ import { useAuth } from "./features/auth/useAuth.js";
 import LoginPage from "./features/auth/pages/Login.jsx";
 import SignUpPage from "./features/auth/pages/SignUp.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
+import MenuManagementPage from "./pages/MenuManagementPage.jsx";
 import Homepage from "./pages/Homepage.jsx";
 
 export default function AppRouter() {
@@ -29,6 +30,16 @@ export default function AppRouter() {
         element={
           user ? (
             <DashboardPage user={user} onLogout={logout} />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+      <Route
+        path="/menu"
+        element={
+          user ? (
+            <MenuManagementPage user={user} onLogout={logout} />
           ) : (
             <Navigate to="/login" replace />
           )

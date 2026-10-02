@@ -13,7 +13,8 @@ const STORAGE_KEYS = {
   MENU: "restaurant_menu_cache",
   ORDERS: "restaurant_orders_cache",
   QUEUE: "restaurant_sync_queue",
-  TOKEN: "token"
+  TOKEN: "token",
+  USER: "restaurant_user"
 };
 
 function getStored(key, fallback = []) {
@@ -63,6 +64,7 @@ function httpApi() {
     if (response.status === 401) {
       token = null;
       localStorage.removeItem(STORAGE_KEYS.TOKEN);
+      localStorage.removeItem(STORAGE_KEYS.USER);
       onSessionExpired();
     }
 
@@ -118,11 +120,33 @@ function httpApi() {
         });
         token = result.token;
         if (token) localStorage.setItem(STORAGE_KEYS.TOKEN, token);
-        return result.user || result.data;
+        const userObj = result.user || result.data;
+        if (userObj) {
+          localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userObj));
+        }
+        return userObj;
       },
       async logout() {
         token = null;
         localStorage.removeItem(STORAGE_KEYS.TOKEN);
+        localStorage.removeItem(STORAGE_KEYS.USER);
+      },
+      async me() {
+        if (!token) {
+          const stored = localStorage.getItem(STORAGE_KEYS.USER);
+          return stored ? JSON.parse(stored) : null;
+        }
+        try {
+          const res = await request("/api/auth/me");
+          const userObj = res.user || res.data;
+          if (userObj) {
+            localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userObj));
+          }
+          return userObj;
+        } catch {
+          const stored = localStorage.getItem(STORAGE_KEYS.USER);
+          return stored ? JSON.parse(stored) : null;
+        }
       }
     },
 
@@ -146,6 +170,24 @@ function httpApi() {
         const current = getStored(STORAGE_KEYS.MENU, []);
         setStored(STORAGE_KEYS.MENU, [item, ...current]);
         return item;
+      },
+      update: async (id, input) => {
+        try {
+          const res = await request(`/api/menu/${id}`, {
+            method: "PATCH",
+            body: JSON.stringify(input)
+          });
+          const item = res.data ?? res.item ?? res;
+          const current = getStored(STORAGE_KEYS.MENU, []);
+          const updated = current.map(m => (m.id === id ? { ...m, ...item } : m));
+          setStored(STORAGE_KEYS.MENU, updated);
+          return item;
+        } catch {
+          const current = getStored(STORAGE_KEYS.MENU, []);
+          const updated = current.map(m => (m.id === id ? { ...m, ...input } : m));
+          setStored(STORAGE_KEYS.MENU, updated);
+          return { id, ...input };
+        }
       },
       delete: async id => {
         await request(`/api/menu/${id}`, { method: "DELETE" });
@@ -275,10 +317,32 @@ function desktopApi() {
   }
 
   return {
-    auth: window.desktopAPI.auth,
+    auth: {
+      login: async (...args) => {
+        const user = await window.desktopAPI.auth.login(...args);
+        if (user) {
+          localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+        }
+        return user;
+      },
+      logout: async () => {
+        localStorage.removeItem(STORAGE_KEYS.USER);
+        if (window.desktopAPI.auth?.logout) {
+          await window.desktopAPI.auth.logout();
+        }
+      },
+      me: async () => {
+        if (window.desktopAPI.auth?.me) {
+          return await window.desktopAPI.auth.me();
+        }
+        const raw = localStorage.getItem(STORAGE_KEYS.USER);
+        return raw ? JSON.parse(raw) : null;
+      }
+    },
     menu: {
       list: guard(window.desktopAPI.menu.list),
       create: guard(window.desktopAPI.menu.create),
+      update: guard(window.desktopAPI.menu.update || (async (id, data) => ({ id, ...data }))),
       delete: guard(window.desktopAPI.menu.delete)
     },
     orders: {

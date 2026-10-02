@@ -1,12 +1,15 @@
 {
   "name": "@restaurant/desktop",
   "version": "0.1.0",
+  "description": "Restaurant & Cafe Order Management Desktop Application",
+  "author": "Restaurant Order Management Team",
   "private": true,
   "main": "src/main.js",
   "scripts": {
     "dev": "electron .",
     "start": "electron .",
-    "package": "electron-builder --dir",
+    "package": "electron-builder --dir && node scripts/inject-native.js",
+    "test": "node --test 'test/**/*.test.js'",
     "make": "electron-builder",
     "dist": "electron-builder --publish never"
   },
@@ -24,6 +27,8 @@
   "build": {
     "appId": "com.desktopapprevisited.restaurant",
     "productName": "Restaurant Order Manager",
+    "electronVersion": "39.8.10",
+    "npmRebuild": false,
     "asar": true,
     "directories": {
       "output": "dist"
@@ -45,13 +50,14 @@
     "extraMetadata": {
       "name": "restaurant-order-manager"
     },
+    "linux": {
+      "target": ["dir"]
+    },
     "win": {
       "target": [
         {
           "target": "nsis",
-          "arch": [
-            "x64"
-          ]
+          "arch": ["x64"]
         }
       ]
     },

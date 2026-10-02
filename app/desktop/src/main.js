@@ -1,229 +1,56 @@
-const path = require("node:path");
-const { app, BrowserWindow, ipcMain, dialog, shell } = require("electron");
-const { autoUpdater } = require("electron-updater");
-const { z } = require("zod");
+const { app, BrowserWindow, crashReporter } = require("electron");
+const { initFileLogger } = require("./logger.js");
+const { getBackendSrcDir, getDatabasePath } = require("./config/app.config.js");
+const { initLocalDatabase } = require("./db/local-db.js");
+const { registerAllIpc } = require("./ipc/index.js");
+const { createMainWindow } = require("./window/main-window.js");
+const { configureAutoUpdater, checkForUpdatesIfPackaged } = require("./updater/auto-updater.js");
 
-// In dev, this file lives at app/desktop/src/main.js and the backend source
-// is a sibling package two levels up (app/backend/src). electron-builder
-// can't glob files from outside app/desktop's own directory (see
-// package.json's build.files), so the packaged build instead copies
-// ../backend/src into the asar at backend/src — one level up from this
-// file, not two. Same story for the frontend's built assets.
-const backendSrcDir = app.isPackaged
-  ? path.join(__dirname, "..", "backend", "src")
-  : path.join(__dirname, "..", "..", "backend", "src");
+// Initialize persistent home directory logging
+initFileLogger(app);
 
-const { openDatabase } = require(path.join(backendSrcDir, "db"));
-const { createServices } = require(path.join(backendSrcDir, "services"));
+// Enable local minidump recording
+try {
+  crashReporter.start({ submitURL: "", uploadToServer: false });
+} catch {}
 
-function getFrontendIndexPath() {
-  return app.isPackaged
-    ? path.join(__dirname, "..", "frontend", "dist", "index.html")
-    : path.join(__dirname, "..", "..", "frontend", "dist", "index.html");
-}
+let dbInstance = null;
 
-let mainWindow;
-let services;
-let db;
+app
+  .whenReady()
+  .then(() => {
+    // Initialize local SQLite database and services with first-run auto-seeding
+    const backendSrcDir = getBackendSrcDir(app.isPackaged);
+    const dbPath = getDatabasePath(app.getPath("userData"));
+    const { db, services } = initLocalDatabase(backendSrcDir, dbPath);
+    dbInstance = db;
 
-// The renderer is untrusted content (same as a browser tab). Unlike the HTTP
-// API, IPC has no bearer token, so the main process itself tracks who is
-// logged in and every handler (other than auth:login) must go through
-// requireAuth()/requireAdmin() below. Never trust a userId/role sent from
-// the renderer.
-let currentUser = null;
+    // Register domain IPC handlers
+    registerAllIpc(services);
 
-function requireAuth() {
-  if (!currentUser) {
-    throw new Error("Authentication required");
-  }
-  return currentUser;
-}
+    // Create UI Window and updater
+    createMainWindow();
+    configureAutoUpdater();
+    checkForUpdatesIfPackaged(app.isPackaged);
 
-function requireAdmin() {
-  const user = requireAuth();
-  if (user.role !== "admin") {
-    throw new Error("Admin access required");
-  }
-  return user;
-}
-
-function getDatabasePath() {
-  return path.join(app.getPath("userData"), "data", "restaurant.sqlite");
-}
-
-function createLocalServices() {
-  db = openDatabase(getDatabasePath());
-  services = createServices(db);
-}
-
-function registerIpc() {
-  ipcMain.handle("auth:login", (_event, credentials) => {
-    const input = z.object({
-      username: z.string().min(1),
-      password: z.string().min(1)
-    }).parse(credentials);
-
-    const user = services.auth.login(input.username, input.password);
-    currentUser = user;
-    return user;
-  });
-
-  ipcMain.handle("auth:logout", () => {
-    currentUser = null;
-    return { ok: true };
-  });
-
-  ipcMain.handle("auth:me", () => requireAuth());
-
-  ipcMain.handle("menu:list", () => {
-    requireAuth();
-    return services.menu.list();
-  });
-
-  ipcMain.handle("menu:create", (_event, input) => {
-    requireAdmin();
-    const parsed = z.object({
-      name: z.string().min(1),
-      priceCents: z.number().int().nonnegative()
-    }).parse(input);
-    return services.menu.create(parsed.name, parsed.priceCents);
-  });
-
-  ipcMain.handle("orders:list", () => {
-    requireAuth();
-    return services.orders.list();
-  });
-
-  ipcMain.handle("orders:create", (_event, input) => {
-    const user = requireAuth();
-    const parsed = z.object({
-      items: z.array(z.object({
-        menuItemId: z.number().int(),
-        quantity: z.number().int().positive()
-      })).min(1)
-    }).parse(input);
-
-    // userId always comes from the tracked session, never from the renderer.
-    return services.orders.create(user.id, parsed.items);
-  });
-
-  ipcMain.handle("orders:set-status", (_event, input) => {
-    requireAuth();
-    const parsed = z.object({
-      id: z.number().int(),
-      status: z.enum(["open", "paid", "cancelled"])
-    }).parse(input);
-    services.orders.setStatus(parsed.id, parsed.status);
-    return { ok: true };
-  });
-
-  ipcMain.handle("dashboard:today", () => {
-    requireAuth();
-    return services.dashboard.today();
-  });
-
-  ipcMain.handle("app:get-info", () => ({
-    version: app.getVersion(),
-    userDataPath: app.getPath("userData")
-  }));
-
-  ipcMain.handle("app:check-for-updates", async () => {
-    if (!app.isPackaged) {
-      return { status: "development" };
-    }
-
-    try {
-      const result = await autoUpdater.checkForUpdates();
-      return {
-        status: result?.updateInfo?.version
-          ? "update-check-complete"
-          : "no-update"
-      };
-    } catch (error) {
-      return { status: "failed", error: error.message };
-    }
-  });
-}
-
-function createWindow() {
-  mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    minWidth: 960,
-    minHeight: 640,
-    webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
-      contextIsolation: true,
-      nodeIntegration: false,
-      sandbox: false
-    }
-  });
-
-  const devUrl = process.env.VITE_DEV_SERVER_URL;
-
-  if (devUrl) {
-    mainWindow.loadURL(devUrl);
-  } else {
-    mainWindow.loadFile(getFrontendIndexPath());
-  }
-
-  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url);
-    return { action: "deny" };
-  });
-}
-
-function configureUpdater() {
-  autoUpdater.autoDownload = false;
-
-  autoUpdater.on("update-available", () => {
-    dialog.showMessageBox(mainWindow, {
-      type: "info",
-      title: "Update available",
-      message: "A new version is available. Download it now?"
-    }).then(({ response }) => {
-      if (response === 0) autoUpdater.downloadUpdate();
+    app.on("activate", () => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        createMainWindow();
+      }
     });
+  })
+  .catch(err => {
+    console.error("Electron startup error:", err);
   });
-
-  autoUpdater.on("update-downloaded", () => {
-    dialog.showMessageBox(mainWindow, {
-      type: "info",
-      title: "Update ready",
-      message: "The update is downloaded. Restart and install it now?"
-    }).then(({ response }) => {
-      if (response === 0) autoUpdater.quitAndInstall();
-    });
-  });
-
-  autoUpdater.on("error", error => {
-    console.error("Auto update error:", error);
-  });
-}
-
-app.whenReady().then(() => {
-  createLocalServices();
-  registerIpc();
-  createWindow();
-  configureUpdater();
-
-  if (app.isPackaged) {
-    // Update checking is deliberately non-blocking.
-    autoUpdater.checkForUpdates().catch(error => {
-      console.error("Initial update check failed:", error.message);
-    });
-  }
-
-  app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
-});
 
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") app.quit();
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
 });
 
 app.on("before-quit", () => {
-  db?.close();
+  if (dbInstance) {
+    dbInstance.close();
+  }
 });

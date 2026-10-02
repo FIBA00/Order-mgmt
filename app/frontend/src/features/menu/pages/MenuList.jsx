@@ -1,16 +1,19 @@
 import { useState, useMemo } from "react";
 import { money } from "../../../utils/money.js";
+import EditMenuItemModal from "./EditMenuItemModal.jsx";
 
 export default function MenuList({
   items = [],
   onSelectItem,
   isAdmin = false,
   onCreateItem,
+  onEditItem,
   onDeleteItem
 }) {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [showForm, setShowForm] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
   const [name, setName] = useState("");
   const [priceStr, setPriceStr] = useState("");
   const [category, setCategory] = useState("Food");
@@ -196,18 +199,35 @@ export default function MenuList({
                 <span className="font-semibold text-stone-900 dark:text-stone-100 text-sm leading-tight">
                   {item.name}
                 </span>
-                {isAdmin && onDeleteItem && (
-                  <button
-                    type="button"
-                    title="Delete item"
-                    onClick={e => {
-                      e.stopPropagation();
-                      onDeleteItem(item.id);
-                    }}
-                    className="opacity-0 group-hover:opacity-100 text-stone-300 dark:text-stone-600 hover:text-red-500 dark:hover:text-red-400 text-xs px-1 rounded transition"
-                  >
-                    ✕
-                  </button>
+                {isAdmin && (
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
+                    {onEditItem && (
+                      <button
+                        type="button"
+                        title="Edit item"
+                        onClick={e => {
+                          e.stopPropagation();
+                          setEditingItem(item);
+                        }}
+                        className="text-stone-400 hover:text-amber-500 dark:hover:text-amber-400 text-xs px-1 rounded transition"
+                      >
+                        ✎
+                      </button>
+                    )}
+                    {onDeleteItem && (
+                      <button
+                        type="button"
+                        title="Delete item"
+                        onClick={e => {
+                          e.stopPropagation();
+                          onDeleteItem(item.id);
+                        }}
+                        className="text-stone-400 hover:text-red-500 dark:hover:text-red-400 text-xs px-1 rounded transition"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
               <span className="text-amber-600 dark:text-amber-400 text-sm mt-1.5 font-bold">
@@ -221,6 +241,14 @@ export default function MenuList({
             </div>
           ))}
         </div>
+      )}
+
+      {editingItem && (
+        <EditMenuItemModal
+          item={editingItem}
+          onSave={onEditItem}
+          onClose={() => setEditingItem(null)}
+        />
       )}
     </div>
   );
