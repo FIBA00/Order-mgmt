@@ -163,7 +163,7 @@ export default function AdminConsolePage({ user, onLogout }) {
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2.5">
             <span className="w-7 h-7 rounded-xl bg-amber-600 dark:bg-amber-500 text-white flex items-center justify-center text-sm font-bold shadow-2xs">
-              ☕
+              <Coffee className="w-4 h-4" />
             </span>
             <h1 className="text-base font-bold text-stone-900 dark:text-stone-100 tracking-tight">
               Order Manager
@@ -174,27 +174,27 @@ export default function AdminConsolePage({ user, onLogout }) {
           <nav className="flex items-center gap-1 bg-stone-100 dark:bg-stone-800 p-1 rounded-xl text-xs font-medium">
             <Link
               to="/dashboard"
-              className="px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
             >
-              📋 POS Register
+              <ClipboardList className="w-3.5 h-3.5" /> POS Register
             </Link>
             <Link
               to="/menu"
-              className="px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
             >
-              ☕ Menu Catalog
+              <Coffee className="w-3.5 h-3.5" /> Menu Catalog
             </Link>
             <Link
               to="/finances"
-              className="px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
             >
-              💰 Finance
+              <CircleDollarSign className="w-3.5 h-3.5" /> Finance
             </Link>
             <Link
               to="/admin"
-              className="px-3 py-1.5 rounded-lg bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs transition font-semibold"
             >
-              👥 Staff & Admin
+              <Users className="w-3.5 h-3.5" /> Staff & Admin
             </Link>
           </nav>
         </div>
@@ -207,7 +207,7 @@ export default function AdminConsolePage({ user, onLogout }) {
             className="flex items-center justify-center w-8 h-8 rounded-full bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 text-sm transition"
             title={`Switch to ${isDark ? "Light" : "Dark"} mode`}
           >
-            {isDark ? "☀️" : "🌙"}
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
 
           {/* Consolidated User Menu Circular Button */}
@@ -223,9 +223,9 @@ export default function AdminConsolePage({ user, onLogout }) {
             <span>{message}</span>
             <button
               onClick={() => setMessage("")}
-              className="hover:opacity-75 font-bold ml-4"
+              className="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 ml-4"
             >
-              ✕
+              <X className="w-3.5 h-3.5" />
             </button>
           </div>
         )}
@@ -234,23 +234,23 @@ export default function AdminConsolePage({ user, onLogout }) {
         <div className="flex items-center gap-2 border-b border-stone-200 dark:border-stone-800 pb-2">
           <button
             onClick={() => setActiveTab("staff")}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition ${
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-medium transition ${
               activeTab === "staff"
                 ? "bg-amber-600 text-white shadow-2xs"
                 : "bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800"
             }`}
           >
-            👥 Staff Accounts ({staffList.length})
+            <Users className="w-3.5 h-3.5" /> Staff Accounts ({staffList.length})
           </button>
           <button
             onClick={() => setActiveTab("store")}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition ${
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-medium transition ${
               activeTab === "store"
                 ? "bg-amber-600 text-white shadow-2xs"
                 : "bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800"
             }`}
           >
-            🏪 Store Profile & Tax
+            <Store className="w-3.5 h-3.5" /> Store Profile & Tax
           </button>
         </div>
 
