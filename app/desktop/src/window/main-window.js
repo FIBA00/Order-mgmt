@@ -79,6 +79,7 @@ function createMainWindow() {
   });
 
   setupApplicationMenu(mainWindow);
+  mainWindow.setMenuBarVisibility(false);
 
   const devUrl = process.env.VITE_DEV_SERVER_URL;
   const targetPath = devUrl || getFrontendIndexPath(app.isPackaged);
@@ -101,6 +102,16 @@ function createMainWindow() {
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: "deny" };
+  });
+
+  mainWindow.webContents.on("will-navigate", (event, navigationUrl) => {
+    const isAllowed =
+      (devUrl && navigationUrl.startsWith(devUrl)) ||
+      navigationUrl.startsWith("file://");
+    if (!isAllowed) {
+      event.preventDefault();
+      shell.openExternal(navigationUrl);
+    }
   });
 
   mainWindow.webContents.on("console-message", (event, level, message, line, sourceId) => {

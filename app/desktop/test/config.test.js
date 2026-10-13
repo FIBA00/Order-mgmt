@@ -18,8 +18,8 @@ test("Desktop Configuration Module", async (t) => {
       `Backend directory must exist: ${backendDir}`,
     );
     assert.ok(
-      fs.existsSync(path.join(backendDir, "db")),
-      "db directory must exist under backendSrcDir",
+      fs.existsSync(path.join(backendDir, "database")),
+      "database directory must exist under backendSrcDir",
     );
     assert.ok(
       fs.existsSync(path.join(backendDir, "services")),

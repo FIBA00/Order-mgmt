@@ -56,10 +56,21 @@ test("Dashboard Module", async (t) => {
       });
       const initialData = (await initialRes.json()).dashboard;
 
-      // 2. Get an active menu item
+      // 2. Get an active menu item (create one if empty)
       const menuRes = await fetch(`${baseUrl}/api/menu`);
       const menuBody = await menuRes.json();
-      const item = menuBody.data[0];
+      let item = menuBody.data?.[0];
+      if (!item) {
+        const createRes = await fetch(`${baseUrl}/api/menu`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({ name: `Coffee_${Date.now()}`, priceCents: 350 }),
+        });
+        item = (await createRes.json()).data;
+      }
 
       // 3. Create open order (should increment orderCount, but NOT revenue)
       const orderRes = await fetch(`${baseUrl}/api/orders`, {

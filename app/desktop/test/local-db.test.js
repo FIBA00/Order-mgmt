@@ -7,6 +7,7 @@ const {
   initLocalDatabase,
   seedDatabaseIfEmpty,
 } = require("../src/db/local-db.js");
+const { count } = require("drizzle-orm");
 const { getBackendSrcDir } = require("../src/config/app.config.js");
 
 test("Desktop Local Database & Auto-Seeder Module", async (t) => {
@@ -37,13 +38,13 @@ test("Desktop Local Database & Auto-Seeder Module", async (t) => {
       assert.ok(fs.existsSync(testDbPath), "database file must exist on disk");
 
       // Check seeded admin user
-      const users = db.prepare("SELECT * FROM users").all();
+      const users = db.select().from(db.schema.users).all();
       assert.equal(users.length, 1);
       assert.equal(users[0].username, "admin");
       assert.equal(users[0].role, "admin");
 
       // Check seeded menu items
-      const menuItems = db.prepare("SELECT * FROM menu_items").all();
+      const menuItems = db.select().from(db.schema.menuItems).all();
       assert.equal(menuItems.length, 5);
       const names = menuItems.map((m) => m.name);
       assert.ok(names.includes("Espresso"));
@@ -56,15 +57,17 @@ test("Desktop Local Database & Auto-Seeder Module", async (t) => {
     () => {
       seedDatabaseIfEmpty(db);
 
-      const userCount = db
-        .prepare("SELECT COUNT(*) AS count FROM users")
-        .get().count;
-      const menuCount = db
-        .prepare("SELECT COUNT(*) AS count FROM menu_items")
-        .get().count;
+      const userRow = db
+        .select({ count: count() })
+        .from(db.schema.users)
+        .get();
+      const menuRow = db
+        .select({ count: count() })
+        .from(db.schema.menuItems)
+        .get();
 
-      assert.equal(userCount, 1);
-      assert.equal(menuCount, 5);
+      assert.equal(userRow.count, 1);
+      assert.equal(menuRow.count, 5);
     },
   );
 
@@ -82,6 +85,22 @@ test("Desktop Local Database & Auto-Seeder Module", async (t) => {
     const list = services.menu.list();
     assert.ok(Array.isArray(list));
     assert.equal(list.length, 5);
+    const espresso = list.find((i) => i.name === "Espresso");
+    assert.ok(espresso);
+    assert.equal(espresso.category, "Coffee");
+  });
+
+  await t.test("creates and updates menu item with custom category", () => {
+    const created = services.menu.create("Matcha Latte", 550, "Specialty");
+    assert.ok(created);
+    assert.equal(created.name, "Matcha Latte");
+    assert.equal(created.category, "Specialty");
+
+    const updated = services.menu.update(created.id, { category: "Seasonal Drinks" });
+    assert.ok(updated);
+    assert.equal(updated.category, "Seasonal Drinks");
+
+    services.menu.delete(created.id);
   });
 
   await t.test(

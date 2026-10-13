@@ -128,10 +128,23 @@ test("Desktop IPC Handlers & Security Guards", async (t) => {
     assert.ok(stats.revenueCents > 0);
   });
 
-  await t.test("retrieves application metadata via app IPC", async () => {
+  await t.test("retrieves application metadata and handles updates via app IPC", async () => {
     const info = invoke("app:get-info");
     assert.equal(info.version, "0.1.0");
     assert.ok(info.userDataPath);
+
+    const checkResult = await invoke("app:check-for-updates");
+    assert.equal(checkResult.status, "development");
+
+    const installResult = invoke("app:install-update");
+    assert.deepEqual(installResult, { success: true });
+  });
+
+  await t.test("controls window state via window IPC", async () => {
+    assert.equal(invoke("window:minimize"), true);
+    assert.equal(typeof invoke("window:maximize"), "boolean");
+    assert.equal(invoke("window:close"), true);
+    assert.equal(typeof invoke("window:is-maximized"), "boolean");
   });
 
   await t.test(

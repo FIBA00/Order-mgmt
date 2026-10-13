@@ -1,22 +1,30 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
+import {
+  Coffee,
+  ClipboardList,
+  CircleDollarSign,
+  Users,
+  Sun,
+  Moon,
+  X,
+} from "lucide-react";
 
 // ── Internal imports ──────────────────────────────────────────────────────────
 import { api, isDesktop } from "../api/client.js";
-import { money } from "../utils/money.js";
 import { useTheme } from "../utils/theme.js";
 
 import MenuList from "../features/menu/pages/MenuList.jsx";
 import OrderList from "../features/orders/pages/OrderList.jsx";
 import CurrentTicket from "../features/orders/pages/CurrentTicket.jsx";
 import OrderDetailsModal from "../features/orders/pages/OrderDetailsModal.jsx";
+import UserMenu from "../features/common/UserMenu.jsx";
 
 export default function DashboardPage({ user, onLogout }) {
   const { theme, toggleTheme, isDark } = useTheme();
 
   const [menu, setMenu] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [stats, setStats] = useState(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [ticketItems, setTicketItems] = useState([]);
@@ -33,14 +41,12 @@ export default function DashboardPage({ user, onLogout }) {
 
   const refresh = useCallback(async () => {
     try {
-      const [items, orderList, today] = await Promise.all([
+      const [items, orderList] = await Promise.all([
         api.menu.list(),
         api.orders.list(),
-        api.dashboard.today(),
       ]);
       setMenu(items);
       setOrders(orderList);
-      setStats(today);
       if (api.sync) {
         setPendingSyncCount(api.sync.getPendingCount());
       }
@@ -202,16 +208,6 @@ export default function DashboardPage({ user, onLogout }) {
     }
   }
 
-  // Derived metrics
-  const openOrdersCount = useMemo(() => {
-    return orders.filter((o) => o.status === "open").length;
-  }, [orders]);
-
-  const averageOrderValue = useMemo(() => {
-    if (!stats || !stats.orderCount) return 0;
-    return Math.round(stats.revenueCents / stats.orderCount);
-  }, [stats]);
-
   return (
     <div className="min-h-screen bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 flex flex-col transition-colors duration-150">
       {/* Header */}
@@ -219,7 +215,7 @@ export default function DashboardPage({ user, onLogout }) {
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2.5">
             <span className="w-7 h-7 rounded-xl bg-amber-600 dark:bg-amber-500 text-white flex items-center justify-center text-sm font-bold shadow-2xs">
-              ☕
+              <Coffee className="w-4 h-4" />
             </span>
             <h1 className="text-base font-bold tracking-tight text-stone-900 dark:text-stone-100">
               Order Manager
@@ -230,16 +226,32 @@ export default function DashboardPage({ user, onLogout }) {
           <nav className="flex items-center gap-1 bg-stone-100 dark:bg-stone-800 p-1 rounded-xl text-xs font-medium">
             <Link
               to="/dashboard"
-              className="px-3 py-1.5 rounded-lg bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs transition font-semibold"
             >
-              📋 POS Register
+              <ClipboardList className="w-3.5 h-3.5" /> POS Register
             </Link>
-            <Link
-              to="/menu"
-              className="px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
-            >
-              ☕ Menu Catalog
-            </Link>
+            {user?.role === "admin" && (
+              <>
+                <Link
+                  to="/menu"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
+                >
+                  <Coffee className="w-3.5 h-3.5" /> Menu Catalog
+                </Link>
+                <Link
+                  to="/finances"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
+                >
+                  <CircleDollarSign className="w-3.5 h-3.5" /> Finance
+                </Link>
+                <Link
+                  to="/admin"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
+                >
+                  <Users className="w-3.5 h-3.5" /> Staff & Admin
+                </Link>
+              </>
+            )}
           </nav>
 
           <span
@@ -270,73 +282,25 @@ export default function DashboardPage({ user, onLogout }) {
           )}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           {/* Theme Toggle Button */}
           <button
             onClick={toggleTheme}
             aria-label="Toggle dark/light theme"
-            className="flex items-center justify-center w-8 h-8 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 text-sm transition"
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 text-sm transition"
             title={`Switch to ${isDark ? "Light" : "Dark"} mode`}
           >
-            {isDark ? "☀️" : "🌙"}
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
 
-          <span className="text-xs text-stone-500 dark:text-stone-400">
-            {user?.username}
-            <span className="ml-1.5 text-[10px] bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 px-2 py-0.5 rounded-full uppercase font-medium">
-              {user?.role}
-            </span>
-          </span>
-
-          <button
-            onClick={onLogout}
-            className="text-xs text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition"
-          >
-            Log out
-          </button>
+          {/* Consolidated User Menu Circular Button */}
+          <UserMenu user={user} onLogout={onLogout} />
         </div>
+
       </header>
 
       {/* Main Body */}
       <main className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 flex flex-col gap-6 flex-1">
-        {/* Metric Cards Banner */}
-        {stats && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
-            <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-4 shadow-xs">
-              <p className="text-xs font-medium text-stone-400 dark:text-stone-500">
-                Orders Today
-              </p>
-              <p className="text-2xl font-bold text-stone-900 dark:text-stone-100 mt-1">
-                {stats.orderCount ?? 0}
-              </p>
-            </div>
-            <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-4 shadow-xs">
-              <p className="text-xs font-medium text-stone-400 dark:text-stone-500">
-                Revenue Today
-              </p>
-              <p className="text-2xl font-bold text-amber-600 dark:text-amber-500 mt-1">
-                {money(stats.revenueCents ?? 0)}
-              </p>
-            </div>
-            <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-4 shadow-xs">
-              <p className="text-xs font-medium text-stone-400 dark:text-stone-500">
-                Avg Ticket Value
-              </p>
-              <p className="text-2xl font-bold text-stone-800 dark:text-stone-200 mt-1">
-                {money(averageOrderValue)}
-              </p>
-            </div>
-            <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-4 shadow-xs">
-              <p className="text-xs font-medium text-stone-400 dark:text-stone-500">
-                Active Open Tickets
-              </p>
-              <p className="text-2xl font-bold text-amber-600 dark:text-amber-500 mt-1">
-                {openOrdersCount}
-              </p>
-            </div>
-          </div>
-        )}
-
         {/* Feedback Alert Banner */}
         {message && (
           <div className="flex items-center justify-between text-xs text-amber-900 dark:text-amber-200 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 rounded-xl px-4 py-2.5">
@@ -345,7 +309,7 @@ export default function DashboardPage({ user, onLogout }) {
               onClick={() => setMessage("")}
               className="text-amber-400 hover:text-amber-600 dark:hover:text-amber-200 ml-3"
             >
-              ✕
+              <X className="w-3.5 h-3.5" />
             </button>
           </div>
         )}
@@ -362,12 +326,14 @@ export default function DashboardPage({ user, onLogout }) {
                   · Click item to add to ticket
                 </span>
               </div>
-              <Link
-                to="/menu"
-                className="text-xs text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 font-medium transition"
-              >
-                Manage Menu Catalog →
-              </Link>
+              {user?.role === "admin" && (
+                <Link
+                  to="/menu"
+                  className="text-xs text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 font-medium transition"
+                >
+                  Manage Menu Catalog →
+                </Link>
+              )}
             </div>
             {loading ? (
               <p className="text-xs text-stone-400 py-6">Loading menu items…</p>
@@ -410,6 +376,7 @@ export default function DashboardPage({ user, onLogout }) {
           ) : (
             <OrderList
               orders={orders}
+              menuItems={menu}
               onSetStatus={handleSetStatus}
               onSelectOrder={setSelectedOrder}
             />

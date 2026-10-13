@@ -1,26 +1,45 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
+import {
+  Coffee,
+  ClipboardList,
+  CircleDollarSign,
+  Users,
+  Sun,
+  Moon,
+  Lock,
+  Utensils,
+  Pencil,
+  Trash2,
+  X,
+} from "lucide-react";
 
 import { api, isDesktop } from "../api/client.js";
 import { money } from "../utils/money.js";
 import { useTheme } from "../utils/theme.js";
 import EditMenuItemModal from "../features/menu/pages/EditMenuItemModal.jsx";
+import ConfirmModal from "../features/common/ConfirmModal.jsx";
+import UserMenu from "../features/common/UserMenu.jsx";
 
 export default function MenuManagementPage({ user, onLogout }) {
   const { toggleTheme, isDark } = useTheme();
+  const isAdmin = user?.role === "admin";
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [editingItem, setEditingItem] = useState(null);
+  const [deletingItem, setDeletingItem] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [message, setMessage] = useState("");
 
   // Create form state
   const [newName, setNewName] = useState("");
   const [newPrice, setNewPrice] = useState("");
-  const [newCategory, setNewCategory] = useState("Food");
+  const [newCategory, setNewCategory] = useState("Coffee");
+  const [isNewCustom, setIsNewCustom] = useState(false);
+  const [newCustomCategory, setNewCustomCategory] = useState("");
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState("");
 
@@ -83,16 +102,23 @@ export default function MenuManagementPage({ user, onLogout }) {
       return;
     }
 
+    const finalCategory = isNewCustom
+      ? newCustomCategory.trim() || "Food"
+      : newCategory.trim() || "Food";
+
     setCreating(true);
     setCreateError("");
     try {
       await api.menu.create({
         name: newName.trim(),
         priceCents: Math.round(priceNum * 100),
-        category: newCategory.trim() || "Food",
+        category: finalCategory,
       });
       setNewName("");
       setNewPrice("");
+      setNewCategory("Coffee");
+      setIsNewCustom(false);
+      setNewCustomCategory("");
       setShowCreateModal(false);
       await loadMenu();
       setMessage(`Added menu item "${newName.trim()}".`);
@@ -115,15 +141,41 @@ export default function MenuManagementPage({ user, onLogout }) {
   }
 
   // Delete menu item
-  async function handleDelete(id, name) {
-    if (!window.confirm(`Are you sure you want to delete "${name}"?`)) return;
+  function handleDelete(id, name) {
+    setDeletingItem({ id, name });
+  }
+
+  async function confirmDeleteItem() {
+    if (!deletingItem) return;
     try {
-      await api.menu.delete(id);
+      await api.menu.delete(deletingItem.id);
       await loadMenu();
-      setMessage(`Deleted "${name}".`);
+      setMessage(`Deleted "${deletingItem.name}".`);
     } catch (err) {
       setMessage(`Delete error: ${err.message}`);
     }
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-stone-50 dark:bg-stone-950 flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-8 max-w-md w-full text-center space-y-4 shadow-xl">
+          <span className="text-4xl">🔒</span>
+          <h2 className="text-lg font-bold text-stone-900 dark:text-stone-100">
+            Access Restricted
+          </h2>
+          <p className="text-xs text-stone-500 dark:text-stone-400">
+            Menu catalog management requires administrator privileges.
+          </p>
+          <Link
+            to="/dashboard"
+            className="inline-block bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-4 py-2 rounded-xl transition"
+          >
+            ← Return to POS Register
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -154,34 +206,40 @@ export default function MenuManagementPage({ user, onLogout }) {
             >
               ☕ Menu Catalog
             </Link>
+            {user?.role === "admin" && (
+              <>
+                <Link
+                  to="/finances"
+                  className="px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
+                >
+                  💰 Finance
+                </Link>
+                <Link
+                  to="/admin"
+                  className="px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
+                >
+                  👥 Staff & Admin
+                </Link>
+              </>
+            )}
           </nav>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
             aria-label="Toggle dark/light theme"
-            className="flex items-center justify-center w-8 h-8 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 text-sm transition"
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 text-sm transition"
             title={`Switch to ${isDark ? "Light" : "Dark"} mode`}
           >
             {isDark ? "☀️" : "🌙"}
           </button>
 
-          <span className="text-xs text-stone-500 dark:text-stone-400">
-            {user?.username}
-            <span className="ml-1.5 text-[10px] bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 px-2 py-0.5 rounded-full uppercase font-medium">
-              {user?.role}
-            </span>
-          </span>
-
-          <button
-            onClick={onLogout}
-            className="text-xs text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition"
-          >
-            Log out
-          </button>
+          {/* Consolidated User Menu Circular Button */}
+          <UserMenu user={user} onLogout={onLogout} />
         </div>
+
       </header>
 
       {/* Main Content Area */}
@@ -198,8 +256,10 @@ export default function MenuManagementPage({ user, onLogout }) {
           </div>
 
           <button
+            disabled={!isAdmin}
             onClick={() => setShowCreateModal(true)}
-            className="inline-flex items-center justify-center gap-1.5 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white font-medium px-4 py-2 rounded-xl text-xs transition shadow-xs"
+            title={isAdmin ? "Add Menu Item" : "Admin permission required"}
+            className="inline-flex items-center justify-center gap-1.5 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white font-medium px-4 py-2 rounded-xl text-xs transition shadow-xs disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <span>+</span> Add Menu Item
           </button>
@@ -275,12 +335,14 @@ export default function MenuManagementPage({ user, onLogout }) {
                 Get started by adding your first food, drink, or dessert item to
                 the menu catalog.
               </p>
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white font-medium px-4 py-2 rounded-xl text-xs transition"
-              >
-                + Add First Item
-              </button>
+              {isAdmin && (
+                <button
+                  onClick={() => setShowCreateModal(true)}
+                  className="bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white font-medium px-4 py-2 rounded-xl text-xs transition"
+                >
+                  + Add First Item
+                </button>
+              )}
             </div>
           ) : !filteredItems.length ? (
             <div className="p-12 text-center text-xs text-stone-400 dark:text-stone-500">
@@ -296,9 +358,11 @@ export default function MenuManagementPage({ user, onLogout }) {
                     <th className="py-3 px-4 font-semibold">Category</th>
                     <th className="py-3 px-4 font-semibold">Price</th>
                     <th className="py-3 px-4 font-semibold">Status</th>
-                    <th className="py-3 px-4 font-semibold text-right">
-                      Actions
-                    </th>
+                    {isAdmin && (
+                      <th className="py-3 px-4 font-semibold text-right">
+                        Actions
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100 dark:divide-stone-800">
@@ -330,14 +394,18 @@ export default function MenuManagementPage({ user, onLogout }) {
                       <td className="py-3.5 px-4 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <button
+                            disabled={!isAdmin}
                             onClick={() => setEditingItem(item)}
-                            className="inline-flex items-center gap-1 text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-200 dark:border-amber-800 px-2.5 py-1 rounded-lg font-medium transition"
+                            title={isAdmin ? "Edit item" : "Admin permission required"}
+                            className="inline-flex items-center gap-1 text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-200 dark:border-amber-800 px-2.5 py-1 rounded-lg font-medium transition disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             ✎ Edit
                           </button>
                           <button
+                            disabled={!isAdmin}
                             onClick={() => handleDelete(item.id, item.name)}
-                            className="inline-flex items-center gap-1 text-xs text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/60 border border-red-200 dark:border-red-800 px-2.5 py-1 rounded-lg font-medium transition"
+                            title={isAdmin ? "Delete item" : "Admin permission required"}
+                            className="inline-flex items-center gap-1 text-xs text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/60 border border-red-200 dark:border-red-800 px-2.5 py-1 rounded-lg font-medium transition disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             🗑 Delete
                           </button>
@@ -353,7 +421,7 @@ export default function MenuManagementPage({ user, onLogout }) {
       </main>
 
       {/* Edit Item Modal */}
-      {editingItem && (
+      {isAdmin && editingItem && (
         <EditMenuItemModal
           item={editingItem}
           onSave={handleSaveEdit}
@@ -362,7 +430,7 @@ export default function MenuManagementPage({ user, onLogout }) {
       )}
 
       {/* Create New Item Modal */}
-      {showCreateModal && (
+      {isAdmin && showCreateModal && (
         <div
           className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4"
           onClick={(e) => {
@@ -418,15 +486,44 @@ export default function MenuManagementPage({ user, onLogout }) {
                   <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 mb-1">
                     Category
                   </label>
-                  <input
-                    type="text"
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value)}
-                    placeholder="Drinks, Food, Desserts"
+                  <select
+                    value={isNewCustom ? "Custom" : newCategory}
+                    onChange={(e) => {
+                      if (e.target.value === "Custom") {
+                        setIsNewCustom(true);
+                      } else {
+                        setIsNewCustom(false);
+                        setNewCategory(e.target.value);
+                      }
+                    }}
                     className="w-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  />
+                  >
+                    <option value="Coffee">Coffee</option>
+                    <option value="Tea">Tea</option>
+                    <option value="Cold Drinks">Cold Drinks</option>
+                    <option value="Bakery">Bakery</option>
+                    <option value="Sandwiches">Sandwiches</option>
+                    <option value="Desserts">Desserts</option>
+                    <option value="Custom">Custom…</option>
+                  </select>
                 </div>
               </div>
+
+              {isNewCustom && (
+                <div>
+                  <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 mb-1">
+                    Custom Category Name
+                  </label>
+                  <input
+                    type="text"
+                    value={newCustomCategory}
+                    onChange={(e) => setNewCustomCategory(e.target.value)}
+                    placeholder="Enter custom category name"
+                    className="w-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    required
+                  />
+                </div>
+              )}
 
               {createError && (
                 <p className="text-red-500 text-xs bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 p-2 rounded-xl">
@@ -453,6 +550,19 @@ export default function MenuManagementPage({ user, onLogout }) {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Confirm Delete Item Modal */}
+      {isAdmin && (
+        <ConfirmModal
+          isOpen={Boolean(deletingItem)}
+          title="Delete Menu Item"
+          message={`Are you sure you want to remove "${deletingItem?.name}" from the menu catalog?`}
+          confirmLabel="Delete Item"
+          variant="danger"
+          onConfirm={confirmDeleteItem}
+          onClose={() => setDeletingItem(null)}
+        />
       )}
     </div>
   );

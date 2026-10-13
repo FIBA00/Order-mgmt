@@ -8,15 +8,24 @@ import inputValidationBody from "../../middlewares/validation.middleware.js";
 import { isLoggedIn, isAdmin } from "../../middlewares/auth.middleware.js";
 
 import { loginSchema, signupSchema } from "./auth.schema.js";
+import createRateLimiter from "../../middlewares/rate-limit.middleware.js";
 
 const authRouter = express.Router();
 const repository = createAuthRepository({ db: database, schema });
 const service = createAuthService(repository);
 const controller = createAuthController(service);
 
-authRouter.post("/login", inputValidationBody(loginSchema), controller.login);
+const authLimiter = createRateLimiter({ windowMs: 60 * 1000, max: 20 });
+
+authRouter.post(
+  "/login",
+  authLimiter,
+  inputValidationBody(loginSchema),
+  controller.login,
+);
 authRouter.post(
   "/signup",
+  authLimiter,
   inputValidationBody(signupSchema),
   controller.signup,
 );

@@ -47,10 +47,22 @@ export function useAuth() {
     }
   }
 
+  async function signup(username, password, role = "cashier") {
+    try {
+      setError("");
+      const newUser = await api.auth.signup({ username, password, role });
+      setUser(newUser);
+      return newUser;
+    } catch (err) {
+      setError(err.message);
+      return null;
+    }
+  }
+
   async function logout() {
     await api.auth.logout();
     setUser(null);
   }
 
-  return { user, error, login, logout };
+  return { user, error, login, signup, logout };
 }

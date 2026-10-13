@@ -1,11 +1,29 @@
 import { useState, useEffect } from "react";
 
+const PRESET_CATEGORIES = [
+  "Coffee",
+  "Tea",
+  "Cold Drinks",
+  "Bakery",
+  "Sandwiches",
+  "Desserts",
+];
+
 export default function EditMenuItemModal({ item, onSave, onClose }) {
   const [name, setName] = useState(item?.name || "");
   const [priceStr, setPriceStr] = useState(
     item?.priceCents !== undefined ? (item.priceCents / 100).toFixed(2) : "",
   );
-  const [category, setCategory] = useState(item?.category || "Food");
+  const isInitialCustom = Boolean(
+    item?.category && !PRESET_CATEGORIES.includes(item.category),
+  );
+  const [isCustom, setIsCustom] = useState(isInitialCustom);
+  const [category, setCategory] = useState(
+    isInitialCustom ? "Coffee" : item?.category || "Coffee",
+  );
+  const [customCategory, setCustomCategory] = useState(
+    isInitialCustom ? item.category : "",
+  );
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -29,13 +47,17 @@ export default function EditMenuItemModal({ item, onSave, onClose }) {
       return;
     }
 
+    const finalCategory = isCustom
+      ? customCategory.trim() || "Food"
+      : category.trim() || "Food";
+
     setSubmitting(true);
     setError("");
     try {
       await onSave(item.id, {
         name: name.trim(),
         priceCents: Math.round(priceNum * 100),
-        category: category.trim() || "Food",
+        category: finalCategory,
       });
       onClose();
     } catch (err) {
@@ -100,15 +122,43 @@ export default function EditMenuItemModal({ item, onSave, onClose }) {
               <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 mb-1">
                 Category
               </label>
-              <input
-                type="text"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                placeholder="Drinks, Food"
+              <select
+                value={isCustom ? "Custom" : category}
+                onChange={(e) => {
+                  if (e.target.value === "Custom") {
+                    setIsCustom(true);
+                  } else {
+                    setIsCustom(false);
+                    setCategory(e.target.value);
+                  }
+                }}
                 className="w-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500"
-              />
+              >
+                {PRESET_CATEGORIES.map((preset) => (
+                  <option key={preset} value={preset}>
+                    {preset}
+                  </option>
+                ))}
+                <option value="Custom">Custom…</option>
+              </select>
             </div>
           </div>
+
+          {isCustom && (
+            <div>
+              <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 mb-1">
+                Custom Category Name
+              </label>
+              <input
+                type="text"
+                value={customCategory}
+                onChange={(e) => setCustomCategory(e.target.value)}
+                placeholder="Enter custom category"
+                className="w-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500"
+                required
+              />
+            </div>
+          )}
 
           {error && (
             <p className="text-red-500 text-xs bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 p-2 rounded-xl">

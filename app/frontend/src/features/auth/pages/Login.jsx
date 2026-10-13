@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { isDesktop } from "../../../api/client.js";
 import { useTheme } from "../../../utils/theme.js";
 
@@ -80,7 +81,16 @@ export default function LoginPage({ onLogin, error }) {
           </button>
         </form>
 
-        <div className="mt-6 pt-4 border-t border-stone-100 dark:border-stone-800 text-center">
+        <div className="mt-6 pt-4 border-t border-stone-100 dark:border-stone-800 text-center space-y-2">
+          <p className="text-xs text-stone-500 dark:text-stone-400">
+            Initial setup or new staff?{" "}
+            <Link
+              to="/signup"
+              className="text-amber-600 dark:text-amber-400 font-medium hover:underline ml-1"
+            >
+              Register here
+            </Link>
+          </p>
           <p className="text-xs text-stone-400 dark:text-stone-500">
             Demo credentials:{" "}
             <span className="font-mono text-stone-600 dark:text-stone-300">

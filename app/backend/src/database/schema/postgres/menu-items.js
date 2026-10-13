@@ -4,6 +4,7 @@ export const menuItems = pgTable("menu_items", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: text().notNull(),
   priceCents: integer("price_cents").notNull(),
+  category: text().notNull().default("Food"),
   active: boolean().notNull().default(true),
   createdAt: integer("created_at")
     .notNull()

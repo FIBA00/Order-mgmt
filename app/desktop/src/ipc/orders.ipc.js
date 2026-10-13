@@ -8,6 +8,11 @@ function registerOrdersIpc(services) {
     return services.orders.list();
   });
 
+  ipcMain.handle("orders:get", (_event, id) => {
+    requireAuth();
+    return services.orders.get(Number(id));
+  });
+
   ipcMain.handle("orders:create", (_event, input) => {
     const user = requireAuth();
     const parsed = z

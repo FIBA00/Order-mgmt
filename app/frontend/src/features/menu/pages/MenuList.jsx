@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { money } from "../../../utils/money.js";
 import EditMenuItemModal from "./EditMenuItemModal.jsx";
+import ConfirmModal from "../../common/ConfirmModal.jsx";
 
 export default function MenuList({
   items = [],
@@ -14,6 +15,7 @@ export default function MenuList({
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [showForm, setShowForm] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [deletingItem, setDeletingItem] = useState(null);
   const [name, setName] = useState("");
   const [priceStr, setPriceStr] = useState("");
   const [category, setCategory] = useState("Food");
@@ -222,7 +224,7 @@ export default function MenuList({
                         title="Delete item"
                         onClick={(e) => {
                           e.stopPropagation();
-                          onDeleteItem(item.id);
+                          setDeletingItem(item);
                         }}
                         className="text-stone-400 hover:text-red-500 dark:hover:text-red-400 text-xs px-1 rounded transition"
                       >
@@ -252,6 +254,20 @@ export default function MenuList({
           onClose={() => setEditingItem(null)}
         />
       )}
+
+      <ConfirmModal
+        isOpen={Boolean(deletingItem)}
+        title="Delete Menu Item"
+        message={`Are you sure you want to remove "${deletingItem?.name}" from the catalog?`}
+        confirmLabel="Delete Item"
+        variant="danger"
+        onConfirm={() => {
+          if (deletingItem && onDeleteItem) {
+            onDeleteItem(deletingItem.id);
+          }
+        }}
+        onClose={() => setDeletingItem(null)}
+      />
     </div>
   );
 }

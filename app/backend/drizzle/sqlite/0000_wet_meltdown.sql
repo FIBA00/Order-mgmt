@@ -2,6 +2,7 @@ CREATE TABLE `menu_items` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
 	`price_cents` integer NOT NULL,
+	`category` text DEFAULT 'Food' NOT NULL,
 	`active` integer DEFAULT true NOT NULL,
 	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL
 );
@@ -13,7 +14,7 @@ CREATE TABLE `order_items` (
 	`quantity` integer NOT NULL,
 	`unit_price_cents` integer NOT NULL,
 	FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON UPDATE no action ON DELETE cascade,
-	FOREIGN KEY (`menu_item_id`) REFERENCES `menu_items`(`id`) ON UPDATE no action ON DELETE no actionj
+	FOREIGN KEY (`menu_item_id`) REFERENCES `menu_items`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `orders` (

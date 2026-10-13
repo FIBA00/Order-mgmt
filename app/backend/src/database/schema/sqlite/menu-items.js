@@ -5,6 +5,7 @@ export const menuItems = sqliteTable("menu_items", {
   id: integer().primaryKey({ autoIncrement: true }),
   name: text().notNull(),
   priceCents: integer("price_cents").notNull(),
+  category: text().notNull().default("Food"),
   active: integer("active", {
     mode: "boolean",
   })

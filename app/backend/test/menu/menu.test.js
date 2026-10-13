@@ -78,18 +78,20 @@ test("Menu Module", async (t) => {
     assert.equal(body.success, false);
   });
 
-  await t.test("updates menu item price", async () => {
+  await t.test("updates menu item price and category", async () => {
     const res = await fetch(`${baseUrl}/api/menu/${createdItemId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         priceCents: 550,
+        category: "Custom Drinks",
       }),
     });
     assert.equal(res.status, 200);
     const body = await res.json();
     assert.equal(body.success, true);
     assert.equal(body.data.priceCents, 550);
+    assert.equal(body.data.category, "Custom Drinks");
   });
 
   await t.test("deletes the created menu item", async () => {

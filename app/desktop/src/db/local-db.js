@@ -1,55 +1,65 @@
 const path = require("node:path");
+const { eq, count } = require("drizzle-orm");
 
 const DEFAULT_ADMIN_HASH =
   "f0203f893bca22dc40bcb1a8ce91ecfd:9e3b34b888a7ffa60d4288583a2f652c9df8d96ccd3ccd2cfffbedfaa233f3390497b0e2c5ebef8a90c1993b3f945b12a85e3fe4144bfa7422ba04d73a3f82f5"; // admin123 (scrypt)
 
 const SEED_MENU_ITEMS = [
-  { name: "Espresso", price_cents: 350 },
-  { name: "Cappuccino", price_cents: 450 },
-  { name: "Croissant", price_cents: 300 },
-  { name: "Avocado Toast", price_cents: 850 },
-  { name: "Club Sandwich", price_cents: 950 },
+  { name: "Espresso", price_cents: 350, category: "Coffee" },
+  { name: "Cappuccino", price_cents: 450, category: "Coffee" },
+  { name: "Croissant", price_cents: 300, category: "Bakery" },
+  { name: "Avocado Toast", price_cents: 850, category: "Food" },
+  { name: "Club Sandwich", price_cents: 950, category: "Sandwiches" },
 ];
 
 function seedDatabaseIfEmpty(db) {
-  const userCount = db
-    .prepare("SELECT COUNT(*) AS count FROM users")
-    .get().count;
+  const { users, menuItems } = db.schema;
+
+  const userRow = db.select({ count: count() }).from(users).get();
+  const userCount = userRow ? userRow.count : 0;
+
   if (userCount === 0) {
-    db.prepare(
-      `
-      INSERT INTO users (username, password_hash, role)
-      VALUES (?, ?, ?)
-    `,
-    ).run("admin", DEFAULT_ADMIN_HASH, "admin");
+    db.insert(users)
+      .values({
+        username: "admin",
+        passwordHash: DEFAULT_ADMIN_HASH,
+        role: "admin",
+      })
+      .run();
   } else {
     // Migrate legacy admin bcrypt hash to scrypt if present
     const admin = db
-      .prepare("SELECT id, password_hash FROM users WHERE username = 'admin'")
+      .select({ id: users.id, passwordHash: users.passwordHash })
+      .from(users)
+      .where(eq(users.username, "admin"))
       .get();
-    if (admin && admin.password_hash.startsWith("$2b$")) {
-      db.prepare("UPDATE users SET password_hash = ? WHERE id = ?").run(
-        DEFAULT_ADMIN_HASH,
-        admin.id,
-      );
+
+    if (admin && admin.passwordHash.startsWith("$2b$")) {
+      db.update(users)
+        .set({ passwordHash: DEFAULT_ADMIN_HASH })
+        .where(eq(users.id, admin.id))
+        .run();
     }
   }
 
-  const menuCount = db
-    .prepare("SELECT COUNT(*) AS count FROM menu_items")
-    .get().count;
+  const menuRow = db.select({ count: count() }).from(menuItems).get();
+  const menuCount = menuRow ? menuRow.count : 0;
+
   if (menuCount === 0) {
-    const insert = db.prepare(
-      "INSERT INTO menu_items (name, price_cents) VALUES (?, ?)",
-    );
     for (const item of SEED_MENU_ITEMS) {
-      insert.run(item.name, item.price_cents);
+      db.insert(menuItems)
+        .values({
+          name: item.name,
+          priceCents: item.price_cents,
+          category: item.category || "Food",
+        })
+        .run();
     }
   }
 }
 
 function initLocalDatabase(backendSrcDir, dbPath) {
-  const { openDatabase } = require(path.join(backendSrcDir, "db"));
+  const { openDatabase } = require(path.join(backendSrcDir, "database"));
   const { createServices } = require(path.join(backendSrcDir, "services"));
 
   const db = openDatabase(dbPath);

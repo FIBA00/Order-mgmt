@@ -5,6 +5,9 @@ contextBridge.exposeInMainWorld("desktopAPI", {
     login: (credentials) => ipcRenderer.invoke("auth:login", credentials),
     logout: () => ipcRenderer.invoke("auth:logout"),
     me: () => ipcRenderer.invoke("auth:me"),
+    listUsers: () => ipcRenderer.invoke("auth:list-users"),
+    createUser: (input) => ipcRenderer.invoke("auth:create-user", input),
+    deleteUser: (id) => ipcRenderer.invoke("auth:delete-user", id),
   },
 
   menu: {
@@ -16,6 +19,7 @@ contextBridge.exposeInMainWorld("desktopAPI", {
 
   orders: {
     list: () => ipcRenderer.invoke("orders:list"),
+    get: (id) => ipcRenderer.invoke("orders:get", id),
     create: (input) => ipcRenderer.invoke("orders:create", input),
     setStatus: (idOrInput, maybeStatus) => {
       const payload =
@@ -38,5 +42,19 @@ contextBridge.exposeInMainWorld("desktopAPI", {
   app: {
     info: () => ipcRenderer.invoke("app:get-info"),
     checkForUpdates: () => ipcRenderer.invoke("app:check-for-updates"),
+    downloadUpdate: () => ipcRenderer.invoke("app:download-update"),
+    installUpdate: () => ipcRenderer.invoke("app:install-update"),
+    onUpdateStatus: (callback) => {
+      const handler = (_event, data) => callback(data);
+      ipcRenderer.on("updater:status", handler);
+      return () => ipcRenderer.removeListener("updater:status", handler);
+    },
+  },
+
+  window: {
+    minimize: () => ipcRenderer.invoke("window:minimize"),
+    maximize: () => ipcRenderer.invoke("window:maximize"),
+    close: () => ipcRenderer.invoke("window:close"),
+    isMaximized: () => ipcRenderer.invoke("window:is-maximized"),
   },
 });

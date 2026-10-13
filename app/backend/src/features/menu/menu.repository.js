@@ -9,6 +9,7 @@ export function createMenuRepository({ db, schema }) {
         id: menuItems.id,
         name: menuItems.name,
         priceCents: menuItems.priceCents,
+        category: menuItems.category,
         active: menuItems.active,
         createdAt: menuItems.createdAt,
       })
@@ -22,6 +23,7 @@ export function createMenuRepository({ db, schema }) {
         id: menuItems.id,
         name: menuItems.name,
         priceCents: menuItems.priceCents,
+        category: menuItems.category,
         active: menuItems.active,
         createdAt: menuItems.createdAt,
       })
@@ -32,7 +34,7 @@ export function createMenuRepository({ db, schema }) {
     return item ?? null;
   }
 
-  async function create({ name, priceCents }) {
+  async function create({ name, priceCents, category }) {
     const [existingItem] = await db
       .select({ name: menuItems.name })
       .from(menuItems)
@@ -41,32 +43,41 @@ export function createMenuRepository({ db, schema }) {
     if (existingItem) {
       return null;
     }
+
+    const insertValues = { name, priceCents };
+    if (category !== undefined) insertValues.category = category;
+
     const [newItem] = await db
       .insert(menuItems)
-      .values({
-        name,
-        priceCents,
-      })
+      .values(insertValues)
       .returning({
         id: menuItems.id,
         name: menuItems.name,
         priceCents: menuItems.priceCents,
+        category: menuItems.category,
         active: menuItems.active,
         createdAt: menuItems.createdAt,
       });
 
-    return newItem;
+    return newItem ?? null;
   }
 
   async function update(id, data) {
+    const setValues = {};
+    if (data.name !== undefined) setValues.name = data.name;
+    if (data.priceCents !== undefined) setValues.priceCents = data.priceCents;
+    if (data.category !== undefined) setValues.category = data.category;
+    if (data.active !== undefined) setValues.active = data.active;
+
     const [item] = await db
       .update(menuItems)
-      .set(data)
+      .set(setValues)
       .where(eq(menuItems.id, id))
       .returning({
         id: menuItems.id,
         name: menuItems.name,
         priceCents: menuItems.priceCents,
+        category: menuItems.category,
         active: menuItems.active,
         createdAt: menuItems.createdAt,
       });

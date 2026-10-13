@@ -24,6 +24,20 @@ function registerAppIpc() {
       return { status: "failed", error: error.message };
     }
   });
+
+  ipcMain.handle("app:download-update", async () => {
+    try {
+      await autoUpdater.downloadUpdate();
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle("app:install-update", () => {
+    autoUpdater.quitAndInstall();
+    return { success: true };
+  });
 }
 
 module.exports = { registerAppIpc };

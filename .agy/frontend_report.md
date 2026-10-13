@@ -24,8 +24,8 @@ The frontend application (`@restaurant/frontend`) is fully functional, equipped 
 
 ### 3. Build & Test Health
 
-- **Production Build**: Clean Vite 7 bundle generated via `pnpm build:frontend` in ~6.9s with zero errors or warnings.
-- **Automated Tests**: 9 of 9 unit tests passing across 2 suites via native `pnpm --filter @restaurant/frontend test` (`node --test`).
+- **Production Build**: Clean Vite 7 bundle generated via `pnpm build:frontend` in ~6.5s with zero errors or warnings.
+- **Automated Tests**: 13 of 13 unit tests passing across 2 suites via native `pnpm --filter @restaurant/frontend test` (`node --test`). Monorepo test count: 77/77 passing.
 
 ---
 
@@ -47,6 +47,14 @@ The frontend application (`@restaurant/frontend`) is fully functional, equipped 
 | 2026-10-02 | Prepare implementation plans and replan domain roadmap            | docs(frontend): synthesize user feature suggestions into unified roadmap   |
 | 2026-10-02 | Complete Phase 1: Session persistence on reload & item edit modal | feat(frontend): implement session persistence and item editing modal       |
 | 2026-10-02 | Create dedicated Menu Management page (/menu) and navigation tabs | feat(frontend): add MenuManagementPage with catalog table and edit actions |
+| 2026-10-13 | Complete Phase 2: Functional setup/signup flow & Admin Console    | feat(frontend): implement SignUpPage and AdminConsolePage staff management |
+| 2026-10-13 | Implement theme-aware ConfirmModal across all destructive actions | feat(frontend): add ConfirmModal for menu delete, staff remove, cancel, clear ticket      |
+| 2026-10-13 | Menu category persistence & Non-admin menu catalog guards        | fix(frontend): persist categories in local storage and guard actions for non-admin users  |
+| 2026-10-13 | Create Frontend Architecture & Developer Guide in .docs/          | docs(frontend): comprehensive architecture, mermaid diagrams, backend trace & guide       |
+| 2026-10-13 | Display full metadata in Order Item List UI (OrderList.jsx)       | feat(frontend): full order info display (name, amount, status, customer, staff, time)    |
+| 2026-10-13 | Vertical tabular layout & eager loading in OrderDetailsModal      | fix(frontend): fix empty modal items table with matching vertical tabular rows & eager loading |
+| 2026-10-13 | Segregate finances & revenue reporting into dedicated Finances tab | feat(frontend): dedicated /finances admin page, remove revenue metrics from POS register |
+| 2026-10-13 | Restrict Menu Catalog (/menu) to admin only for pure staff POS    | feat(frontend): restrict /menu to admins, hide catalog editing from cashiers/staff       |
 
 ---
 
@@ -123,6 +131,18 @@ The frontend application (`@restaurant/frontend`) is fully functional, equipped 
     3. `DELETE /api/users/:id`: Deactivate staff account.
     4. Database relations for store settings (`shops`) and financial ledgers.
 
+#### 6. In-App Confirmation Modals for Actions (User Report Suggestion)
+
+- **Problem**: Destructive actions (menu item deletion, staff deactivation) currently rely on browser-native `window.confirm()`, which breaks theme styling (dark/light mode) and creates OS-level modal freezes in Electron. Additionally, order cancellation in `OrderDetailsModal` and cart clearing in `CurrentTicket` execute instantly without an undo or confirmation safety prompt.
+- **Solution Architecture**:
+  - Create `app/frontend/src/features/common/ConfirmModal.jsx`: minimal (~40 lines), accessible dialog styled with the cafe palette (`amber-600`, `stone-900`/`stone-100`, red-600 danger accents).
+  - Integrate across:
+    1. `MenuManagementPage.jsx` (Menu item deletion)
+    2. `MenuList.jsx` (Menu item quick card deletion)
+    3. `AdminConsolePage.jsx` (Staff account deactivation)
+    4. `OrderDetailsModal.jsx` (Order cancellation)
+    5. `CurrentTicket.jsx` (Clearing active ticket)
+
 ---
 
 ### 🗺️ Unified & Replanned Domain Roadmap
@@ -132,8 +152,8 @@ The combined roadmap synthesizes existing operational goals with the user's new 
 | Phase       | Milestone                              | Priority | Focus                                                                         |
 | :---------- | :------------------------------------- | :------- | :---------------------------------------------------------------------------- |
 | **Phase 1** | **Operational Stability & POS Parity** | 🟢 P0    | ✅ Completed (Session persistence, item editing modal, offline caching)       |
-| **Phase 2** | **Onboarding & Staff Provisioning**    | 🟡 P1    | Functional signup page on initial setup, admin staff creation console         |
-| **Phase 3** | **Store Operations & Layout**          | 🔵 P2    | Table/section management, item modifiers, store profile & tax settings        |
+| **Phase 2** | **Onboarding & Staff Provisioning**    | 🟢 P1    | ✅ Completed (Functional signup on initial setup, admin staff creation console) |
+| **Phase 3** | **Store Operations & Layout**          | 🟢 P2    | Table/section management, item modifiers, store profile & tax settings (Completed) |
 | **Phase 4** | **Kitchen & Financial Intelligence**   | 🟣 P3    | Kitchen Display System (KDS), shift cash drawer / Z-Report, financial ledgers |
 
 #### Phase 1: Operational Stability & Core POS Parity (🟢 P0 — Completed)
@@ -153,27 +173,44 @@ The combined roadmap synthesizes existing operational goals with the user's new 
 - [x] **1.5 Warm Cafe & Amber Switchable Theme** _(Completed)_
 - [x] **1.6 Removal of Conflicting Seed Sources & Cache Purge** _(Completed)_
 
-#### Phase 2: User Onboarding & Staff Provisioning (🟡 P1 — Next)
+#### Phase 2: User Onboarding & Staff Provisioning (🟢 P1 — Completed)
 
-- [ ] **2.1 Initial Setup & Signup Flow**:
-  - Implement functional `SignUpPage.jsx` with input validation and role selection.
-  - Implement `api.auth.signup` with auto-login on successful registration.
-  - Seamless navigation between Login and Signup.
-- [ ] **2.2 Admin Console — Staff Account Provisioning**:
-  - Dedicated admin tab in dashboard for managing staff.
-  - Staff creation modal (username, password, role `cashier`/`admin`).
-  - Listing active staff accounts with role indicators.
+- [x] **2.1 Initial Setup & Signup Flow**:
+  - Implemented interactive `SignUpPage.jsx` with input validation, password confirmation (min 6 chars), and role selection (`admin` vs `cashier`).
+  - Implemented `api.auth.signup` in `client.js` with auto-login on successful registration and session persistence to `localStorage`.
+  - Added seamless navigation links between `/login` and `/signup`.
+- [x] **2.2 Admin Console — Staff Account Provisioning**:
+  - Built dedicated `AdminConsolePage.jsx` mounted at `/admin` guarded by role (`user.role === 'admin'`).
+  - Added navigation header tab `👥 Staff & Admin` across `DashboardPage`, `MenuManagementPage`, and `AdminConsolePage`.
+  - Built staff accounts list table with role badges, live search filter, and active account statistics (Total, Admins, Cashiers).
+  - Built interactive "+ Provision Staff Account" modal with input validation.
+  - Added account deactivation / deletion action with self-deletion protection guard.
+  - Implemented full backend REST endpoints (`GET/POST/DELETE /api/auth/users`) and desktop IPC parity (`auth:list-users`, `auth:create-user`, `auth:delete-user`).
 
-#### Phase 3: Store Operations & Domain Enhancements (🔵 P2)
+#### Phase 3: Store Operations & Domain Enhancements (🟢 P2 — Completed)
 
-- [ ] **3.1 Table / Section Management**:
-  - Visual table selector / ticket tagging (e.g. Table 1-20, Bar, Takeaway).
-  - Filter orders and active tickets by table identifier.
-- [ ] **3.2 Item Modifiers & Customizations**:
-  - Item options (e.g. Oat Milk, Extra Shot, Decaf, No Sugar).
-  - Modifier price adjustments computed in subtotal.
-- [ ] **3.3 Configurable Store Profile & Tax**:
-  - Settings page for Store Name, Tax Rate (%), Currency, and Receipt header/footer text.
+- [x] **3.1 Table / Section Management**:
+  - Implemented visual Dining Mode toggle (`🍽️ Dine-In` vs `🛍️ Takeaway`) on POS register ticket builder (`CurrentTicket.jsx`).
+  - Added Table / Bar selector (`Table 1-12`, `Bar 1-4`, `Patio 1-2`) with optional customer note input.
+  - Extracted dining metadata (`parseDiningInfo`) in `utils/order.js` and rendered badges on order cards in `OrderList.jsx`.
+  - Added Dining filter pills (`All Types`, `🍽️ Dine-In`, `🛍️ Takeaway`) to `OrderList.jsx`.
+- [x] **3.2 Item Modifiers & Customizations**:
+  - Added cafe modifiers drawer to ticket items in `CurrentTicket.jsx` (`Oat Milk +$0.75`, `Almond Milk +$0.75`, `Extra Shot +$0.50`, `Decaf`, `No Sugar`, `Extra Hot`, `Iced`).
+  - Computed live modifier price adjustments into line item prices, subtotal, and tax totals.
+  - Summarized modifier choices cleanly in order notes and receipt breakdowns.
+- [x] **3.3 Configurable Store Profile & Tax Engine**:
+  - Added dedicated `🏪 Store Profile & Tax` settings tab to `AdminConsolePage.jsx` for configuring Store Name, Address, Phone, Tax Rate (%), Currency, and Receipt Header/Footer.
+  - Implemented `api.store.get()` and `api.store.save()` with localStorage persistence and default store profile fallback.
+  - Rendered store branding header, itemized tax calculations (Subtotal, Tax, Total), and receipt footer in `OrderDetailsModal.jsx`.
+  - Displayed live subtotal, estimated tax, and total breakdown in `CurrentTicket.jsx`.
+- [x] **3.4 Prebuilt & Custom Categories (Inter-Phase Feature)**:
+  - Added prebuilt category options (`Coffee`, `Tea`, `Cold Drinks`, `Bakery`, `Sandwiches`, `Desserts`) and dynamic custom category input in `MenuManagementPage.jsx` and `EditMenuItemModal.jsx`.
+- [x] **3.5 Universal Action Protection Guards**:
+  - Guarded active cart ticket clearing in `CurrentTicket.jsx`, order cancellations in `OrderList.jsx` and `OrderDetailsModal.jsx`, menu deletions in `MenuManagementPage.jsx` and `MenuList.jsx`, and staff deactivation in `AdminConsolePage.jsx` with `<ConfirmModal />`.
+- [x] **3.6 Consolidated User Management Top Bar (`UserMenu.jsx`)**:
+  - Replaced sprawling username, role pills, and logout buttons across headers with a unified circular avatar trigger button.
+  - Interactive dropdown menu cleanly displays user profile info, role badge (`Administrator` vs `Cashier`), quick navigation links (`POS Register`, `Menu Catalog`, `Staff & Settings`), and a styled log out action button.
+
 
 #### Phase 4: Kitchen & Reporting Systems (🟣 P3)
 
@@ -184,3 +221,4 @@ The combined roadmap synthesizes existing operational goals with the user's new 
   - Opening float, cash-in/cash-out tracking, and end-of-shift Z-Report summary.
 - [ ] **4.3 Financial Ledgers & Sales Analytics**:
   - Daily ledger reconciliation, top-selling items report, peak hours volume chart.
+

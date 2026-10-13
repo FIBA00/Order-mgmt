@@ -7,6 +7,7 @@ import Database from "better-sqlite3";
 import { drizzle as drizzlePg } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import { drizzle as drizzleSqlite } from "drizzle-orm/better-sqlite3";
+import { migrate as migrateSqlite } from "drizzle-orm/better-sqlite3/migrator";
 
 // ! internal imports
 import "../configs/env.config.js";
@@ -53,6 +54,10 @@ if (isSqlite) {
     orderItems: sqliteOrderItems,
   };
   database = drizzleSqlite(sqliteClient, { schema });
+  const migrationsFolder = path.resolve(import.meta.dirname, "../../drizzle/sqlite");
+  if (fs.existsSync(migrationsFolder)) {
+    migrateSqlite(database, { migrationsFolder });
+  }
   log.info("Using SQLite database");
 } else {
   pool = new Pool({ connectionString: DB_URL });

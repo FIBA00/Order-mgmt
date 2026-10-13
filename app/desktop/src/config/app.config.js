@@ -21,6 +21,9 @@ const windowConfig = {
   height: 800,
   minWidth: 960,
   minHeight: 640,
+  frame: false,
+  titleBarStyle: "hidden",
+  resizable: true,
 };
 
 module.exports = {

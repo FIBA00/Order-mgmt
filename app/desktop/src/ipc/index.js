@@ -4,6 +4,7 @@ const { registerOrdersIpc } = require("./orders.ipc.js");
 const { registerDashboardIpc } = require("./dashboard.ipc.js");
 const { registerAppIpc } = require("./app.ipc.js");
 const { registerPrinterIpc } = require("./printer.ipc.js");
+const { registerWindowIpc } = require("./window.ipc.js");
 
 function registerAllIpc(services) {
   registerAuthIpc(services);
@@ -12,6 +13,7 @@ function registerAllIpc(services) {
   registerDashboardIpc(services);
   registerAppIpc();
   registerPrinterIpc();
+  registerWindowIpc();
 }
 
 module.exports = { registerAllIpc };

@@ -54,6 +54,11 @@ The desktop codebase has been refactored into domain-segregated modules followin
 | 2026-10-02 | Build automated test suite for desktop package                | test(desktop): add unit and IPC integration tests with mock electron                     |
 | 2026-10-02 | Fix standalone exe bcrypt & sqlite ABI mismatch               | fix(desktop): resolve standalone bcrypt and sqlite ABI 140 errors                        |
 | 2026-10-02 | Add persistent home directory logger & fix ELF corruption     | feat(desktop): persistent log to ~/.restaurant-order-manager.log and verified ELF binary |
+| 2026-10-13 | Refactor desktop database operations to Drizzle ORM           | refactor(desktop): replace raw SQL with Drizzle ORM across services and seeder           |
+| 2026-10-13 | Frameless window with drag-to-move & internal controls        | feat(desktop): frameless window, titlebar drag-move, and custom window controls IPC     |
+| 2026-10-13 | Multi-platform CI/CD and deployment pipeline configuration    | ci(desktop): add ci.yml, multi-platform release.yml, root check/test scripts             |
+| 2026-10-13 | Fix startup Drizzle migration collision & ESM backend packaging| fix(desktop): catch already existing sqlite tables and bundle backend/package.json        |
+| 2026-10-13 | Optimize packaging with local electronDist (zero network)     | perf(desktop): configure electronDist to use node_modules/electron/dist                  |
 
 ---
 
@@ -68,3 +73,11 @@ The desktop codebase has been refactored into domain-segregated modules followin
 - [x] **Task 7 (Automated Desktop Test Suite)**: Implemented 21 unit/integration tests in `app/desktop/test/` verifying database initialization, seeder idempotency, config paths, and IPC auth guards.
 - [x] **Task 8 (Standalone Startup & Native ABI Fix)**: Resolved `MODULE_NOT_FOUND: 'bcrypt'` and `ERR_DLOPEN_FAILED` (ABI 127 vs 140 for `better-sqlite3`) by safely degrading bcrypt to `node:crypto` (`scryptSync`), updating seed admin hash, caching Electron ABI 140 binary, and creating `scripts/inject-native.js` post-package injection.
 - [x] **Task 9 (Home Directory Persistent Logging & ELF Integrity)**: Implemented `src/logger.js` saving crash logs, errors, and lifecycle events synchronously to `~/.restaurant-order-manager.log` with auto-rotation (5MB) and `crashReporter` minidumps; replaced corrupted prebuilt ELF binary with fully verified intact binary tested with `ldd` and live execution.
+- [x] **Task 10 (Drizzle ORM Migration for Desktop Database & Services)**: Replaced all raw SQL `db.prepare(...)` queries in `app/backend/src/services/index.js` and `app/desktop/src/db/local-db.js` with Drizzle ORM operations (`db.select()`, `db.insert()`, `db.update()`, `db.delete()`). Added delegates on `openDatabase` to maintain backward-compatibility.
+- [x] **Task 11 (Frameless Window, Drag-to-Move & Internal Controls)**: Removed native OS window decorations (`frame: false`, `titleBarStyle: "hidden"`), enabled edge drag-resize (`resizable: true`), implemented window control IPC channels (`minimize`, `maximize`, `close`, `isMaximized`), and built custom draggable `TitleBar.jsx` with internal controls.
+- [x] **Task 12 (CI/CD Pipeline & Packaging Verification)**: Configured GitHub Actions `.github/workflows/ci.yml` (testing, frontend building, Linux and Windows desktop packaging) and multi-platform `.github/workflows/release.yml`; added root `check`, `test`, `build` scripts; verified end-to-end `pnpm check`.
+- [x] **Task 13 (Startup Crash & Drizzle Schema Defense)**: Wrapped `migrateSqlite` in `backend/src/database/index.js` with error defense against `table already exists` on dirty local databases; bundled `backend/package.json` into ASAR to eliminate `MODULE_TYPELESS_PACKAGE_JSON` warning. Verified clean boot and auto-seeding.
+- [x] **Task 14 (Zero-Download Offline Packaging via `electronDist`)**: Configured `"electronDist": "node_modules/electron/dist"` in `app/desktop/package.json` under `build`, preventing `electron-builder` from attempting remote zip downloads. Packaging runtime reduced to ~20 seconds.
+- [ ] **Task 15 (Security Hardening - Pillar 1)**: Implement `will-navigate` guard in `src/window/main-window.js` to block arbitrary web navigation; implement lightweight in-memory rate limiting middleware on auth routes (`/api/auth/login`, `/api/auth/signup`).
+- [ ] **Task 16 (Remote Updates via GitHub Releases - Pillar 2)**: Add `AppImage` linux target in `package.json`; expose updater IPC events (`updater:check`, `updater:status`, `updater:install`) to renderer via context bridge; add UI status badge/banner in title bar.
+

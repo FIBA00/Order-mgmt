@@ -14,9 +14,10 @@ function registerMenuIpc(services) {
       .object({
         name: z.string().min(1),
         priceCents: z.number().int().nonnegative(),
+        category: z.string().optional(),
       })
       .parse(input);
-    return services.menu.create(parsed.name, parsed.priceCents);
+    return services.menu.create(parsed.name, parsed.priceCents, parsed.category);
   });
 
   ipcMain.handle("menu:update", (_event, { id, ...data }) => {

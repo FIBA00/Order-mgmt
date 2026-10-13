@@ -12,6 +12,7 @@ export function createMenuService(repository) {
     return repository.create({
       name: data.name,
       priceCents: data.priceCents,
+      category: data.category,
     });
   }
 

@@ -66,6 +66,7 @@ Tests have been partitioned into dedicated domain folders within `test/` instead
 | 2026-10-02 | Desktop IPC Database and Services Compatibility Layer | feat(backend): add db and services adapter packages for Electron IPC             |
 | 2026-10-02 | Automated Test Suite Modernization to ESM             | test(backend): modernize test/api.test.js with node:test and verify all routes   |
 | 2026-10-02 | Modular Domain Test Suite Architecture                | test(backend): partition test suite into modular folders under test/             |
+| 2026-10-13 | Modularize domain services and add category handling   | refactor(backend): split services into auth, menu, orders, dashboard modules       |
 
 ---
 

@@ -16,6 +16,7 @@
   "dependencies": {
     "better-sqlite3": "^12.4.1",
     "cross-env": "^10.1.0",
+    "drizzle-orm": "^0.44.2",
     "electron-updater": "^6.6.2",
     "jsonwebtoken": "^9.0.2",
     "zod": "^4.1.5"
@@ -28,6 +29,7 @@
     "appId": "com.desktopapprevisited.restaurant",
     "productName": "Restaurant Order Manager",
     "electronVersion": "39.8.10",
+    "electronDist": "node_modules/electron/dist",
     "npmRebuild": false,
     "asar": true,
     "directories": {
@@ -39,6 +41,20 @@
       {
         "from": "../backend/src",
         "to": "backend/src",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "../backend",
+        "to": "backend",
+        "filter": [
+          "package.json"
+        ]
+      },
+      {
+        "from": "../backend/drizzle",
+        "to": "backend/drizzle",
         "filter": [
           "**/*"
         ]
@@ -56,7 +72,8 @@
     },
     "linux": {
       "target": [
-        "dir"
+        "dir",
+        "AppImage"
       ]
     },
     "win": {

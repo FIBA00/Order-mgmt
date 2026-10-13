@@ -4,7 +4,7 @@ export function createOrdersRepository({ db, schema }) {
   const { orders, orderItems, menuItems, users } = schema;
 
   async function findAll() {
-    return db
+    const orderRows = await db
       .select({
         id: orders.id,
         userId: orders.userId,
@@ -16,6 +16,35 @@ export function createOrdersRepository({ db, schema }) {
       .from(orders)
       .leftJoin(users, eq(orders.userId, users.id))
       .orderBy(desc(orders.id));
+
+    if (!orderRows.length) return [];
+
+    const orderIds = orderRows.map((o) => o.id);
+    const itemRows = await db
+      .select({
+        id: orderItems.id,
+        orderId: orderItems.orderId,
+        menuItemId: orderItems.menuItemId,
+        name: menuItems.name,
+        quantity: orderItems.quantity,
+        unitPriceCents: orderItems.unitPriceCents,
+      })
+      .from(orderItems)
+      .leftJoin(menuItems, eq(orderItems.menuItemId, menuItems.id))
+      .where(inArray(orderItems.orderId, orderIds));
+
+    const itemsByOrder = new Map();
+    for (const item of itemRows) {
+      if (!itemsByOrder.has(item.orderId)) {
+        itemsByOrder.set(item.orderId, []);
+      }
+      itemsByOrder.get(item.orderId).push(item);
+    }
+
+    return orderRows.map((o) => ({
+      ...o,
+      items: itemsByOrder.get(o.id) || [],
+    }));
   }
 
   async function findById(id) {

@@ -1,233 +1,42 @@
-const crypto = require("node:crypto");
+/**
+ * @file Application Domain Services Aggregator
+ * @module @restaurant/backend/services
+ *
+ * Aggregates modular domain services (auth, menu, orders, dashboard)
+ * with backward-compatible exports for Electron IPC and backend runners.
+ */
 
-let bcrypt = null;
-try {
-  bcrypt = require("bcrypt");
-} catch {
-  // bcrypt not available in standalone desktop bundle; fallback to node:crypto
-}
+import {
+  createAuthService,
+  verifyPassword,
+  hashPasswordSync,
+} from "./auth.service.js";
+import { createMenuService } from "./menu.service.js";
+import { createOrdersService } from "./orders.service.js";
+import { createDashboardService } from "./dashboard.service.js";
 
-function verifyPassword(password, stored) {
-  if (!password || !stored) return false;
-  if (
-    stored.startsWith("$2a$") ||
-    stored.startsWith("$2b$") ||
-    stored.startsWith("$2y$")
-  ) {
-    if (bcrypt && typeof bcrypt.compareSync === "function") {
-      try {
-        return bcrypt.compareSync(password, stored);
-      } catch {
-        return false;
-      }
-    }
-    return false;
-  }
-  if (stored.includes(":")) {
-    const [salt, expected] = stored.split(":");
-    const actual = crypto.scryptSync(password, salt, 64).toString("hex");
-    return crypto.timingSafeEqual(
-      Buffer.from(actual, "hex"),
-      Buffer.from(expected, "hex"),
-    );
-  }
-  return false;
-}
+export {
+  createAuthService,
+  verifyPassword,
+  hashPasswordSync,
+  createMenuService,
+  createOrdersService,
+  createDashboardService,
+};
 
-function hashPasswordSync(password) {
-  if (bcrypt && typeof bcrypt.hashSync === "function") {
-    try {
-      return bcrypt.hashSync(password, 10);
-    } catch {
-      // fallback to scrypt
-    }
-  }
-  const salt = crypto.randomBytes(16).toString("hex");
-  const hash = crypto.scryptSync(password, salt, 64).toString("hex");
-  return `${salt}:${hash}`;
-}
-
-function createServices(db) {
+/**
+ * Instantiates domain services on top of a Drizzle ORM database instance.
+ *
+ * @param {import("drizzle-orm/better-sqlite3").BetterSQLite3Database} db - Drizzle database instance
+ * @returns {object} Domain services (auth, menu, orders, dashboard)
+ */
+export function createServices(db) {
   return {
-    auth: {
-      login(username, password) {
-        const user = db
-          .prepare(
-            "SELECT id, username, password_hash, role FROM users WHERE username = ?",
-          )
-          .get(username);
-        if (!user || !verifyPassword(password, user.password_hash)) {
-          throw new Error("Invalid username or password");
-        }
-        return { id: user.id, username: user.username, role: user.role };
-      },
-      listUsers() {
-        return db
-          .prepare(
-            "SELECT id, username, role, created_at AS createdAt FROM users ORDER BY id ASC",
-          )
-          .all();
-      },
-      createUser(username, password, role = "cashier") {
-        const existing = db
-          .prepare("SELECT id FROM users WHERE username = ?")
-          .get(username);
-        if (existing) {
-          throw new Error("Username already taken");
-        }
-        const passwordHash = hashPasswordSync(password);
-        const result = db
-          .prepare(
-            "INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)",
-          )
-          .run(username, passwordHash, role);
-        return {
-          id: Number(result.lastInsertRowid),
-          username,
-          role,
-        };
-      },
-      deleteUser(id) {
-        return db.prepare("DELETE FROM users WHERE id = ?").run(id);
-      },
-    },
-
-    menu: {
-      list() {
-        return db
-          .prepare(
-            "SELECT id, name, price_cents AS priceCents, active FROM menu_items ORDER BY name",
-          )
-          .all();
-      },
-      create(name, priceCents) {
-        const result = db
-          .prepare("INSERT INTO menu_items (name, price_cents) VALUES (?, ?)")
-          .run(name, priceCents);
-        return db
-          .prepare(
-            "SELECT id, name, price_cents AS priceCents, active FROM menu_items WHERE id = ?",
-          )
-          .get(result.lastInsertRowid);
-      },
-      update(id, updates) {
-        if (updates.name !== undefined && updates.priceCents !== undefined) {
-          db.prepare(
-            "UPDATE menu_items SET name = ?, price_cents = ? WHERE id = ?",
-          ).run(updates.name, updates.priceCents, id);
-        } else if (updates.name !== undefined) {
-          db.prepare("UPDATE menu_items SET name = ? WHERE id = ?").run(
-            updates.name,
-            id,
-          );
-        } else if (updates.priceCents !== undefined) {
-          db.prepare("UPDATE menu_items SET price_cents = ? WHERE id = ?").run(
-            updates.priceCents,
-            id,
-          );
-        }
-        return db
-          .prepare(
-            "SELECT id, name, price_cents AS priceCents, active FROM menu_items WHERE id = ?",
-          )
-          .get(id);
-      },
-      delete(id) {
-        return db.prepare("DELETE FROM menu_items WHERE id = ?").run(id);
-      },
-    },
-
-    orders: {
-      list() {
-        return db
-          .prepare(
-            `
-          SELECT
-            o.id,
-            o.status,
-            o.total_cents AS totalCents,
-            o.created_at AS createdAt,
-            u.username
-          FROM orders o
-          JOIN users u ON u.id = o.user_id
-          ORDER BY o.id DESC
-        `,
-          )
-          .all();
-      },
-
-      create(userId, items) {
-        const getMenu = db.prepare(
-          "SELECT id, price_cents AS priceCents FROM menu_items WHERE id = ? AND active = 1",
-        );
-        const insertOrder = db.prepare(
-          "INSERT INTO orders (user_id, status, total_cents) VALUES (?, 'open', ?)",
-        );
-        const insertItem = db.prepare(`
-          INSERT INTO order_items
-            (order_id, menu_item_id, quantity, unit_price_cents)
-          VALUES (?, ?, ?, ?)
-        `);
-
-        return db.transaction(() => {
-          let total = 0;
-          const resolved = [];
-
-          for (const item of items) {
-            const menu = getMenu.get(item.menuItemId);
-            if (!menu)
-              throw new Error(`Menu item ${item.menuItemId} not found`);
-            if (!Number.isInteger(item.quantity) || item.quantity <= 0) {
-              throw new Error("Quantity must be a positive integer");
-            }
-            total += menu.priceCents * item.quantity;
-            resolved.push({ ...item, priceCents: menu.priceCents });
-          }
-
-          const order = insertOrder.run(userId, total);
-
-          for (const item of resolved) {
-            insertItem.run(
-              order.lastInsertRowid,
-              item.menuItemId,
-              item.quantity,
-              item.priceCents,
-            );
-          }
-
-          return {
-            id: Number(order.lastInsertRowid),
-            totalCents: total,
-            status: "open",
-          };
-        })();
-      },
-
-      setStatus(id, status) {
-        if (!["open", "paid", "cancelled"].includes(status)) {
-          throw new Error("Invalid order status");
-        }
-        db.prepare("UPDATE orders SET status = ? WHERE id = ?").run(status, id);
-      },
-    },
-
-    dashboard: {
-      today() {
-        return db
-          .prepare(
-            `
-          SELECT
-            COUNT(*) AS orderCount,
-            COALESCE(SUM(CASE WHEN status = 'paid' THEN total_cents ELSE 0 END), 0) AS revenueCents
-          FROM orders
-          WHERE date(datetime(created_at / 1000, 'unixepoch', 'localtime')) = date('now', 'localtime')
-             OR date(created_at, 'localtime') = date('now', 'localtime')
-        `,
-          )
-          .get();
-      },
-    },
+    auth: createAuthService(db),
+    menu: createMenuService(db),
+    orders: createOrdersService(db),
+    dashboard: createDashboardService(db),
   };
 }
 
-module.exports = { createServices };
+export default { createServices, verifyPassword, hashPasswordSync };
