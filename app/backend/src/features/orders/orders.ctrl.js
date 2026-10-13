@@ -33,7 +33,13 @@ export function createOrdersController(service) {
 
   async function createOrder(req, res, next) {
     try {
-      const userId = req.user?.id || 1;
+      if (!req.user?.id) {
+        return res.status(401).json({
+          success: false,
+          message: "Authentication required to place order",
+        });
+      }
+      const userId = req.user.id;
       const order = await service.create(userId, req.body.items);
       return res.status(201).json({
         success: true,

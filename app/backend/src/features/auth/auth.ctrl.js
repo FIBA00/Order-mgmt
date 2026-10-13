@@ -99,6 +99,12 @@ export function createAuthController(service) {
   async function deleteStaff(req, res, next) {
     try {
       const id = Number(req.params.id);
+      if (!id || Number.isNaN(id)) {
+        return res.status(400).json({
+          success: false,
+          message: "Valid user ID is required",
+        });
+      }
       if (req.user && req.user.id === id) {
         return res.status(400).json({
           success: false,
@@ -111,6 +117,16 @@ export function createAuthController(service) {
         message: "Staff account removed",
       });
     } catch (error) {
+      if (
+        error.statusCode === 400 ||
+        error.statusCode === 404 ||
+        error.statusCode === 409
+      ) {
+        return res.status(error.statusCode).json({
+          success: false,
+          message: error.message,
+        });
+      }
       next(error);
     }
   }

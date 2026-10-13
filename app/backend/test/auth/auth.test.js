@@ -137,4 +137,145 @@ test("Auth Module", async (t) => {
     const body = await res.json();
     assert.equal(body.user.username, uniqueUsername);
   });
+
+  let adminUser = null;
+  let adminToken = null;
+  const adminUsername = `admin_${Date.now()}`;
+
+  await t.test("registers an admin user for staff management", async () => {
+    const res = await fetch(`${baseUrl}/api/auth/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: adminUsername,
+        password: "adminpassword123",
+        role: "admin",
+      }),
+    });
+    assert.equal(res.status, 201);
+    const body = await res.json();
+    adminUser = body.user;
+    adminToken = body.token;
+  });
+
+  await t.test("lists staff members as admin", async () => {
+    const res = await fetch(`${baseUrl}/api/auth/users`, {
+      headers: { Authorization: `Bearer ${adminToken}` },
+    });
+    assert.equal(res.status, 200);
+    const body = await res.json();
+    assert.equal(body.success, true);
+    assert.ok(Array.isArray(body.staff || body.data));
+  });
+
+  await t.test("rejects deleting own admin account", async () => {
+    const res = await fetch(`${baseUrl}/api/auth/users/${adminUser.id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${adminToken}` },
+    });
+    assert.equal(res.status, 400);
+    const body = await res.json();
+    assert.equal(body.success, false);
+    assert.match(body.message, /Cannot delete your own/);
+  });
+
+  let tempStaff = null;
+  const tempStaffUsername = `cashier_${Date.now()}`;
+
+  await t.test("provisions a new staff member and deletes them", async () => {
+    const createRes = await fetch(`${baseUrl}/api/auth/users`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${adminToken}`,
+      },
+      body: JSON.stringify({
+        username: tempStaffUsername,
+        password: "password123",
+        role: "cashier",
+      }),
+    });
+    assert.equal(createRes.status, 201);
+    const createBody = await createRes.json();
+    tempStaff = createBody.user || createBody.data;
+
+    const deleteRes = await fetch(`${baseUrl}/api/auth/users/${tempStaff.id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${adminToken}` },
+    });
+    assert.equal(deleteRes.status, 200);
+    const deleteBody = await deleteRes.json();
+    assert.equal(deleteBody.success, true);
+  });
+
+  await t.test("returns 404 when deleting non-existent staff member", async () => {
+    const res = await fetch(`${baseUrl}/api/auth/users/999999`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${adminToken}` },
+    });
+    assert.equal(res.status, 404);
+    const body = await res.json();
+    assert.equal(body.success, false);
+  });
+
+  await t.test(
+    "rejects deleting staff member with existing order history with 409 Conflict",
+    async () => {
+      const staffUser = `ordered_staff_${Date.now()}`;
+      const createRes = await fetch(`${baseUrl}/api/auth/users`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify({
+          username: staffUser,
+          password: "password123",
+          role: "cashier",
+        }),
+      });
+      const staff = (await createRes.json()).user;
+
+      const loginRes = await fetch(`${baseUrl}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: staffUser,
+          password: "password123",
+        }),
+      });
+      const staffToken = (await loginRes.json()).token;
+
+      const menuRes = await fetch(`${baseUrl}/api/menu`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: `Item_${Date.now()}`,
+          priceCents: 400,
+        }),
+      });
+      const menuItem = (await menuRes.json()).data;
+
+      const orderRes = await fetch(`${baseUrl}/api/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${staffToken}`,
+        },
+        body: JSON.stringify({
+          items: [{ menuItemId: menuItem.id, quantity: 1 }],
+        }),
+      });
+      assert.equal(orderRes.status, 201);
+
+      const deleteRes = await fetch(`${baseUrl}/api/auth/users/${staff.id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${adminToken}` },
+      });
+      assert.equal(deleteRes.status, 409);
+      const deleteBody = await deleteRes.json();
+      assert.equal(deleteBody.success, false);
+      assert.match(deleteBody.message, /order history/i);
+    },
+  );
 });

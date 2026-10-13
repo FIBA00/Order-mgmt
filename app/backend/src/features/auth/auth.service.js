@@ -70,7 +70,37 @@ export function createAuthService(repository) {
   }
 
   async function deleteStaff(id) {
-    return repository.deleteUser(id);
+    const user = await repository.findById(id);
+    if (!user) {
+      const err = new Error("Staff member not found");
+      err.statusCode = 404;
+      throw err;
+    }
+
+    if (repository.hasOrders && (await repository.hasOrders(id))) {
+      const err = new Error(
+        "Cannot delete staff account with existing order history. Historical sales records must be preserved.",
+      );
+      err.statusCode = 409;
+      throw err;
+    }
+
+    try {
+      return await repository.deleteUser(id);
+    } catch (err) {
+      if (
+        err.code === "SQLITE_CONSTRAINT_FOREIGNKEY" ||
+        err.code === "23503" ||
+        err.message?.includes("FOREIGN KEY")
+      ) {
+        const conflictErr = new Error(
+          "Cannot delete staff account with existing order history. Historical sales records must be preserved.",
+        );
+        conflictErr.statusCode = 409;
+        throw conflictErr;
+      }
+      throw err;
+    }
   }
 
   return {

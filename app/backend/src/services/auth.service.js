@@ -57,7 +57,7 @@ export function hashPasswordSync(password) {
 
 export function createAuthService(db) {
   const schema = db.schema || sqliteSchema;
-  const { users } = schema;
+  const { users, orders } = schema;
 
   return {
     login(username, password) {
@@ -125,7 +125,32 @@ export function createAuthService(db) {
     },
 
     deleteUser(id) {
-      return db.delete(users).where(eq(users.id, id)).run();
+      if (orders) {
+        const hasOrders = db
+          .select({ id: orders.id })
+          .from(orders)
+          .where(eq(orders.userId, id))
+          .get();
+        if (hasOrders) {
+          throw new Error(
+            "Cannot delete staff account with existing order history. Historical sales records must be preserved.",
+          );
+        }
+      }
+
+      try {
+        return db.delete(users).where(eq(users.id, id)).run();
+      } catch (err) {
+        if (
+          err.code === "SQLITE_CONSTRAINT_FOREIGNKEY" ||
+          err.message?.includes("FOREIGN KEY")
+        ) {
+          throw new Error(
+            "Cannot delete staff account with existing order history. Historical sales records must be preserved.",
+          );
+        }
+        throw err;
+      }
     },
   };
 }

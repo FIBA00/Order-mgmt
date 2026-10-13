@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 
 export function createAuthRepository({ db, schema }) {
-  const { users } = schema;
+  const { users, orders } = schema;
 
   async function findByUsername(username) {
     const [user] = await db
@@ -59,6 +59,17 @@ export function createAuthRepository({ db, schema }) {
       .orderBy(users.username);
   }
 
+  async function hasOrders(userId) {
+    if (!orders) return false;
+    const [order] = await db
+      .select({ id: orders.id })
+      .from(orders)
+      .where(eq(orders.userId, userId))
+      .limit(1);
+
+    return Boolean(order);
+  }
+
   async function deleteUser(id) {
     return db.delete(users).where(eq(users.id, id));
   }
@@ -68,6 +79,7 @@ export function createAuthRepository({ db, schema }) {
     findById,
     findAll,
     deleteUser,
+    hasOrders,
     create,
   };
 }
