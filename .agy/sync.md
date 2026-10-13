@@ -3,7 +3,7 @@
 ## Active Locks (Editing Now)
 
 - [ ] Backend: Idle
-- [x] Frontend: Implementing Phase 2 (Initial Setup & Signup Flow + Admin Staff Provisioning Console)
+- [x] Frontend: Implementing Phase 2 (Initial Setup & Signup Flow + Admin Staff Console)
 - [ ] Desktop: Idle
 - [ ] QA: Idle
 
@@ -16,3 +16,5 @@
   3. Database relations & schemas for store profile (`/api/shop`) and financial ledgers (`/api/finance`).
 - **Desktop -> Backend**: [RESOLVED] CommonJS DB and service adapters operational for Electron IPC.
 - **Desktop -> Frontend**: [RESOLVED] Desktop app bundles production build from `app/frontend/dist` with offline IPC parity.
+
+

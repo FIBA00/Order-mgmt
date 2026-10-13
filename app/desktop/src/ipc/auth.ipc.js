@@ -38,6 +38,34 @@ function registerAuthIpc(services) {
   });
 
   ipcMain.handle("auth:me", () => requireAuth());
+
+  ipcMain.handle("auth:list-users", () => {
+    requireAdmin();
+    return services.auth.listUsers();
+  });
+
+  ipcMain.handle("auth:create-user", (_event, data) => {
+    const input = z
+      .object({
+        username: z.string().min(1),
+        password: z.string().min(6),
+        role: z.enum(["admin", "cashier"]).optional(),
+      })
+      .parse(data);
+
+    if (currentUser) {
+      requireAdmin();
+    }
+    return services.auth.createUser(input.username, input.password, input.role || "cashier");
+  });
+
+  ipcMain.handle("auth:delete-user", (_event, id) => {
+    const admin = requireAdmin();
+    if (admin.id === Number(id)) {
+      throw new Error("Cannot delete your own admin account");
+    }
+    return services.auth.deleteUser(Number(id));
+  });
 }
 
 module.exports = {

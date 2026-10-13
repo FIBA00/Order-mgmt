@@ -8,5 +8,5 @@ export const loginSchema = z.object({
 export const signupSchema = z.object({
   username: z.string().min(1),
   password: z.string().min(1),
-  role: z.enum(["admin", "cashier", "manager"]).optional().default("cashier"),
+  role: z.enum(["admin", "cashier"]).optional(),
 });

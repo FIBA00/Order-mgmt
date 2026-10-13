@@ -34,6 +34,19 @@ function verifyPassword(password, stored) {
   return false;
 }
 
+function hashPasswordSync(password) {
+  if (bcrypt && typeof bcrypt.hashSync === "function") {
+    try {
+      return bcrypt.hashSync(password, 10);
+    } catch {
+      // fallback to scrypt
+    }
+  }
+  const salt = crypto.randomBytes(16).toString("hex");
+  const hash = crypto.scryptSync(password, salt, 64).toString("hex");
+  return `${salt}:${hash}`;
+}
+
 function createServices(db) {
   return {
     auth: {
@@ -47,6 +60,35 @@ function createServices(db) {
           throw new Error("Invalid username or password");
         }
         return { id: user.id, username: user.username, role: user.role };
+      },
+      listUsers() {
+        return db
+          .prepare(
+            "SELECT id, username, role, created_at AS createdAt FROM users ORDER BY id ASC",
+          )
+          .all();
+      },
+      createUser(username, password, role = "cashier") {
+        const existing = db
+          .prepare("SELECT id FROM users WHERE username = ?")
+          .get(username);
+        if (existing) {
+          throw new Error("Username already taken");
+        }
+        const passwordHash = hashPasswordSync(password);
+        const result = db
+          .prepare(
+            "INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)",
+          )
+          .run(username, passwordHash, role);
+        return {
+          id: Number(result.lastInsertRowid),
+          username,
+          role,
+        };
+      },
+      deleteUser(id) {
+        return db.prepare("DELETE FROM users WHERE id = ?").run(id);
       },
     },
 

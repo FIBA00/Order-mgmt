@@ -47,9 +47,27 @@ export function createAuthRepository({ db, schema }) {
     return user;
   }
 
+  async function findAll() {
+    return db
+      .select({
+        id: users.id,
+        username: users.username,
+        role: users.role,
+        createdAt: users.createdAt,
+      })
+      .from(users)
+      .orderBy(users.username);
+  }
+
+  async function deleteUser(id) {
+    return db.delete(users).where(eq(users.id, id));
+  }
+
   return {
     findByUsername,
     findById,
+    findAll,
+    deleteUser,
     create,
   };
 }

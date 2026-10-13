@@ -5,7 +5,7 @@ import { createAuthRepository } from "./auth.repository.js";
 import { createAuthService } from "./auth.service.js";
 import { createAuthController } from "./auth.ctrl.js";
 import inputValidationBody from "../../middlewares/validation.middleware.js";
-import { isLoggedIn } from "../../middlewares/auth.middleware.js";
+import { isLoggedIn, isAdmin } from "../../middlewares/auth.middleware.js";
 
 import { loginSchema, signupSchema } from "./auth.schema.js";
 
@@ -21,6 +21,16 @@ authRouter.post(
   controller.signup,
 );
 authRouter.get("/me", isLoggedIn, controller.profile);
+
+authRouter.get("/users", isLoggedIn, isAdmin, controller.listStaff);
+authRouter.post(
+  "/users",
+  isLoggedIn,
+  isAdmin,
+  inputValidationBody(signupSchema),
+  controller.createStaff,
+);
+authRouter.delete("/users/:id", isLoggedIn, isAdmin, controller.deleteStaff);
 
 export { createAuthRepository, createAuthService, createAuthController };
 export default authRouter;

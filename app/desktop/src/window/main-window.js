@@ -81,6 +81,16 @@ function createMainWindow() {
   setupApplicationMenu(mainWindow);
 
   const devUrl = process.env.VITE_DEV_SERVER_URL;
+  const targetPath = devUrl || getFrontendIndexPath(app.isPackaged);
+  console.log(`Loading frontend from: ${targetPath}`);
+
+  mainWindow.webContents.on("did-finish-load", () => {
+    console.log("Frontend did finish load successfully");
+  });
+
+  mainWindow.webContents.on("did-fail-load", (event, errorCode, errorDescription, validatedURL) => {
+    console.error(`Frontend failed to load (${errorCode}): ${errorDescription} on ${validatedURL}`);
+  });
 
   if (devUrl) {
     mainWindow.loadURL(devUrl);
@@ -91,6 +101,15 @@ function createMainWindow() {
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: "deny" };
+  });
+
+  mainWindow.webContents.on("console-message", (event, level, message, line, sourceId) => {
+    const filename = sourceId ? path.basename(sourceId) : "renderer";
+    if (level >= 2) {
+      console.error(`[Renderer] (${filename}:${line}) ${message}`);
+    } else {
+      console.log(`[Renderer] (${filename}:${line}) ${message}`);
+    }
   });
 
   mainWindow.webContents.on("render-process-gone", (event, details) => {

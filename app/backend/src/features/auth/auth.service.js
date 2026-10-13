@@ -65,9 +65,19 @@ export function createAuthService(repository) {
     return user;
   }
 
+  async function listStaff() {
+    return repository.findAll();
+  }
+
+  async function deleteStaff(id) {
+    return repository.deleteUser(id);
+  }
+
   return {
     login,
     signup,
     getProfile,
+    listStaff,
+    deleteStaff,
   };
 }

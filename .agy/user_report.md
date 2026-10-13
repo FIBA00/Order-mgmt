@@ -14,6 +14,24 @@
 - [backend]- while testing frontend the user wants to delete and edit the menu items but cors problem occured here is some logs: `814 Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://localhost:8000/api/menu/4. (Reason: Did not find method in CORS header ‘Access-Control-Allow-Methods’). 
 22:53:58.815 Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://localhost:8000/api/menu/4. (Reason: CORS request did not succeed). Status code: (null). `
 
+- [DESKTOP] the app loaded successfully and did signed in success but the terminal shows this, lets add spiner loading modal to wait for loading screen , and check this log `Frontend did finish load successfully
+Error occurred in handler for 'auth:me': Error: Authentication required
+    at requireAuth (/home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/app/desktop/dist/linux-unpacked/resources/app.asar/src/ipc/auth.ipc.js:8:11)
+    at /home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/app/desktop/dist/linux-unpacked/resources/app.asar/src/ipc/auth.ipc.js:40:35
+    at Session.<anonymous> (node:electron/js2c/browser_init:2:112778)
+    at Session.emit (node:events:519:28)
+`
+- [DESKTOP] while deleting the menu item this error occured: `[28920:1003/210610.199707:ERROR:content/browser/browser_main_loop.cc:288] GLib-GObject: ../../../gobject/gsignal.c:2685: instance '0x13ac019f3590' has no handler with id '5147'
+Error occurred in handler for 'menu:delete': SqliteError: FOREIGN KEY constraint failed
+    at Object.delete (/home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/app/desktop/dist/linux-unpacked/resources/app.asar/backend/src/services/index.js:94:66)
+    at /home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/app/desktop/dist/linux-unpacked/resources/app.asar/src/ipc/menu.ipc.js:31:25
+    at Session.<anonymous> (node:electron/js2c/browser_init:2:112778)
+    at Session.emit (node:events:519:28) {
+  code: 'SQLITE_CONSTRAINT_FOREIGNKEY'
+}
+`
+- [DESKTOP] the desktop shouldnt be using any raw sql codes instead we should use orm .
+
 ## Feature suggestion
 
 - [ui] implement the signup on initial setup (Planned for Phase 2)
