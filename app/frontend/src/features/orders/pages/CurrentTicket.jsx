@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Utensils, ShoppingBag, X } from "lucide-react";
 import { money } from "../../../utils/money.js";
 import { api } from "../../../api/client.js";
 import ConfirmModal from "../../common/ConfirmModal.jsx";
@@ -192,7 +193,7 @@ export default function CurrentTicket({
                       className="text-stone-300 dark:text-stone-600 hover:text-red-500 dark:hover:text-red-400 text-xs pl-1 transition"
                       title="Remove line"
                     >
-                      ✕
+                      <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
@@ -210,7 +211,7 @@ export default function CurrentTicket({
                         onClick={() => handleToggleModifier(item.menuItemId, mod)}
                         className="hover:text-red-500 transition text-[9px]"
                       >
-                        ✕
+                        <X className="w-2.5 h-2.5" />
                       </button>
                     </span>
                   ))}
@@ -261,24 +262,24 @@ export default function CurrentTicket({
             <button
               type="button"
               onClick={() => setDiningMode("dine-in")}
-              className={`flex-1 py-1 rounded-lg transition text-center ${
+              className={`flex-1 py-1 rounded-lg transition text-center inline-flex items-center justify-center gap-1.5 ${
                 diningMode === "dine-in"
                   ? "bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs font-semibold"
                   : "text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100"
               }`}
             >
-              🍽️ Dine-In
+              <Utensils className="w-3.5 h-3.5" /> Dine-In
             </button>
             <button
               type="button"
               onClick={() => setDiningMode("takeaway")}
-              className={`flex-1 py-1 rounded-lg transition text-center ${
+              className={`flex-1 py-1 rounded-lg transition text-center inline-flex items-center justify-center gap-1.5 ${
                 diningMode === "takeaway"
                   ? "bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs font-semibold"
                   : "text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100"
               }`}
             >
-              🛍️ Takeaway
+              <ShoppingBag className="w-3.5 h-3.5" /> Takeaway
             </button>
           </div>
 
@@ -296,8 +297,8 @@ export default function CurrentTicket({
                 ))}
               </select>
             ) : (
-              <div className="flex items-center px-2.5 py-1.5 text-xs bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 rounded-xl border border-amber-200 dark:border-amber-800 font-medium">
-                🛍️ Takeaway
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 rounded-xl border border-amber-200 dark:border-amber-800 font-medium">
+                <ShoppingBag className="w-3.5 h-3.5" /> Takeaway
               </div>
             )}
             <input

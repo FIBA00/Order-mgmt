@@ -1,4 +1,13 @@
 import { useState, useMemo } from "react";
+import {
+  Utensils,
+  ShoppingBag,
+  X,
+  Clock,
+  User,
+  Tag,
+  Coffee,
+} from "lucide-react";
 import { money } from "../../../utils/money.js";
 import { filterOrders, parseOrderDetails } from "../../../utils/order.js";
 import ConfirmModal from "../../common/ConfirmModal.jsx";
@@ -115,23 +124,23 @@ export default function OrderList({
             </button>
             <button
               onClick={() => setDiningFilter("dine-in")}
-              className={`px-2.5 py-1 rounded-lg font-medium transition ${
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-medium transition ${
                 diningFilter === "dine-in"
                   ? "bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs"
                   : "text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200"
               }`}
             >
-              🍽️ Dine-In
+              <Utensils className="w-3.5 h-3.5" /> Dine-In
             </button>
             <button
               onClick={() => setDiningFilter("takeaway")}
-              className={`px-2.5 py-1 rounded-lg font-medium transition ${
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-medium transition ${
                 diningFilter === "takeaway"
                   ? "bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs"
                   : "text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200"
               }`}
             >
-              🛍️ Takeaway
+              <ShoppingBag className="w-3.5 h-3.5" /> Takeaway
             </button>
           </div>
         </div>
@@ -149,7 +158,7 @@ export default function OrderList({
               onClick={() => setSearch("")}
               className="absolute right-2.5 top-1.5 text-xs text-stone-400 hover:text-stone-600 dark:hover:text-stone-300"
             >
-              ✕
+              <X className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
@@ -203,7 +212,7 @@ export default function OrderList({
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-500 dark:text-stone-400">
                     {/* Date / Time */}
                     <span className="inline-flex items-center gap-1">
-                      <span>🕒</span>
+                      <Clock className="w-3.5 h-3.5 text-stone-400" />
                       <span className="font-medium text-stone-600 dark:text-stone-300">
                         {details.formattedTime}
                       </span>
@@ -212,14 +221,16 @@ export default function OrderList({
                     {/* Customer Name if available */}
                     {details.customerName && (
                       <span className="inline-flex items-center gap-1 bg-amber-50/70 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/60 px-2 py-0.5 rounded-md font-medium">
-                        <span>👤</span>
+                        <User className="w-3.5 h-3.5 text-amber-700 dark:text-amber-300" />
                         <span>{details.customerName}</span>
                       </span>
                     )}
 
                     {/* Cashier */}
                     <span className="inline-flex items-center gap-1">
-                      <span className="text-stone-400 dark:text-stone-500">🏷️ Cashier:</span>
+                      <span className="text-stone-400 dark:text-stone-500 inline-flex items-center gap-1">
+                        <Tag className="w-3 h-3" /> Cashier:
+                      </span>
                       <span className="font-semibold text-stone-700 dark:text-stone-300">
                         {details.cashier}
                       </span>
@@ -227,7 +238,9 @@ export default function OrderList({
 
                     {/* Barista */}
                     <span className="inline-flex items-center gap-1">
-                      <span className="text-stone-400 dark:text-stone-500">☕ Barista:</span>
+                      <span className="text-stone-400 dark:text-stone-500 inline-flex items-center gap-1">
+                        <Coffee className="w-3 h-3" /> Barista:
+                      </span>
                       <span className="font-semibold text-stone-700 dark:text-stone-300">
                         {details.barista || "Barista Station"}
                       </span>
@@ -236,12 +249,12 @@ export default function OrderList({
                     {/* Dining Tag */}
                     {details.diningInfo.type === "dine-in" && (
                       <span className="inline-flex items-center gap-1 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 px-2 py-0.5 rounded-md border border-stone-200 dark:border-stone-700">
-                        🍽️ {details.diningInfo.label || "Dine-In"}
+                        <Utensils className="w-3 h-3 text-stone-500" /> {details.diningInfo.label || "Dine-In"}
                       </span>
                     )}
                     {details.diningInfo.type === "takeaway" && (
                       <span className="inline-flex items-center gap-1 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 px-2 py-0.5 rounded-md border border-amber-200 dark:border-amber-800">
-                        🛍️ Takeaway
+                        <ShoppingBag className="w-3 h-3 text-amber-600 dark:text-amber-400" /> Takeaway
                       </span>
                     )}
                   </div>

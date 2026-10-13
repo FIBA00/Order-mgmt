@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { X, User, Tag, Coffee, ShoppingBag, Utensils } from "lucide-react";
 import { money } from "../../../utils/money.js";
 import { parseOrderDetails } from "../../../utils/order.js";
 import { api } from "../../../api/client.js";
