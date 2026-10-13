@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Coffee, Sun, Moon } from "lucide-react";
 import { useTheme } from "../utils/theme.js";
 
 export default function Homepage() {
@@ -12,13 +13,13 @@ export default function Homepage() {
           aria-label="Toggle theme"
           className="flex items-center justify-center w-8 h-8 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-300 text-xs shadow-2xs hover:bg-stone-100 dark:hover:bg-stone-800 transition"
         >
-          {isDark ? "☀️" : "🌙"}
+          {isDark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
         </button>
       </div>
 
       <div className="bg-white dark:bg-stone-900 rounded-3xl shadow-sm border border-stone-200 dark:border-stone-800 p-8 sm:p-10 max-w-md w-full text-center transition-colors">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-xl mb-4">
-          ☕
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 mb-4">
+          <Coffee className="w-6 h-6" />
         </div>
         <h1 className="text-2xl font-bold text-stone-900 dark:text-stone-100 mb-2 tracking-tight">
           Restaurant Order Manager

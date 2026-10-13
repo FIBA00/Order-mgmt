@@ -3,6 +3,7 @@ packages:
 allowBuilds:
   bcrypt: false
   better-sqlite3: true
+  core-js: set this to true or false
   electron: true
   electron-winstaller: true
   esbuild: true

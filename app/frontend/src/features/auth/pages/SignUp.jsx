@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Sun, Moon } from "lucide-react";
 import { useTheme } from "../../../utils/theme.js";
 
 export default function SignUpPage({ onSignUp, error: propError }) {
@@ -36,7 +37,7 @@ export default function SignUpPage({ onSignUp, error: propError }) {
           aria-label="Toggle theme"
           className="flex items-center justify-center w-8 h-8 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-300 text-xs shadow-2xs hover:bg-stone-100 dark:hover:bg-stone-800 transition"
         >
-          {isDark ? "☀️" : "🌙"}
+          {isDark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
         </button>
       </div>
 

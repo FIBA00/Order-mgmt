@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { X } from "lucide-react";
 
 const PRESET_CATEGORIES = [
   "Coffee",
@@ -82,7 +83,7 @@ export default function EditMenuItemModal({ item, onSave, onClose }) {
             onClick={onClose}
             className="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 text-xs px-1"
           >
-            ✕
+            <X className="w-4 h-4" />
           </button>
         </div>
 

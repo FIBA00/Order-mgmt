@@ -49,7 +49,38 @@
        - `app/backend/src/services/orders.service.js`: Order lifecycle (`list`, `create`, `setStatus`).
        - `app/backend/src/services/dashboard.service.js`: Reporting metrics (`today`).
     2. Converted `app/backend/src/services/index.js` into a clean aggregator maintaining 100% backward compatibility for Electron IPC and test harnesses.
+- [BACKEND] - When deleting staff member in admin mode this failure occurs, ```GET /api/auth/users 304 8.330 ms - -
+OPTIONS /api/auth/users/1 204 1.062 ms - -
+DELETE /api/auth/users/1 500 9.315 ms - 1258
+SqliteError: FOREIGN KEY constraint failed
+    at PreparedQuery.run (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/better-sqlite3/session.js:72:22)
+    at QueryPromise.resultCb (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/sqlite-core/session.js:119:64)
+    at QueryPromise.execute (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/sqlite-core/session.js:13:17)
+    at QueryPromise.then (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/query-promise.js:21:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+DELETE /api/auth/users/1 500 12.730 ms - 1258
+SqliteError: FOREIGN KEY constraint failed
+    at PreparedQuery.run (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/better-sqlite3/session.js:72:22)
+    at QueryPromise.resultCb (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/sqlite-core/session.js:119:64)
+    at QueryPromise.execute (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/sqlite-core/session.js:13:17)
+    at QueryPromise.then (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/query-promise.js:21:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
 
+ ```
+
+- [BACKEND] - menu item deleting also failed ```  /api/menu 200 3.312 ms - 375
+OPTIONS /api/menu/9 204 0.966 ms - -
+DELETE /api/menu/9 500 27.811 ms - 1512
+SqliteError: FOREIGN KEY constraint failed
+    at PreparedQuery.values (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/better-sqlite3/session.js:106:28)
+    at PreparedQuery.all (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/better-sqlite3/session.js:81:23)
+    at QueryPromise.resultCb (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/sqlite-core/session.js:119:64)
+    at QueryPromise.execute (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/sqlite-core/session.js:13:17)
+    at QueryPromise.then (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/query-promise.js:21:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+
+
+ ```
 ## Feature suggestion
 
 - [ui] [RESOLVED (Phase 2)] implement the signup on initial setup
@@ -109,3 +140,21 @@
     3. Removed `☕ Menu Catalog` from navigation headers and `UserMenu.jsx` for non-admin users.
     4. Guarded `Manage Menu Catalog →` shortcut link in `DashboardPage.jsx` so cashiers and staff only ever see the POS ordering and order management interface.
     5. Verified 100% of monorepo automated tests passing (77/77) and clean production build.
+- [ui] [RESOLVED] lets use external package lucide icons instead of emojis
+  - **Resolution**:
+    1. Installed `lucide-react` in `app/frontend/package.json`.
+    2. Replaced all raw unicode emojis and symbol glyphs across the entire application with modern Lucide icons:
+       - Navigation & Brand: `Utensils` (branding), `ClipboardList` (POS Register), `Coffee` (Menu Catalog), `CircleDollarSign` (Finances), `Users` (Staff & Admin), `LogOut` (Sign Out).
+       - Order & POS Cards: `Clock` (Timestamp), `User` (Customer), `Tag` (Cashier), `Coffee` (Barista), `ShoppingBag` (Takeaway), `Utensils` (Dine-In), `X` (Clear/Dismiss), `Trash2` (Remove).
+       - Theme & Actions: `Sun` / `Moon` (Theme toggles), `Lock` (Permission guard), `Printer` (Print report), `RefreshCw` (Data sync), `Pencil` (Edit item), `Trash2` (Delete item).
+    3. Updated components: `TitleBar.jsx`, `UserMenu.jsx`, `DashboardPage.jsx`, `MenuManagementPage.jsx`, `FinancesPage.jsx`, `AdminConsolePage.jsx`, `OrderList.jsx`, `CurrentTicket.jsx`, `OrderDetailsModal.jsx`, `MenuList.jsx`, `EditMenuItemModal.jsx`, `Login.jsx`, `SignUp.jsx`, `Homepage.jsx`.
+    4. Verified zero remaining raw emojis with regex scan, Vite production bundle completed cleanly, and all 80/80 automated monorepo tests pass green.
+
+- [ui] [RESOLVED] the receipt and report printing is doing screenshots which is not the right way to print for pos machines we need extenral deps to create the receipts and for reports we need something to create pdf output not screenshot.
+  - **Resolution**:
+    1. Installed `jspdf` and `jspdf-autotable` in `@restaurant/frontend` for client-side vector PDF generation.
+    2. Implemented `app/frontend/src/utils/pdf.js`:
+       - **POS 80mm Thermal Receipt Generator (`createReceiptPdf`, `printReceiptPdf`, `downloadReceiptPdf`)**: Produces formatted 80mm width thermal receipts with store branding, order metadata, line items (quantity, unit price, line totals), itemized subtotal/tax/grand-total, and receipt footer message. Prints directly via an isolated invisible iframe without capturing window screenshots, with a secondary option to download the receipt PDF directly.
+       - **Financial & Revenue Report Generator (`createFinancialReportPdf`, `printFinancialReportPdf`, `downloadFinancialReportPdf`)**: Produces structured A4 multi-page PDF reports containing store header, executive summary KPI grid (gross revenue, average ticket, pending, cancelled), dining channel breakdown (dine-in vs takeaway volume and sales shares), and full transactions ledger table via `autoTable`.
+    3. Integrated into `OrderDetailsModal.jsx` (providing "Print Receipt" and "PDF" download buttons) and `FinancesPage.jsx` (providing "Print PDF" and "Export PDF" buttons).
+    4. Added automated unit tests in `app/frontend/test/pdf.test.js` verifying receipt 80mm geometry, item fallbacks, and multi-column financial report generation. All 83/83 monorepo tests pass.

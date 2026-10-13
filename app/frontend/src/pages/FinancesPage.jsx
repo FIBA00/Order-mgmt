@@ -9,6 +9,7 @@ import {
   Moon,
   Lock,
   Printer,
+  Download,
   RefreshCw,
   X,
   Utensils,
@@ -20,6 +21,10 @@ import {
 import { api, isDesktop } from "../api/client.js";
 import { money } from "../utils/money.js";
 import { parseOrderDetails, parseDiningInfo } from "../utils/order.js";
+import {
+  printFinancialReportPdf,
+  downloadFinancialReportPdf,
+} from "../utils/pdf.js";
 import { useTheme } from "../utils/theme.js";
 import UserMenu from "../features/common/UserMenu.jsx";
 import OrderDetailsModal from "../features/orders/pages/OrderDetailsModal.jsx";
@@ -175,6 +180,28 @@ export default function FinancesPage({ user, onLogout }) {
     );
   }
 
+  function handlePrintReport() {
+    const store = api?.store ? api.store.get() : {};
+    printFinancialReportPdf({
+      orders: periodOrders,
+      menu,
+      period,
+      store,
+      user,
+    });
+  }
+
+  function handleDownloadReport() {
+    const store = api?.store ? api.store.get() : {};
+    downloadFinancialReportPdf({
+      orders: periodOrders,
+      menu,
+      period,
+      store,
+      user,
+    });
+  }
+
   return (
     <div className="min-h-screen bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 flex flex-col transition-colors">
       {/* Top Application Header */}
@@ -218,12 +245,20 @@ export default function FinancesPage({ user, onLogout }) {
           </nav>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => window.print()}
+            onClick={handlePrintReport}
+            title="Print formatted PDF report"
             className="inline-flex items-center gap-1.5 text-xs bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200 px-3 py-1.5 rounded-xl font-medium transition"
           >
-            <Printer className="w-3.5 h-3.5" /> Print Report
+            <Printer className="w-3.5 h-3.5" /> Print PDF
+          </button>
+          <button
+            onClick={handleDownloadReport}
+            title="Download vector PDF report"
+            className="inline-flex items-center gap-1.5 text-xs bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white px-3 py-1.5 rounded-xl font-medium transition shadow-xs"
+          >
+            <Download className="w-3.5 h-3.5" /> Export PDF
           </button>
           <button
             onClick={toggleTheme}

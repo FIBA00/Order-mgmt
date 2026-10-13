@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { X, User, Tag, Coffee, ShoppingBag, Utensils } from "lucide-react";
+import { X, User, Tag, Coffee, ShoppingBag, Utensils, Printer, Download } from "lucide-react";
 import { money } from "../../../utils/money.js";
 import { parseOrderDetails } from "../../../utils/order.js";
+import { printReceiptPdf, downloadReceiptPdf } from "../../../utils/pdf.js";
 import { api } from "../../../api/client.js";
 import ConfirmModal from "../../common/ConfirmModal.jsx";
 
@@ -67,7 +68,11 @@ export default function OrderDetailsModal({
   const details = parseOrderDetails(orderData, menuItems);
 
   function handlePrint() {
-    window.print();
+    printReceiptPdf(orderData, menuItems, store);
+  }
+
+  function handleDownload() {
+    downloadReceiptPdf(orderData, menuItems, store);
   }
 
   const formattedDate = orderData.createdAt
@@ -101,7 +106,7 @@ export default function OrderDetailsModal({
             onClick={onClose}
             className="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 text-sm"
           >
-            ✕
+            <X className="w-4 h-4" />
           </button>
         </div>
 
@@ -143,29 +148,39 @@ export default function OrderDetailsModal({
             {details.customerName && (
               <div className="py-2 flex justify-between items-center">
                 <span className="text-stone-500 dark:text-stone-400">Customer</span>
-                <span className="font-semibold text-stone-900 dark:text-stone-100">
-                  👤 {details.customerName}
+                <span className="font-semibold text-stone-900 dark:text-stone-100 flex items-center">
+                  <User className="w-3.5 h-3.5 inline mr-1 text-amber-600 dark:text-amber-400" />
+                  {details.customerName}
                 </span>
               </div>
             )}
             <div className="py-2 flex justify-between items-center">
               <span className="text-stone-500 dark:text-stone-400">Cashier</span>
-              <span className="font-medium text-stone-800 dark:text-stone-200">
-                🏷️ {details.cashier}
+              <span className="font-medium text-stone-800 dark:text-stone-200 flex items-center">
+                <Tag className="w-3.5 h-3.5 inline mr-1 text-stone-400" />
+                {details.cashier}
               </span>
             </div>
             <div className="py-2 flex justify-between items-center">
               <span className="text-stone-500 dark:text-stone-400">Barista</span>
-              <span className="font-medium text-stone-800 dark:text-stone-200">
-                ☕ {details.barista || "Barista Station"}
+              <span className="font-medium text-stone-800 dark:text-stone-200 flex items-center">
+                <Coffee className="w-3.5 h-3.5 inline mr-1 text-stone-400" />
+                {details.barista || "Barista Station"}
               </span>
             </div>
             <div className="pt-2 flex justify-between items-center">
               <span className="text-stone-500 dark:text-stone-400">Dining Mode</span>
-              <span className="font-medium text-stone-800 dark:text-stone-200">
-                {details.diningInfo.type === "takeaway"
-                  ? "🛍️ Takeaway"
-                  : `🍽️ ${details.diningInfo.label || "Dine-In"}`}
+              <span className="font-medium text-stone-800 dark:text-stone-200 flex items-center">
+                {details.diningInfo.type === "takeaway" ? (
+                  <>
+                    <ShoppingBag className="w-3.5 h-3.5 inline mr-1" /> Takeaway
+                  </>
+                ) : (
+                  <>
+                    <Utensils className="w-3.5 h-3.5 inline mr-1" />
+                    {details.diningInfo.label || "Dine-In"}
+                  </>
+                )}
               </span>
             </div>
           </div>
@@ -251,13 +266,24 @@ export default function OrderDetailsModal({
 
         {/* Modal Footer & Actions */}
         <div className="px-6 py-4 bg-stone-50 dark:bg-stone-800/40 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between gap-2">
-          <button
-
-            onClick={handlePrint}
-            className="text-xs border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-50 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200 px-3 py-1.5 rounded-lg transition"
-          >
-            Print Receipt
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={handlePrint}
+              title="Print formatted 80mm thermal receipt"
+              className="text-xs flex items-center gap-1.5 border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-50 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200 px-3 py-1.5 rounded-lg transition"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              Print Receipt
+            </button>
+            <button
+              onClick={handleDownload}
+              title="Download 80mm receipt PDF"
+              className="text-xs flex items-center gap-1 border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-50 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 px-2.5 py-1.5 rounded-lg transition"
+            >
+              <Download className="w-3.5 h-3.5" />
+              PDF
+            </button>
+          </div>
 
           <div className="flex items-center gap-2">
             {orderData.status === "open" && onSetStatus && (

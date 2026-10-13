@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { X, Pencil, Trash2 } from "lucide-react";
 import { money } from "../../../utils/money.js";
 import EditMenuItemModal from "./EditMenuItemModal.jsx";
 import ConfirmModal from "../../common/ConfirmModal.jsx";
@@ -87,7 +88,7 @@ export default function MenuList({
               onClick={() => setSearch("")}
               className="absolute right-3 top-2.5 text-xs text-stone-400 hover:text-stone-600 dark:hover:text-stone-300"
             >
-              ✕
+              <X className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
@@ -213,9 +214,9 @@ export default function MenuList({
                           e.stopPropagation();
                           setEditingItem(item);
                         }}
-                        className="text-stone-400 hover:text-amber-500 dark:hover:text-amber-400 text-xs px-1 rounded transition"
+                        className="text-stone-400 hover:text-amber-500 dark:hover:text-amber-400 p-1 rounded transition"
                       >
-                        ✎
+                        <Pencil className="w-3.5 h-3.5" />
                       </button>
                     )}
                     {onDeleteItem && (
@@ -226,9 +227,9 @@ export default function MenuList({
                           e.stopPropagation();
                           setDeletingItem(item);
                         }}
-                        className="text-stone-400 hover:text-red-500 dark:hover:text-red-400 text-xs px-1 rounded transition"
+                        className="text-stone-400 hover:text-red-500 dark:hover:text-red-400 p-1 rounded transition"
                       >
-                        ✕
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     )}
                   </div>
