@@ -49,38 +49,30 @@
        - `app/backend/src/services/orders.service.js`: Order lifecycle (`list`, `create`, `setStatus`).
        - `app/backend/src/services/dashboard.service.js`: Reporting metrics (`today`).
     2. Converted `app/backend/src/services/index.js` into a clean aggregator maintaining 100% backward compatibility for Electron IPC and test harnesses.
-- [BACKEND] - When deleting staff member in admin mode this failure occurs, ```GET /api/auth/users 304 8.330 ms - -
-OPTIONS /api/auth/users/1 204 1.062 ms - -
-DELETE /api/auth/users/1 500 9.315 ms - 1258
-SqliteError: FOREIGN KEY constraint failed
-    at PreparedQuery.run (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/better-sqlite3/session.js:72:22)
-    at QueryPromise.resultCb (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/sqlite-core/session.js:119:64)
-    at QueryPromise.execute (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/sqlite-core/session.js:13:17)
-    at QueryPromise.then (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/query-promise.js:21:17)
-    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-DELETE /api/auth/users/1 500 12.730 ms - 1258
-SqliteError: FOREIGN KEY constraint failed
-    at PreparedQuery.run (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/better-sqlite3/session.js:72:22)
-    at QueryPromise.resultCb (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/sqlite-core/session.js:119:64)
-    at QueryPromise.execute (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/sqlite-core/session.js:13:17)
-    at QueryPromise.then (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/query-promise.js:21:17)
-    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+- [BACKEND] [RESOLVED] When deleting staff member in admin mode this failure occurs:
+  ```
+  DELETE /api/auth/users/1 500 12.730 ms - 1258
+  SqliteError: FOREIGN KEY constraint failed
+  ```
+  - **Root Cause**:
+    1. The `orders.user_id` foreign key references `users.id`. Attempting to delete a staff member who processed orders triggered SQLite's foreign key constraint, which unhandled bubbled to an HTTP 500 error.
+    2. Automated backend tests previously executed directly against `./data/app.sqlite`, generating random `auth_user_<timestamp>` accounts and creating test orders linked to user ID 1 (`auth_user_...`). Additionally, `orders.ctrl.js` fell back to `userId = 1` if `req.user` was missing, attributing tickets to the test user.
+  - **Resolution**:
+    1. Added `hasOrders(userId)` check in `app/backend/src/features/auth/auth.repository.js` and safe deletion handling in `auth.service.js` and `auth.ctrl.js`. Attempting to delete an account with existing order history returns a clean HTTP 409 Conflict (`Cannot delete staff account with existing order history. Historical sales records must be preserved.`) instead of an unhandled 500 error.
+    2. Enforced authenticated `userId = req.user.id` in `orders.ctrl.js`, returning HTTP 401 if unauthenticated.
+    3. Added test environment database isolation in `env.config.js` (`NODE_ENV=test` routes to `./data/test.sqlite`), guaranteeing automated tests never mutate `./data/app.sqlite`.
+    4. Cleaned up legacy test users (`auth_user_...`) and test order records from `app.sqlite`, leaving only clean production accounts (`admin`, `barista1`).
+    5. Added full test coverage for staff listing, self-deletion guard (400), non-existent deletion (404), and historical order deletion conflict (409).
 
- ```
-
-- [BACKEND] - menu item deleting also failed ```  /api/menu 200 3.312 ms - 375
-OPTIONS /api/menu/9 204 0.966 ms - -
-DELETE /api/menu/9 500 27.811 ms - 1512
-SqliteError: FOREIGN KEY constraint failed
-    at PreparedQuery.values (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/better-sqlite3/session.js:106:28)
-    at PreparedQuery.all (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/better-sqlite3/session.js:81:23)
-    at QueryPromise.resultCb (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/sqlite-core/session.js:119:64)
-    at QueryPromise.execute (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/sqlite-core/session.js:13:17)
-    at QueryPromise.then (file:///home/fraold/Develop_and_Code/StandardProjects/MERN/Desktop-app/Order-mgmt/node_modules/.pnpm/drizzle-orm@0.44.7_better-sqlite3@12.11.1_pg@8.23.0/node_modules/drizzle-orm/query-promise.js:21:17)
-    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-
-
- ```
+- [BACKEND] [RESOLVED] menu item deleting also failed with FOREIGN KEY constraint failed:
+  ```
+  DELETE /api/menu/9 500 27.811 ms - 1512
+  SqliteError: FOREIGN KEY constraint failed
+  ```
+  - **Resolution**:
+    1. Updated `deleteMenu` in `app/backend/src/features/menu/menu.repository.js` to catch `FOREIGN KEY constraint failed` when historical order items reference the menu item, automatically soft-deleting (`UPDATE menu_items SET active = 0 WHERE id = ?`) and returning HTTP 203.
+    2. Filtered `findAll` in `menu.repository.js` to only active catalog items (`where(eq(menuItems.active, true))`).
+    3. Added automated test verifying soft-deletion and list exclusion when menu items have order history.
 ## Feature suggestion
 
 - [ui] [RESOLVED (Phase 2)] implement the signup on initial setup

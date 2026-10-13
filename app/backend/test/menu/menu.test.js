@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createTestServer } from "../helpers/test-server.js";
+import { createTestServer, createTestToken } from "../helpers/test-server.js";
 
 test("Menu Module", async (t) => {
   const { baseUrl, close } = createTestServer();
@@ -111,4 +111,44 @@ test("Menu Module", async (t) => {
     const body = await res.json();
     assert.equal(body.success, false);
   });
+
+  await t.test(
+    "soft-deletes menu item when referenced by existing orders without 500 error",
+    async () => {
+      const token = createTestToken({ id: 1, username: "admin", role: "admin" });
+
+      const itemRes = await fetch(`${baseUrl}/api/menu`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: `SoftDeleteItem_${Date.now()}`,
+          priceCents: 450,
+        }),
+      });
+      const item = (await itemRes.json()).data;
+
+      await fetch(`${baseUrl}/api/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          items: [{ menuItemId: item.id, quantity: 1 }],
+        }),
+      });
+
+      const deleteRes = await fetch(`${baseUrl}/api/menu/${item.id}`, {
+        method: "DELETE",
+      });
+      assert.equal(deleteRes.status, 203);
+      const deleteBody = await deleteRes.json();
+      assert.equal(deleteBody.success, true);
+      assert.equal(deleteBody.data.active, false);
+
+      const listRes = await fetch(`${baseUrl}/api/menu`);
+      const listBody = await listRes.json();
+      assert.ok(!listBody.data.some((m) => m.id === item.id));
+    },
+  );
 });

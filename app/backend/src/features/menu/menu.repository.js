@@ -14,6 +14,7 @@ export function createMenuRepository({ db, schema }) {
         createdAt: menuItems.createdAt,
       })
       .from(menuItems)
+      .where(eq(menuItems.active, true))
       .orderBy(asc(menuItems.name));
   }
 
@@ -85,12 +86,23 @@ export function createMenuRepository({ db, schema }) {
     return item ?? null;
   }
   async function deleteMenu(id) {
-    const [item] = await db
-      .delete(menuItems)
-      .where(eq(menuItems.id, id))
-      .returning();
+    try {
+      const [item] = await db
+        .delete(menuItems)
+        .where(eq(menuItems.id, id))
+        .returning();
 
-    return item ?? null;
+      return item ?? null;
+    } catch (err) {
+      if (
+        err.code === "SQLITE_CONSTRAINT_FOREIGNKEY" ||
+        err.code === "23503" ||
+        err.message?.includes("FOREIGN KEY")
+      ) {
+        return update(id, { active: false });
+      }
+      throw err;
+    }
   }
 
   async function setActive(id, active) {
