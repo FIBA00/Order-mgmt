@@ -35,8 +35,12 @@ function registerAppIpc() {
   });
 
   ipcMain.handle("app:install-update", () => {
-    autoUpdater.quitAndInstall();
-    return { success: true };
+    try {
+      autoUpdater.quitAndInstall();
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
   });
 }
 

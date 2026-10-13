@@ -59,6 +59,7 @@ The desktop codebase has been refactored into domain-segregated modules followin
 | 2026-10-13 | Multi-platform CI/CD and deployment pipeline configuration    | ci(desktop): add ci.yml, multi-platform release.yml, root check/test scripts             |
 | 2026-10-13 | Fix startup Drizzle migration collision & ESM backend packaging| fix(desktop): catch already existing sqlite tables and bundle backend/package.json        |
 | 2026-10-13 | Optimize packaging with local electronDist (zero network)     | perf(desktop): configure electronDist to use node_modules/electron/dist                  |
+| 2026-10-13 | Implement Pillar 1 (Security) & Pillar 2 (Remote Updates)     | feat(security,updater): will-navigate lock, auth rate limiter, AppImage target & updater IPC |
 
 ---
 
@@ -78,6 +79,6 @@ The desktop codebase has been refactored into domain-segregated modules followin
 - [x] **Task 12 (CI/CD Pipeline & Packaging Verification)**: Configured GitHub Actions `.github/workflows/ci.yml` (testing, frontend building, Linux and Windows desktop packaging) and multi-platform `.github/workflows/release.yml`; added root `check`, `test`, `build` scripts; verified end-to-end `pnpm check`.
 - [x] **Task 13 (Startup Crash & Drizzle Schema Defense)**: Wrapped `migrateSqlite` in `backend/src/database/index.js` with error defense against `table already exists` on dirty local databases; bundled `backend/package.json` into ASAR to eliminate `MODULE_TYPELESS_PACKAGE_JSON` warning. Verified clean boot and auto-seeding.
 - [x] **Task 14 (Zero-Download Offline Packaging via `electronDist`)**: Configured `"electronDist": "node_modules/electron/dist"` in `app/desktop/package.json` under `build`, preventing `electron-builder` from attempting remote zip downloads. Packaging runtime reduced to ~20 seconds.
-- [ ] **Task 15 (Security Hardening - Pillar 1)**: Implement `will-navigate` guard in `src/window/main-window.js` to block arbitrary web navigation; implement lightweight in-memory rate limiting middleware on auth routes (`/api/auth/login`, `/api/auth/signup`).
-- [ ] **Task 16 (Remote Updates via GitHub Releases - Pillar 2)**: Add `AppImage` linux target in `package.json`; expose updater IPC events (`updater:check`, `updater:status`, `updater:install`) to renderer via context bridge; add UI status badge/banner in title bar.
+- [x] **Task 15 (Security Hardening - Pillar 1)**: Added `will-navigate` guard in `src/window/main-window.js` to block remote web navigation and delegate external links to `shell.openExternal`; implemented lightweight in-memory rate limiting middleware on auth routes (`/api/auth/login`, `/api/auth/signup`) with unit tests.
+- [x] **Task 16 (Remote Updates via GitHub Releases - Pillar 2)**: Added `AppImage` linux target in `package.json` and `release.yml`; exposed updater IPC events (`updater:status`) and actions (`downloadUpdate`, `installUpdate`) in preload; added update indicator badge and restart action in `TitleBar.jsx`.
 

@@ -160,7 +160,7 @@ export default function MenuManagementPage({ user, onLogout }) {
     return (
       <div className="min-h-screen bg-stone-50 dark:bg-stone-950 flex items-center justify-center p-4">
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-8 max-w-md w-full text-center space-y-4 shadow-xl">
-          <span className="text-4xl">🔒</span>
+          <Lock className="w-10 h-10 text-amber-600 dark:text-amber-500 mx-auto" />
           <h2 className="text-lg font-bold text-stone-900 dark:text-stone-100">
             Access Restricted
           </h2>
@@ -185,7 +185,7 @@ export default function MenuManagementPage({ user, onLogout }) {
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2.5">
             <span className="w-7 h-7 rounded-xl bg-amber-600 dark:bg-amber-500 text-white flex items-center justify-center text-sm font-bold shadow-2xs">
-              ☕
+              <Coffee className="w-4 h-4" />
             </span>
             <h1 className="text-base font-bold text-stone-900 dark:text-stone-100 tracking-tight">
               Order Manager
@@ -196,29 +196,29 @@ export default function MenuManagementPage({ user, onLogout }) {
           <nav className="flex items-center gap-1 bg-stone-100 dark:bg-stone-800 p-1 rounded-xl text-xs font-medium">
             <Link
               to="/dashboard"
-              className="px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
             >
-              📋 POS Register
+              <ClipboardList className="w-3.5 h-3.5" /> POS Register
             </Link>
             <Link
               to="/menu"
-              className="px-3 py-1.5 rounded-lg bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs transition font-semibold"
             >
-              ☕ Menu Catalog
+              <Coffee className="w-3.5 h-3.5" /> Menu Catalog
             </Link>
             {user?.role === "admin" && (
               <>
                 <Link
                   to="/finances"
-                  className="px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
                 >
-                  💰 Finance
+                  <CircleDollarSign className="w-3.5 h-3.5" /> Finance
                 </Link>
                 <Link
                   to="/admin"
-                  className="px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
                 >
-                  👥 Staff & Admin
+                  <Users className="w-3.5 h-3.5" /> Staff & Admin
                 </Link>
               </>
             )}
@@ -233,7 +233,7 @@ export default function MenuManagementPage({ user, onLogout }) {
             className="flex items-center justify-center w-8 h-8 rounded-full bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 text-sm transition"
             title={`Switch to ${isDark ? "Light" : "Dark"} mode`}
           >
-            {isDark ? "☀️" : "🌙"}
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
 
           {/* Consolidated User Menu Circular Button */}
@@ -273,7 +273,7 @@ export default function MenuManagementPage({ user, onLogout }) {
               onClick={() => setMessage("")}
               className="text-amber-500 hover:text-amber-700 ml-4"
             >
-              ✕
+              <X className="w-3.5 h-3.5" />
             </button>
           </div>
         )}
@@ -293,7 +293,7 @@ export default function MenuManagementPage({ user, onLogout }) {
                 onClick={() => setSearch("")}
                 className="absolute right-3 top-2.5 text-xs text-stone-400 hover:text-stone-600 dark:hover:text-stone-300"
               >
-                ✕
+                <X className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
@@ -325,8 +325,8 @@ export default function MenuManagementPage({ user, onLogout }) {
             </div>
           ) : !items.length ? (
             <div className="p-12 text-center">
-              <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-xl mx-auto flex items-center justify-center mb-3">
-                🍽️
+              <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 mx-auto flex items-center justify-center mb-3">
+                <Utensils className="w-6 h-6 text-amber-600 dark:text-amber-400" />
               </div>
               <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100 mb-1">
                 No menu items yet
@@ -397,17 +397,17 @@ export default function MenuManagementPage({ user, onLogout }) {
                             disabled={!isAdmin}
                             onClick={() => setEditingItem(item)}
                             title={isAdmin ? "Edit item" : "Admin permission required"}
-                            className="inline-flex items-center gap-1 text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-200 dark:border-amber-800 px-2.5 py-1 rounded-lg font-medium transition disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="inline-flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-200 dark:border-amber-800 px-2.5 py-1 rounded-lg font-medium transition disabled:opacity-40 disabled:cursor-not-allowed"
                           >
-                            ✎ Edit
+                            <Pencil className="w-3 h-3" /> Edit
                           </button>
                           <button
                             disabled={!isAdmin}
                             onClick={() => handleDelete(item.id, item.name)}
                             title={isAdmin ? "Delete item" : "Admin permission required"}
-                            className="inline-flex items-center gap-1 text-xs text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/60 border border-red-200 dark:border-red-800 px-2.5 py-1 rounded-lg font-medium transition disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="inline-flex items-center gap-1.5 text-xs text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/60 border border-red-200 dark:border-red-800 px-2.5 py-1 rounded-lg font-medium transition disabled:opacity-40 disabled:cursor-not-allowed"
                           >
-                            🗑 Delete
+                            <Trash2 className="w-3 h-3" /> Delete
                           </button>
                         </div>
                       </td>
@@ -446,7 +446,7 @@ export default function MenuManagementPage({ user, onLogout }) {
                 onClick={() => setShowCreateModal(false)}
                 className="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 text-xs px-1"
               >
-                ✕
+                <X className="w-4 h-4" />
               </button>
             </div>
 

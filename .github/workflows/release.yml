@@ -33,8 +33,11 @@ jobs:
       - name: Build frontend
         run: pnpm build:frontend
 
-      - name: Build desktop package
-        run: pnpm build:electron
+      - name: Build and publish desktop
+        working-directory: app/desktop
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm dist --publish always
 
       - name: Create Linux Tarball
         run: tar -czf restaurant-order-manager-linux-x64-${{ github.ref_name }}.tar.gz -C app/desktop/dist/linux-unpacked .

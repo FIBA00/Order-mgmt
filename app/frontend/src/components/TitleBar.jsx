@@ -4,6 +4,7 @@ import { isDesktop } from "../api/client.js";
 
 export default function TitleBar() {
   const [isMaximized, setIsMaximized] = useState(false);
+  const [updateStatus, setUpdateStatus] = useState(null);
 
   useEffect(() => {
     if (!isDesktop || !window.desktopAPI?.window) return;
@@ -11,6 +12,16 @@ export default function TitleBar() {
     window.desktopAPI.window.isMaximized().then((max) => {
       setIsMaximized(Boolean(max));
     }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!isDesktop || !window.desktopAPI?.app?.onUpdateStatus) return;
+    const unsubscribe = window.desktopAPI.app.onUpdateStatus((status) => {
+      setUpdateStatus(status);
+    });
+    return () => {
+      if (typeof unsubscribe === "function") unsubscribe();
+    };
   }, []);
 
   if (!isDesktop) return null;
@@ -50,7 +61,23 @@ export default function TitleBar() {
         <span>Restaurant Order Manager</span>
       </div>
 
-      <div className="flex-1 h-full" />
+      <div className="flex-1 h-full flex items-center justify-center">
+        {updateStatus?.status === "downloading" && (
+          <span className="text-[11px] text-amber-400 font-medium px-2 py-0.5 rounded bg-amber-950/40 border border-amber-800/60 animate-pulse">
+            Downloading update {updateStatus.percent ? `(${updateStatus.percent}%)` : "..."}
+          </span>
+        )}
+        {updateStatus?.status === "downloaded" && (
+          <button
+            type="button"
+            onClick={() => window.desktopAPI?.app?.installUpdate?.()}
+            className="text-[11px] bg-emerald-700 hover:bg-emerald-600 text-white font-medium px-2 py-0.5 rounded transition shadow-sm"
+            style={{ WebkitAppRegion: "no-drag" }}
+          >
+            Restart to update {updateStatus.version ? `(v${updateStatus.version})` : ""}
+          </button>
+        )}
+      </div>
 
       <div
         className="flex items-center h-full"

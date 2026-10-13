@@ -1,5 +1,22 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
+import {
+  Coffee,
+  ClipboardList,
+  CircleDollarSign,
+  Users,
+  Sun,
+  Moon,
+  Lock,
+  Printer,
+  RefreshCw,
+  X,
+  Utensils,
+  ShoppingBag,
+  Tag,
+  Clock,
+  User,
+} from "lucide-react";
 import { api, isDesktop } from "../api/client.js";
 import { money } from "../utils/money.js";
 import { parseOrderDetails, parseDiningInfo } from "../utils/order.js";
@@ -139,7 +156,7 @@ export default function FinancesPage({ user, onLogout }) {
     return (
       <div className="min-h-screen bg-stone-50 dark:bg-stone-950 flex items-center justify-center p-4">
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-8 max-w-md w-full text-center space-y-4 shadow-xl">
-          <span className="text-4xl">🔒</span>
+          <Lock className="w-10 h-10 text-amber-600 dark:text-amber-500 mx-auto" />
           <h2 className="text-lg font-bold text-stone-900 dark:text-stone-100">
             Access Restricted
           </h2>
@@ -165,7 +182,7 @@ export default function FinancesPage({ user, onLogout }) {
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2.5">
             <span className="w-7 h-7 rounded-xl bg-amber-600 dark:bg-amber-500 text-white flex items-center justify-center text-sm font-bold shadow-2xs">
-              ☕
+              <Coffee className="w-4 h-4" />
             </span>
             <h1 className="text-base font-bold text-stone-900 dark:text-stone-100 tracking-tight">
               Order Manager
@@ -176,27 +193,27 @@ export default function FinancesPage({ user, onLogout }) {
           <nav className="flex items-center gap-1 bg-stone-100 dark:bg-stone-800 p-1 rounded-xl text-xs font-medium">
             <Link
               to="/dashboard"
-              className="px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
             >
-              📋 POS Register
+              <ClipboardList className="w-3.5 h-3.5" /> POS Register
             </Link>
             <Link
               to="/menu"
-              className="px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
             >
-              ☕ Menu Catalog
+              <Coffee className="w-3.5 h-3.5" /> Menu Catalog
             </Link>
             <Link
               to="/finances"
-              className="px-3 py-1.5 rounded-lg bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs transition font-semibold"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs transition font-semibold"
             >
-              💰 Finance
+              <CircleDollarSign className="w-3.5 h-3.5" /> Finance
             </Link>
             <Link
               to="/admin"
-              className="px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
             >
-              👥 Staff & Admin
+              <Users className="w-3.5 h-3.5" /> Staff & Admin
             </Link>
           </nav>
         </div>
@@ -204,9 +221,9 @@ export default function FinancesPage({ user, onLogout }) {
         <div className="flex items-center gap-2.5">
           <button
             onClick={() => window.print()}
-            className="text-xs bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200 px-3 py-1.5 rounded-xl font-medium transition"
+            className="inline-flex items-center gap-1.5 text-xs bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200 px-3 py-1.5 rounded-xl font-medium transition"
           >
-            🖨️ Print Report
+            <Printer className="w-3.5 h-3.5" /> Print Report
           </button>
           <button
             onClick={toggleTheme}
@@ -214,7 +231,7 @@ export default function FinancesPage({ user, onLogout }) {
             className="flex items-center justify-center w-8 h-8 rounded-full bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 text-sm transition"
             title={`Switch to ${isDark ? "Light" : "Dark"} mode`}
           >
-            {isDark ? "☀️" : "🌙"}
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
           <UserMenu user={user} onLogout={onLogout} />
         </div>
@@ -259,9 +276,9 @@ export default function FinancesPage({ user, onLogout }) {
             <button
               onClick={loadData}
               disabled={loading}
-              className="text-xs text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 px-2 py-1 transition"
+              className="inline-flex items-center gap-1.5 text-xs text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 px-2 py-1 transition"
             >
-              🔄 Refresh
+              <RefreshCw className="w-3.5 h-3.5" /> Refresh
             </button>
           </div>
         </div>
@@ -269,7 +286,9 @@ export default function FinancesPage({ user, onLogout }) {
         {message && (
           <div className="text-xs text-amber-900 dark:text-amber-200 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 rounded-xl px-4 py-2 flex justify-between items-center">
             <span>{message}</span>
-            <button onClick={() => setMessage("")}>✕</button>
+            <button onClick={() => setMessage("")} className="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200">
+              <X className="w-3.5 h-3.5" />
+            </button>
           </div>
         )}
 
@@ -334,7 +353,7 @@ export default function FinancesPage({ user, onLogout }) {
             <div className="divide-y divide-stone-100 dark:divide-stone-800 text-xs">
               <div className="py-2.5 flex justify-between items-center">
                 <span className="flex items-center gap-1.5 font-medium text-stone-800 dark:text-stone-200">
-                  <span>🍽️</span> Dine-In ({metrics.dineInCount} orders)
+                  <Utensils className="w-4 h-4 text-stone-400" /> Dine-In ({metrics.dineInCount} orders)
                 </span>
                 <span className="font-bold text-stone-900 dark:text-stone-100">
                   {money(metrics.dineInRevenue)}
@@ -342,7 +361,7 @@ export default function FinancesPage({ user, onLogout }) {
               </div>
               <div className="py-2.5 flex justify-between items-center">
                 <span className="flex items-center gap-1.5 font-medium text-stone-800 dark:text-stone-200">
-                  <span>🛍️</span> Takeaway ({metrics.takeawayCount} orders)
+                  <ShoppingBag className="w-4 h-4 text-stone-400" /> Takeaway ({metrics.takeawayCount} orders)
                 </span>
                 <span className="font-bold text-stone-900 dark:text-stone-100">
                   {money(metrics.takeawayRevenue)}
@@ -363,7 +382,7 @@ export default function FinancesPage({ user, onLogout }) {
                 metrics.staffPerformance.map((staff, idx) => (
                   <div key={idx} className="py-2.5 flex justify-between items-center">
                     <span className="flex items-center gap-1.5 font-medium text-stone-800 dark:text-stone-200">
-                      <span>🏷️</span> {staff.name} ({staff.count} orders)
+                      <Tag className="w-4 h-4 text-stone-400" /> {staff.name} ({staff.count} orders)
                     </span>
                     <span className="font-bold text-stone-900 dark:text-stone-100">
                       {money(staff.revenueCents)}
@@ -482,15 +501,27 @@ export default function FinancesPage({ user, onLogout }) {
                         </div>
 
                         <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-stone-500 dark:text-stone-400">
-                          <span>🕒 {details.formattedTime}</span>
+                          <span className="inline-flex items-center gap-1">
+                            <Clock className="w-3 h-3 text-stone-400" /> {details.formattedTime}
+                          </span>
                           {details.customerName && (
-                            <span>👤 {details.customerName}</span>
+                            <span className="inline-flex items-center gap-1">
+                              <User className="w-3 h-3 text-stone-400" /> {details.customerName}
+                            </span>
                           )}
-                          <span>🏷️ {details.cashier}</span>
-                          <span>
-                            {details.diningInfo.type === "takeaway"
-                              ? "🛍️ Takeaway"
-                              : `🍽️ ${details.diningInfo.label || "Dine-In"}`}
+                          <span className="inline-flex items-center gap-1">
+                            <Tag className="w-3 h-3 text-stone-400" /> {details.cashier}
+                          </span>
+                          <span className="inline-flex items-center gap-1">
+                            {details.diningInfo.type === "takeaway" ? (
+                              <>
+                                <ShoppingBag className="w-3 h-3 text-stone-400" /> Takeaway
+                              </>
+                            ) : (
+                              <>
+                                <Utensils className="w-3 h-3 text-stone-400" /> {details.diningInfo.label || "Dine-In"}
+                              </>
+                            )}
                           </span>
                         </div>
                       </div>
