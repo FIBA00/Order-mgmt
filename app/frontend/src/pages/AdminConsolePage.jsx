@@ -1,5 +1,15 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
+import {
+  Coffee,
+  ClipboardList,
+  CircleDollarSign,
+  Users,
+  Sun,
+  Moon,
+  X,
+  Store,
+} from "lucide-react";
 
 import { api, isDesktop } from "../api/client.js";
 import { useTheme } from "../utils/theme.js";
