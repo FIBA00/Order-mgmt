@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Sun, Moon } from "lucide-react";
 import { isDesktop } from "../../../api/client.js";
 import { useTheme } from "../../../utils/theme.js";
+import LanguageSwitcher from "../../common/LanguageSwitcher.jsx";
 
 export default function LoginPage({ onLogin, error }) {
+  const { t } = useTranslation();
   const { toggleTheme, isDark } = useTheme();
   const [username, setUsername] = useState("admin");
   const [password, setPassword] = useState("admin123");
@@ -16,7 +19,8 @@ export default function LoginPage({ onLogin, error }) {
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 p-4 transition-colors">
-      <div className="absolute top-5 right-5">
+      <div className="absolute top-5 right-5 flex items-center gap-2">
+        <LanguageSwitcher />
         <button
           onClick={toggleTheme}
           aria-label="Toggle theme"
@@ -30,7 +34,7 @@ export default function LoginPage({ onLogin, error }) {
         <div className="flex items-center gap-2 mb-1">
           <span className="w-3 h-3 rounded-full bg-amber-600 dark:bg-amber-500" />
           <h1 className="text-2xl font-bold text-stone-900 dark:text-stone-100 tracking-tight">
-            Order Manager
+            {t("dashboard.title")}
           </h1>
         </div>
 
@@ -43,11 +47,11 @@ export default function LoginPage({ onLogin, error }) {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 mb-1">
-              Username
+              {t("auth.username")}
             </label>
             <input
               className="w-full bg-white dark:bg-stone-800 border border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 transition"
-              placeholder="Username"
+              placeholder={t("auth.username")}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
@@ -56,12 +60,12 @@ export default function LoginPage({ onLogin, error }) {
 
           <div>
             <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 mb-1">
-              Password
+              {t("auth.password")}
             </label>
             <input
               className="w-full bg-white dark:bg-stone-800 border border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 transition"
               type="password"
-              placeholder="Password"
+              placeholder={t("auth.password")}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -78,7 +82,7 @@ export default function LoginPage({ onLogin, error }) {
             type="submit"
             className="bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white font-medium rounded-xl py-2.5 text-sm transition shadow-xs mt-1"
           >
-            Log in to Register
+            {t("auth.login")}
           </button>
         </form>
 

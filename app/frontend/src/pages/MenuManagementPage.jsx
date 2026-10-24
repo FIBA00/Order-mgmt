@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Coffee,
   ClipboardList,
@@ -20,8 +21,10 @@ import { useTheme } from "../utils/theme.js";
 import EditMenuItemModal from "../features/menu/pages/EditMenuItemModal.jsx";
 import ConfirmModal from "../features/common/ConfirmModal.jsx";
 import UserMenu from "../features/common/UserMenu.jsx";
+import LanguageSwitcher from "../features/common/LanguageSwitcher.jsx";
 
 export default function MenuManagementPage({ user, onLogout }) {
+  const { t } = useTranslation();
   const { toggleTheme, isDark } = useTheme();
   const isAdmin = user?.role === "admin";
 
@@ -188,7 +191,7 @@ export default function MenuManagementPage({ user, onLogout }) {
               <Coffee className="w-4 h-4" />
             </span>
             <h1 className="text-base font-bold text-stone-900 dark:text-stone-100 tracking-tight">
-              Order Manager
+              {t("dashboard.title")}
             </h1>
           </div>
 
@@ -198,13 +201,13 @@ export default function MenuManagementPage({ user, onLogout }) {
               to="/dashboard"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
             >
-              <ClipboardList className="w-3.5 h-3.5" /> POS Register
+              <ClipboardList className="w-3.5 h-3.5" /> {t("nav.pos")}
             </Link>
             <Link
               to="/menu"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs transition font-semibold"
             >
-              <Coffee className="w-3.5 h-3.5" /> Menu Catalog
+              <Coffee className="w-3.5 h-3.5" /> {t("nav.menu")}
             </Link>
             {user?.role === "admin" && (
               <>
@@ -212,13 +215,13 @@ export default function MenuManagementPage({ user, onLogout }) {
                   to="/finances"
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
                 >
-                  <CircleDollarSign className="w-3.5 h-3.5" /> Finance
+                  <CircleDollarSign className="w-3.5 h-3.5" /> {t("nav.finance")}
                 </Link>
                 <Link
                   to="/admin"
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
                 >
-                  <Users className="w-3.5 h-3.5" /> Staff & Admin
+                  <Users className="w-3.5 h-3.5" /> {t("nav.admin")}
                 </Link>
               </>
             )}
@@ -226,6 +229,8 @@ export default function MenuManagementPage({ user, onLogout }) {
         </div>
 
         <div className="flex items-center gap-2.5">
+          <LanguageSwitcher />
+
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
@@ -248,7 +253,7 @@ export default function MenuManagementPage({ user, onLogout }) {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold tracking-tight text-stone-900 dark:text-stone-100">
-              Menu Management
+              {t("menu.title")}
             </h2>
             <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
               Create, edit, price, and organize menu items across categories.
@@ -261,7 +266,7 @@ export default function MenuManagementPage({ user, onLogout }) {
             title={isAdmin ? "Add Menu Item" : "Admin permission required"}
             className="inline-flex items-center justify-center gap-1.5 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white font-medium px-4 py-2 rounded-xl text-xs transition shadow-xs disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <span>+</span> Add Menu Item
+            <span>+</span> {t("menu.addItem")}
           </button>
         </div>
 

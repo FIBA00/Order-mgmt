@@ -1,8 +1,8 @@
 import { Globe } from 'lucide-react';
-import i18n from '../../i18n';
+import { useTranslation } from 'react-i18next';
 
-// toggle between 'en' and 'am', persist to localStorage
 function LanguageSwitcher() {
+  const { i18n } = useTranslation();
   const current = i18n.language === 'am' ? 'am' : 'en';
 
   function toggle() {
@@ -13,14 +13,14 @@ function LanguageSwitcher() {
 
   return (
     <button
+      type="button"
       onClick={toggle}
-      title="Switch language"
-      className="flex items-center gap-1 px-2 py-1 rounded-lg text-sm font-medium
-                 text-gray-600 hover:text-gray-900 hover:bg-gray-100
-                 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-gray-700
-                 transition-colors"
+      title="Switch language / ቋንቋ ቀይር"
+      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium
+                 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700
+                 text-stone-700 dark:text-stone-200 transition shadow-2xs"
     >
-      <Globe size={16} />
+      <Globe className="w-3.5 h-3.5" />
       <span>{current === 'en' ? 'EN' : 'አማ'}</span>
     </button>
   );

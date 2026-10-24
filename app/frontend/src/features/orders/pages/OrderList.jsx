@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Utensils,
   ShoppingBag,
@@ -25,6 +26,7 @@ export default function OrderList({
   onSetStatus,
   onSelectOrder,
 }) {
+  const { t } = useTranslation();
   const [statusFilter, setStatusFilter] = useState("all");
   const [diningFilter, setDiningFilter] = useState("all");
   const [search, setSearch] = useState("");
@@ -75,7 +77,7 @@ export default function OrderList({
                   : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200"
               }`}
             >
-              Open
+              {t("orders.open")}
               {openCount > 0 && (
                 <span
                   className={`text-[10px] px-1.5 rounded-full font-bold ${
@@ -96,7 +98,7 @@ export default function OrderList({
                   : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200"
               }`}
             >
-              Paid
+              {t("orders.paid")}
             </button>
             <button
               onClick={() => setStatusFilter("cancelled")}
@@ -106,7 +108,7 @@ export default function OrderList({
                   : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200"
               }`}
             >
-              Cancelled
+              {t("orders.cancelled")}
             </button>
           </div>
 
@@ -278,13 +280,13 @@ export default function OrderList({
                         onClick={() => onSetStatus(order.id, "paid")}
                         className="text-xs bg-green-600 hover:bg-green-700 text-white font-medium px-3 py-1.5 rounded-lg transition shadow-2xs"
                       >
-                        Mark paid
+                        {t("orders.markPaid")}
                       </button>
                       <button
                         onClick={() => setOrderToCancel(order)}
                         className="text-xs bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 px-2.5 py-1.5 rounded-lg transition"
                       >
-                        Cancel
+                        {t("common.cancel")}
                       </button>
                     </div>
                   )}

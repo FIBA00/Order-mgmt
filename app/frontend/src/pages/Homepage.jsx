@@ -1,13 +1,17 @@
 import { Link } from "react-router-dom";
 import { Coffee, Sun, Moon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "../utils/theme.js";
+import LanguageSwitcher from "../features/common/LanguageSwitcher.jsx";
 
 export default function Homepage() {
+  const { t } = useTranslation();
   const { toggleTheme, isDark } = useTheme();
 
   return (
     <div className="min-h-screen bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 flex items-center justify-center p-6 relative transition-colors">
-      <div className="absolute top-5 right-5">
+      <div className="absolute top-5 right-5 flex items-center gap-2">
+        <LanguageSwitcher />
         <button
           onClick={toggleTheme}
           aria-label="Toggle theme"

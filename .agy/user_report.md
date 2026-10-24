@@ -159,7 +159,10 @@
 <!-- Oct 14 -->
 
 ## Testing Report
-- [DESKTOP] - when clicking the finance tab the app crashed blank screen 
+- [DESKTOP] - when clicking the finance tab the app crashed blank screen , when that happens on the backend log this happened, ```logs [2026-10-24 14:50:03.332 +0300] ERROR: Error while verifying token: jwt expired
+GET /api/orders 401 2.868 ms - 55
+[2026-10-24 14:50:03.354 +0300] ERROR: Error while verifying token: jwt expired
+OPTIONS /api/auth/login 204 1.021 ms - - ```
 - 
 
 

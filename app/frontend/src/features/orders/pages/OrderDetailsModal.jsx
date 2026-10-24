@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { X, User, Tag, Coffee, ShoppingBag, Utensils, Printer, Download } from "lucide-react";
 import { money } from "../../../utils/money.js";
 import { parseOrderDetails } from "../../../utils/order.js";
@@ -19,6 +20,7 @@ export default function OrderDetailsModal({
   onClose,
   onSetStatus,
 }) {
+  const { t } = useTranslation();
   const [orderData, setOrderData] = useState(order);
   const [loadingItems, setLoadingItems] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
@@ -248,7 +250,7 @@ export default function OrderDetailsModal({
             </div>
             <div className="flex justify-between items-center pt-2 border-t border-dashed border-stone-200 dark:border-stone-700/60">
               <span className="text-sm font-semibold text-stone-800 dark:text-stone-200">
-                Total
+                {t("orders.total")}
               </span>
               <span className="text-xl font-bold text-amber-700 dark:text-amber-400">
                 {money(grandTotalCents)}
@@ -273,7 +275,7 @@ export default function OrderDetailsModal({
               className="text-xs flex items-center gap-1.5 border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-50 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200 px-3 py-1.5 rounded-lg transition"
             >
               <Printer className="w-3.5 h-3.5" />
-              Print Receipt
+              {t("orders.printReceipt")}
             </button>
             <button
               onClick={handleDownload}
@@ -292,7 +294,7 @@ export default function OrderDetailsModal({
                   onClick={() => setShowCancelConfirm(true)}
                   className="text-xs bg-red-50 dark:bg-red-950/50 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800 px-3 py-1.5 rounded-lg transition"
                 >
-                  Cancel Order
+                  {t("orders.cancelOrder")}
                 </button>
                 <button
                   onClick={() => {
@@ -301,7 +303,7 @@ export default function OrderDetailsModal({
                   }}
                   className="text-xs bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-1.5 rounded-lg transition"
                 >
-                  Mark as Paid
+                  {t("orders.markPaid")}
                 </button>
               </>
             )}
@@ -309,7 +311,7 @@ export default function OrderDetailsModal({
               onClick={onClose}
               className="text-xs text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 px-2 py-1.5 transition"
             >
-              Close
+              {t("common.close")}
             </button>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   ClipboardList,
   Coffee,
@@ -9,6 +10,7 @@ import {
 } from "lucide-react";
 
 export default function UserMenu({ user, onLogout }) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   if (!user) return null;
@@ -50,7 +52,7 @@ export default function UserMenu({ user, onLogout }) {
                 {user.username}
               </span>
               <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wider">
-                {isAdmin ? "Administrator" : "Cashier"}
+                {isAdmin ? t("common.administrator") : t("common.cashier")}
               </span>
             </div>
           </div>
@@ -62,7 +64,7 @@ export default function UserMenu({ user, onLogout }) {
               onClick={() => setIsOpen(false)}
               className="flex items-center gap-2 px-3 py-2 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition"
             >
-              <ClipboardList className="w-4 h-4 text-stone-400" /> POS Register
+              <ClipboardList className="w-4 h-4 text-stone-400" /> {t("nav.pos")}
             </Link>
             {isAdmin && (
               <>
@@ -71,21 +73,21 @@ export default function UserMenu({ user, onLogout }) {
                   onClick={() => setIsOpen(false)}
                   className="flex items-center gap-2 px-3 py-2 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition"
                 >
-                  <Coffee className="w-4 h-4 text-stone-400" /> Menu Catalog
+                  <Coffee className="w-4 h-4 text-stone-400" /> {t("nav.menu")}
                 </Link>
                 <Link
                   to="/finances"
                   onClick={() => setIsOpen(false)}
                   className="flex items-center gap-2 px-3 py-2 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition"
                 >
-                  <CircleDollarSign className="w-4 h-4 text-stone-400" /> Finance
+                  <CircleDollarSign className="w-4 h-4 text-stone-400" /> {t("nav.finance")}
                 </Link>
                 <Link
                   to="/admin"
                   onClick={() => setIsOpen(false)}
                   className="flex items-center gap-2 px-3 py-2 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition"
                 >
-                  <Users className="w-4 h-4 text-stone-400" /> Staff & Settings
+                  <Users className="w-4 h-4 text-stone-400" /> {t("nav.admin")}
                 </Link>
               </>
             )}
@@ -101,7 +103,7 @@ export default function UserMenu({ user, onLogout }) {
               }}
               className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition"
             >
-              <LogOut className="w-4 h-4 text-red-500" /> Log out
+              <LogOut className="w-4 h-4 text-red-500" /> {t("common.logout")}
             </button>
           </div>
         </div>

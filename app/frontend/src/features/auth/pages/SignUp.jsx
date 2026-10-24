@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Sun, Moon } from "lucide-react";
 import { useTheme } from "../../../utils/theme.js";
+import LanguageSwitcher from "../../common/LanguageSwitcher.jsx";
 
 export default function SignUpPage({ onSignUp, error: propError }) {
+  const { t } = useTranslation();
   const { toggleTheme, isDark } = useTheme();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -31,7 +34,8 @@ export default function SignUpPage({ onSignUp, error: propError }) {
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 p-4 transition-colors">
-      <div className="absolute top-5 right-5">
+      <div className="absolute top-5 right-5 flex items-center gap-2">
+        <LanguageSwitcher />
         <button
           onClick={toggleTheme}
           aria-label="Toggle theme"
@@ -119,7 +123,7 @@ export default function SignUpPage({ onSignUp, error: propError }) {
             type="submit"
             className="bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white font-medium rounded-xl py-2.5 text-sm transition shadow-xs mt-1"
           >
-            Create Account & Enter
+            {t("auth.createAccount")}
           </button>
         </form>
 

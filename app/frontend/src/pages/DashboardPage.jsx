@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Coffee,
   ClipboardList,
@@ -19,8 +20,10 @@ import OrderList from "../features/orders/pages/OrderList.jsx";
 import CurrentTicket from "../features/orders/pages/CurrentTicket.jsx";
 import OrderDetailsModal from "../features/orders/pages/OrderDetailsModal.jsx";
 import UserMenu from "../features/common/UserMenu.jsx";
+import LanguageSwitcher from "../features/common/LanguageSwitcher.jsx";
 
 export default function DashboardPage({ user, onLogout }) {
+  const { t } = useTranslation();
   const { theme, toggleTheme, isDark } = useTheme();
 
   const [menu, setMenu] = useState([]);
@@ -218,7 +221,7 @@ export default function DashboardPage({ user, onLogout }) {
               <Coffee className="w-4 h-4" />
             </span>
             <h1 className="text-base font-bold tracking-tight text-stone-900 dark:text-stone-100">
-              Order Manager
+              {t("dashboard.title")}
             </h1>
           </div>
 
@@ -228,7 +231,7 @@ export default function DashboardPage({ user, onLogout }) {
               to="/dashboard"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs transition font-semibold"
             >
-              <ClipboardList className="w-3.5 h-3.5" /> POS Register
+              <ClipboardList className="w-3.5 h-3.5" /> {t("nav.pos")}
             </Link>
             {user?.role === "admin" && (
               <>
@@ -236,19 +239,19 @@ export default function DashboardPage({ user, onLogout }) {
                   to="/menu"
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
                 >
-                  <Coffee className="w-3.5 h-3.5" /> Menu Catalog
+                  <Coffee className="w-3.5 h-3.5" /> {t("nav.menu")}
                 </Link>
                 <Link
                   to="/finances"
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
                 >
-                  <CircleDollarSign className="w-3.5 h-3.5" /> Finance
+                  <CircleDollarSign className="w-3.5 h-3.5" /> {t("nav.finance")}
                 </Link>
                 <Link
                   to="/admin"
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition"
                 >
-                  <Users className="w-3.5 h-3.5" /> Staff & Admin
+                  <Users className="w-3.5 h-3.5" /> {t("nav.admin")}
                 </Link>
               </>
             )}
@@ -283,6 +286,8 @@ export default function DashboardPage({ user, onLogout }) {
         </div>
 
         <div className="flex items-center gap-2.5">
+          <LanguageSwitcher />
+
           {/* Theme Toggle Button */}
           <button
             onClick={toggleTheme}
