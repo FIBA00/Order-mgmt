@@ -7,11 +7,16 @@
   "scripts": {
     "dev": "nodemon  src/server.js",
     "start": "nodemon src/server.js",
-    "test": "nodemon --test",
-    "lint": "prettier --write ."
+    "test": "cross-env NODE_ENV=test node --test --test-concurrency=1 'test/**/*.test.js'",
+    "lint": "prettier --write .",
+    "db:generate:sqlite": "drizzle-kit generate --config=drizzle.sqlite.config.js",
+    "db:generate:postgres": "drizzle-kit generate --config=drizzle.postgres.config.js",
+    "db:migrate:sqlite": "node src/database/migrate.js sqlite",
+    "db:migrate:postgres": "node src/database/migrate.js postgres"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "better-sqlite3": "^12.11.1",
     "body-parser": "^2.3.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
@@ -21,6 +26,7 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mocha": "^12.0.2",
+    "morgan": "^1.12.1",
     "nodemon": "^3.1.14",
     "pg": "^8.16.0",
     "pino": "^10.3.1",

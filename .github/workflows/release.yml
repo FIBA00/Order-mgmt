@@ -1,14 +1,17 @@
-name: Desktop Release
+name: Multi-Platform Release
 
 on:
   push:
     tags:
       - "v*.*.*"
 
-jobs:
-  windows:
-    runs-on: windows-latest
+permissions:
+  contents: write
 
+jobs:
+  release-linux:
+    name: Build & Release (Linux)
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -18,13 +21,13 @@ jobs:
         with:
           version: 9
 
-      - name: Setup Node
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
 
-      - name: Install
+      - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Build frontend
@@ -33,9 +36,48 @@ jobs:
       - name: Build and publish desktop
         working-directory: app/desktop
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          # Production signing credentials go here only if you configure
-          # Windows code signing in the release environment.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm dist --publish always
+
+      - name: Create Linux Tarball
+        run: tar -czf restaurant-order-manager-linux-x64-${{ github.ref_name }}.tar.gz -C app/desktop/dist/linux-unpacked .
+
+      - name: Publish Linux release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            restaurant-order-manager-linux-x64-${{ github.ref_name }}.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-windows:
+    name: Build & Release (Windows)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build frontend
+        run: pnpm build:frontend
+
+      - name: Build and publish desktop
+        working-directory: app/desktop
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
         run: pnpm dist --publish always

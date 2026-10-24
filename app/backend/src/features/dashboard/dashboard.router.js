@@ -1,18 +1,22 @@
-const { Router } = require("express");
+import express from "express";
 
-function createDashboardRouter(dashboardService, authenticate) {
-  const router = Router();
+import { database, schema } from "../../database/database.js";
+import { createDashboardRepository } from "./dashboard.repository.js";
+import { createDashboardService } from "./dashboard.service.js";
+import { createDashboardController } from "./dashboard.ctrl.js";
+import { isLoggedIn } from "../../middlewares/auth.middleware.js";
 
-  router.get("/", authenticate, async (_req, res, next) => {
-    try {
-      const stats = await dashboardService.today();
-      res.json({ dashboard: stats });
-    } catch (err) {
-      next(err);
-    }
-  });
+const dashboardRouter = express.Router();
+const repository = createDashboardRepository({ db: database, schema });
+const service = createDashboardService(repository);
+const controller = createDashboardController(service);
 
-  return router;
-}
+dashboardRouter.get("/", isLoggedIn, controller.getToday);
+dashboardRouter.get("/today", isLoggedIn, controller.getToday);
 
-module.exports = { createDashboardRouter };
+export {
+  createDashboardRepository,
+  createDashboardService,
+  createDashboardController,
+};
+export default dashboardRouter;

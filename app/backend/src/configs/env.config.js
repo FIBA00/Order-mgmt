@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import process from "node:process";
 
 const rootDir = path.resolve(fileURLToPath(new URL("../..", import.meta.url)));
+const isTest = process.env.NODE_ENV === "test";
 const envFile =
   process.env.NODE_ENV === "production"
     ? path.join(rootDir, ".env.production")
@@ -11,3 +12,7 @@ const envFile =
 
 dotenv.config({ path: path.join(rootDir, ".env") });
 dotenv.config({ path: envFile, override: true });
+
+if (isTest) {
+  process.env.DATABASE_URL = path.join(rootDir, "data", "test.sqlite");
+}

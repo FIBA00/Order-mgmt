@@ -61,6 +61,7 @@ The desktop build does not require a remote server for normal operation.
 Do not put a private signing key, production secrets, or real customer data into this repository.
 
 The repository contains development/demo signing instructions and placeholders only.
+
 # Scripts
 
 Expected future scripts:

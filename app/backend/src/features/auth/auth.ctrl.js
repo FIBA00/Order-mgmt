@@ -1,56 +1,142 @@
-import { AuthService } from "./auth.service.js";
-import { loginSchema, signupSchema } from "./auth.schema.js";
+import { setAuthCookie } from "../../middlewares/auth.middleware.js";
 
-const authService = AuthService();
+export function createAuthController(service) {
+  async function login(req, res, next) {
+    try {
+      const { username, password } = req.body;
+      const { user, token } = await service.login(username, password);
 
-export async function loginUser ( req, res, next )
-{
-	try
-	{
-		const input = loginSchema.parse( req.body );
-		const user = await authService.login( input.username, input.password );
-		const token = jwt.sign( user, jwtSecret, { expiresIn: "8h" } );
+      setAuthCookie(res, token);
+      return res.status(200).json({
+        success: true,
+        message: "Login successful",
+        token,
+        user,
+        data: { user, token },
+      });
+    } catch (error) {
+      if (error.statusCode === 401) {
+        return res.status(401).json({
+          success: false,
+          message: error.message,
+        });
+      }
+      next(error);
+    }
+  }
 
-		if ( !user )
-		{
-			return res
-				.status( 404 )
-				.json( { success: false, message: "User not found." } );
-		}
-		return res.status( 200 ).json( {
-			success: true,
-			message: "Hello there user",
-			data: { userId: user.id, userEmail: user.email, token: token },
-		} );
-	} catch ( error )
-	{
-		console.log( "Error while checking user profile: ", error.message );
-		return res.status( 500 ).json( {
-			success: false,
-			message: "Error while handling user",
-		} );
-	}
-}
+  async function signup(req, res, next) {
+    try {
+      const { username, password, role } = req.body;
+      const { user, token } = await service.signup(username, password, role);
 
-export async function signupUser ( req, res, next )
-{
-	try
-	{
-		const input = signupSchema.parse( req.body );
-		const user = await authService.signup( input.username, input.password );
-		const token = jwt.sign( user, jwtSecret, { expiresIn: "8h" } );
-		res.json( { token, user } );
-		
-	} catch ( error )
-	{
-		console.log( "Error while signing up user:", error.message );
-		return res
-			.status( 500 )
-			.json( { success: false, message: "Error signing up user." } );
-	}
-}
+      setAuthCookie(res, token);
+      return res.status(201).json({
+        success: true,
+        message: "User registered successfully",
+        token,
+        user,
+        data: { user, token },
+      });
+    } catch (error) {
+      if (error.statusCode === 409) {
+        return res.status(409).json({
+          success: false,
+          message: error.message,
+        });
+      }
+      next(error);
+    }
+  }
 
-export async function profileUser ( req, res )
-{
-	res.json( { user: req.user } );
+  async function profile(req, res, next) {
+    try {
+      const user = await service.getProfile(req.user.id);
+      return res.status(200).json({
+        success: true,
+        user,
+        data: user,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async function listStaff(req, res, next) {
+    try {
+      const staff = await service.listStaff();
+      return res.status(200).json({
+        success: true,
+        data: staff,
+        staff,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async function createStaff(req, res, next) {
+    try {
+      const { username, password, role } = req.body;
+      const { user } = await service.signup(username, password, role || "cashier");
+      return res.status(201).json({
+        success: true,
+        message: "Staff account created successfully",
+        user,
+        data: user,
+      });
+    } catch (error) {
+      if (error.statusCode === 409) {
+        return res.status(409).json({
+          success: false,
+          message: error.message,
+        });
+      }
+      next(error);
+    }
+  }
+
+  async function deleteStaff(req, res, next) {
+    try {
+      const id = Number(req.params.id);
+      if (!id || Number.isNaN(id)) {
+        return res.status(400).json({
+          success: false,
+          message: "Valid user ID is required",
+        });
+      }
+      if (req.user && req.user.id === id) {
+        return res.status(400).json({
+          success: false,
+          message: "Cannot delete your own admin account",
+        });
+      }
+      await service.deleteStaff(id);
+      return res.status(200).json({
+        success: true,
+        message: "Staff account removed",
+      });
+    } catch (error) {
+      if (
+        error.statusCode === 400 ||
+        error.statusCode === 404 ||
+        error.statusCode === 409
+      ) {
+        return res.status(error.statusCode).json({
+          success: false,
+          message: error.message,
+        });
+      }
+      next(error);
+    }
+  }
+
+  return {
+    login,
+    signup,
+    profile,
+    listStaff,
+    createStaff,
+    deleteStaff,
+  };
 }

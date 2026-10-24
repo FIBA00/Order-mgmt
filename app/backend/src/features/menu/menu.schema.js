@@ -1,20 +1,24 @@
 import { z } from "zod";
 
 export const menuItemResponse = z.object({
-  id: z.string(),
+  id: z.number().int(),
   name: z.string().trim().min(2),
-  priceCents: z.number(),
+  priceCents: z.number().int().nonnegative(),
+  category: z.string().optional(),
   active: z.boolean(),
+  createdAt: z.date(),
 });
 
 export const menuItemListResponse = z.array(menuItemResponse);
 
 export const createMenuItemInputSchema = z.object({
-  name: z.string().min(1),
+  name: z.string().trim().min(2),
   priceCents: z.number().int().nonnegative(),
+  category: z.string().trim().optional(),
 });
 
 export const updateMenuItemInputSchema = z.object({
-  name: z.string().min(1),
-  priceCents: z.number().int().nonnegative(),
+  name: z.string().trim().min(2).optional(),
+  priceCents: z.number().int().nonnegative().optional(),
+  category: z.string().trim().optional(),
 });

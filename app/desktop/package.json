@@ -1,18 +1,22 @@
 {
   "name": "@restaurant/desktop",
   "version": "0.1.0",
+  "description": "Restaurant & Cafe Order Management Desktop Application",
+  "author": "Restaurant Order Management Team",
   "private": true,
   "main": "src/main.js",
   "scripts": {
     "dev": "electron .",
     "start": "electron .",
-    "package": "electron-builder --dir",
+    "package": "electron-builder --dir && node scripts/inject-native.js",
+    "test": "node --test 'test/**/*.test.js'",
     "make": "electron-builder",
     "dist": "electron-builder --publish never"
   },
   "dependencies": {
     "better-sqlite3": "^12.4.1",
     "cross-env": "^10.1.0",
+    "drizzle-orm": "^0.44.2",
     "electron-updater": "^6.6.2",
     "jsonwebtoken": "^9.0.2",
     "zod": "^4.1.5"
@@ -24,6 +28,9 @@
   "build": {
     "appId": "com.desktopapprevisited.restaurant",
     "productName": "Restaurant Order Manager",
+    "electronVersion": "39.8.10",
+    "electronDist": "node_modules/electron/dist",
+    "npmRebuild": false,
     "asar": true,
     "directories": {
       "output": "dist"
@@ -34,16 +41,40 @@
       {
         "from": "../backend/src",
         "to": "backend/src",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "../backend",
+        "to": "backend",
+        "filter": [
+          "package.json"
+        ]
+      },
+      {
+        "from": "../backend/drizzle",
+        "to": "backend/drizzle",
+        "filter": [
+          "**/*"
+        ]
       },
       {
         "from": "../frontend/dist",
         "to": "frontend/dist",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       }
     ],
     "extraMetadata": {
       "name": "restaurant-order-manager"
+    },
+    "linux": {
+      "target": [
+        "dir",
+        "AppImage"
+      ]
     },
     "win": {
       "target": [

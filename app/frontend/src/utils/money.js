@@ -1,3 +1,4 @@
 export function money(cents) {
-  return `$${(cents / 100).toFixed(2)}`;
+  const amount = Number(cents) || 0;
+  return `$${(amount / 100).toFixed(2)}`;
 }

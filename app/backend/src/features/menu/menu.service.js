@@ -1,52 +1,55 @@
-import { eq, asc } from "drizzle-orm";
-import { menuItems } from "../../database/models.js";
-import { database } from "../../database/database.js";
-
-export default function MenuService() {
+export function createMenuService(repository) {
   async function list() {
-    const items = await database
-      .select({
-        id: menuItems.id,
-        name: menuItems.name,
-        priceCents: menuItems.priceCents,  // FIX: was menuItems.price_cents
-        active: menuItems.active,
-      })
-      .from(menuItems)
-      .orderBy(asc(menuItems.name));
-    return items;
+    return repository.findAll();
   }
 
-  async function create(name, priceCents) {
-    const [item] = await database
-      .insert(menuItems)
-      .values({ name, priceCents })
-      .returning({
-        id: menuItems.id,
-        name: menuItems.name,
-        priceCents: menuItems.priceCents,
-        active: menuItems.active,
-      });
+  async function get(id) {
+    const item = await repository.findById(id);
     return item;
+  }
+
+  async function create(data) {
+    return repository.create({
+      name: data.name,
+      priceCents: data.priceCents,
+      category: data.category,
+    });
   }
 
   async function update(id, data) {
-    const [item] = await database
-      .update(menuItems)
-      .set({ name: data.name })
-      .where(eq(menuItems.id, id))
-      .returning();
-    return item;
+    await get(id);
+
+    return repository.update(id, data);
+  }
+
+  async function deleteMenu(id) {
+    const itemId = await get(id);
+
+    if (itemId === null) {
+      return null;
+    } else {
+      return repository.deleteMenu(id);
+    }
   }
 
   async function setActive(id, active) {
-    const [item] = await database
-      .update(menuItems)
-      .set({ active })
-      .where(eq(menuItems.id, id))
-      .returning({ id: menuItems.id });
+    await get(id);
 
-    return item;
+    return repository.setActive(id, active);
   }
 
-  return { list, create, setActive, update };
+  return {
+    list,
+    get,
+    create,
+    update,
+    deleteMenu,
+    setActive,
+  };
+}
+
+function createError(message, statusCode) {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  return error;
 }

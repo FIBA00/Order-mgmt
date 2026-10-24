@@ -1,0 +1,69 @@
+{
+  "nav": {
+    "pos": "ትዕዛዝ ቦርድ",
+    "menu": "ምናሌ",
+    "finance": "ፋይናንስ",
+    "admin": "ሰራተኞች"
+  },
+  "auth": {
+    "login": "ግባ",
+    "createAccount": "መለያ ፍጠር",
+    "username": "የተጠቃሚ ስም",
+    "password": "የይለፍ ቃል",
+    "adminLogin": "አስተዳዳሪ መግቢያ",
+    "getStarted": "ጀምር"
+  },
+  "common": {
+    "logout": "ውጣ",
+    "administrator": "አስተዳዳሪ",
+    "cashier": "ገንዘብ ተቀባይ",
+    "search": "ምናሌ ፈልግ…",
+    "edit": "አርትዕ",
+    "delete": "ሰርዝ",
+    "save": "አስቀምጥ",
+    "cancel": "ሰርዝ",
+    "close": "ዝጋ",
+    "confirm": "አረጋግጥ",
+    "add": "ጨምር"
+  },
+  "dashboard": {
+    "title": "የትዕዛዝ አስተዳዳሪ",
+    "openTickets": "ክፍት ትዕዛዞች",
+    "paidToday": "ዛሬ ተከፍሏል"
+  },
+  "orders": {
+    "markPaid": "ተከፍሏል",
+    "cancelOrder": "ትዕዛዝ ሰርዝ",
+    "printReceipt": "ደረሰኝ አትም",
+    "open": "ክፍት",
+    "paid": "ተከፍሏል",
+    "cancelled": "ተሰርዟል",
+    "total": "ጠቅላላ"
+  },
+  "menu": {
+    "title": "ምናሌ አስተዳደር",
+    "editItem": "ምናሌ አርትዕ",
+    "addItem": "ምናሌ ጨምር",
+    "price": "ዋጋ",
+    "category": "ምድብ",
+    "available": "ይገኛል",
+    "unavailable": "አይገኝም"
+  },
+  "finance": {
+    "title": "ፋይናንስ",
+    "exportPdf": "PDF አውጣ",
+    "revenue": "ገቢ",
+    "orders": "ትዕዛዞች",
+    "daily": "ዕለታዊ",
+    "weekly": "ሳምንታዊ",
+    "monthly": "ወርሃዊ"
+  },
+  "admin": {
+    "title": "ሰራተኞችና አስተዳዳሪ",
+    "addStaff": "ሰራተኛ ጨምር",
+    "storeProfile": "የሱቅ መረጃ",
+    "staffList": "የሰራተኞች ዝርዝር",
+    "role": "ሚና",
+    "name": "ስም"
+  }
+}
