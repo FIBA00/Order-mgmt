@@ -44,6 +44,7 @@ contextBridge.exposeInMainWorld("desktopAPI", {
     checkForUpdates: () => ipcRenderer.invoke("app:check-for-updates"),
     downloadUpdate: () => ipcRenderer.invoke("app:download-update"),
     installUpdate: () => ipcRenderer.invoke("app:install-update"),
+    uploadLogs: (targetUrl) => ipcRenderer.invoke("app:upload-logs", targetUrl),
     onUpdateStatus: (callback) => {
       const handler = (_event, data) => callback(data);
       ipcRenderer.on("updater:status", handler);

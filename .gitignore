@@ -5,6 +5,8 @@ release/
 *.sqlite
 *.sqlite-shm
 *.sqlite-wal
+*.jsonl
+data/
 .env
 .env.*
 !.env.example

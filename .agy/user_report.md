@@ -166,7 +166,18 @@
   - **Resolution**:
     1. Replaced unsafe string `.startsWith()` calls in `FinancesPage.jsx` and `client.js` with polymorphic date parser `(o.createdAt instanceof Date ? o.createdAt : new Date(o.createdAt)).toISOString().slice(0, 10) === todayStr` that safely accepts Date instances, ISO strings, and integer epoch timestamps without throwing.
     2. Verified clean rendering of `/finances` under all date formats.
+- [CI/CD] [RESOLVED] - Github Action failed test with `ReferenceError: require is not defined in ES module scope` in `test/api.test.js:7`.
+  - **Root Cause**: An obsolete legacy CommonJS test file `app/backend/test/api.test.js` using `require("node:test")` was present on the initial `main` branch. Because `app/backend/package.json` specifies `"type": "module"`, Node.js 22 treats `.js` files as ES modules, throwing a ReferenceError on `require()`.
+  - **Resolution**:
+    1. On `development`, `api.test.js` had been replaced with 4 modern ESM test suites (`auth.test.js`, `menu.test.js`, `orders.test.js`, `services.test.js`).
+    2. Cleanly merged `development` tree into `main` to eliminate obsolete test files and sync test runners.
+    3. Created `CHANGELOG.md` adhering to Keep a Changelog specifications and Semantic Versioning (v1.0.0).
+    4. Tagged release `v1.0.0`.
 
 ## Feature suggestion
 
-- [UI / BACKEND] lets collect all logs through a package that is used by proffesionals to store them and upload them, while we dont have remote server to upload for now lets have the code to upload while fully functional log collection from the 3 apps.
+- [UI / BACKEND / DESKTOP] [RESOLVED] lets collect all logs through a package that is used by proffesionals to store them and upload them, while we dont have remote server to upload for now lets have the code to upload while fully functional log collection from the 3 apps.
+  - **Resolution**:
+    1. **Backend**: Implemented `POST /api/logs/upload` in `app/backend/src/features/logs/logs.router.js` mounted at `/api/logs` in `main.route.js`. Safely ingests logs from any app/client, appends structured entries locally to `data/collected-logs.jsonl`, and supports optional upstream forwarding when `REMOTE_LOG_UPLOAD_URL` is set.
+    2. **Desktop (Electron)**: Added `uploadLogs(targetUrl)` in `app/desktop/src/logger.js`, wired `app:upload-logs` in `app/desktop/src/ipc/app.ipc.js`, and exposed `desktopAPI.app.uploadLogs(targetUrl)` in `preload.js`. Desktop logs are written locally to rotating files and can be uploaded on demand.
+    3. **Frontend**: Created lightweight client logger in `app/frontend/src/utils/logger.js` with local ring buffer (`localStorage`), auto-capturing `window.onerror` and `window.onunhandledrejection`. Exposed `api.logs.upload(targetUrl)` in `app/frontend/src/api/client.js` for both HTTP and Desktop modes.

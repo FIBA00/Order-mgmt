@@ -1,7 +1,11 @@
 const { app, ipcMain } = require("electron");
 const { autoUpdater } = require("electron-updater");
+const { uploadLogs } = require("../logger");
 
 function registerAppIpc() {
+  ipcMain.handle("app:upload-logs", async (_event, targetUrl) => {
+    return await uploadLogs(targetUrl);
+  });
   ipcMain.handle("app:get-info", () => ({
     version: app.getVersion(),
     userDataPath: app.getPath("userData"),
