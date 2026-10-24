@@ -102,8 +102,35 @@ function initFileLogger(app) {
   return { LOG_FILE, appendLog };
 }
 
+async function uploadLogs(targetUrl = "http://localhost:8000/api/logs/upload") {
+  try {
+    if (!fs.existsSync(LOG_FILE)) return { success: false, message: "No log file found" };
+    const content = fs.readFileSync(LOG_FILE, "utf8");
+    const lines = content.trim().split("\n").filter(Boolean).slice(-200);
+    if (!lines.length) return { success: true, count: 0 };
+
+    const res = await fetch(targetUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ source: "desktop", entries: lines }),
+    });
+
+    if (!res.ok) {
+      appendLog("WARN", `Log upload responded with status ${res.status}`);
+      return { success: false, status: res.status };
+    }
+    const result = await res.json().catch(() => ({}));
+    appendLog("INFO", `Uploaded ${lines.length} log lines to ${targetUrl}`);
+    return { success: true, count: lines.length, result };
+  } catch (err) {
+    appendLog("WARN", `Log upload failed: ${err.message}`);
+    return { success: false, error: err.message };
+  }
+}
+
 module.exports = {
   LOG_FILE,
   appendLog,
   initFileLogger,
+  uploadLogs,
 };

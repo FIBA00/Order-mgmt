@@ -1,3 +1,5 @@
+import { uploadClientLogs } from "../utils/logger.js";
+
 const API_URL =
   (typeof import.meta !== "undefined" &&
     import.meta.env &&
@@ -501,6 +503,10 @@ function httpApi() {
       isOnline: () =>
         typeof navigator !== "undefined" ? navigator.onLine : true,
     },
+
+    logs: {
+      upload: (targetUrl) => uploadClientLogs(targetUrl),
+    },
   };
 }
 
@@ -662,6 +668,14 @@ function desktopApi() {
       syncNow: async () => 0,
       getPendingCount: () => 0,
       isOnline: () => true,
+    },
+    logs: {
+      upload: async (targetUrl) => {
+        if (window.desktopAPI?.app?.uploadLogs) {
+          return await window.desktopAPI.app.uploadLogs(targetUrl);
+        }
+        return await uploadClientLogs(targetUrl);
+      },
     },
   };
 }
