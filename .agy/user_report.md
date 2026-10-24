@@ -1,5 +1,6 @@
 # User reports , Tests, Features, and Errors
 
+<!-- Oct 13 -->
 ## Testing report
 
 - [UI FRONTEND] [RESOLVED] while testing the frontend initially the bakcend and frontend was not synced so , when default order items where created in the frontend using default datas it conflicted with the backend, where item number does not exist so the solution is removing any default data source in the frontend and wait for the backend to send the data or created by the user on the frontend.
@@ -73,6 +74,9 @@
     1. Updated `deleteMenu` in `app/backend/src/features/menu/menu.repository.js` to catch `FOREIGN KEY constraint failed` when historical order items reference the menu item, automatically soft-deleting (`UPDATE menu_items SET active = 0 WHERE id = ?`) and returning HTTP 203.
     2. Filtered `findAll` in `menu.repository.js` to only active catalog items (`where(eq(menuItems.active, true))`).
     3. Added automated test verifying soft-deletion and list exclusion when menu items have order history.
+
+
+
 ## Feature suggestion
 
 - [ui] [RESOLVED (Phase 2)] implement the signup on initial setup
@@ -150,3 +154,15 @@
        - **Financial & Revenue Report Generator (`createFinancialReportPdf`, `printFinancialReportPdf`, `downloadFinancialReportPdf`)**: Produces structured A4 multi-page PDF reports containing store header, executive summary KPI grid (gross revenue, average ticket, pending, cancelled), dining channel breakdown (dine-in vs takeaway volume and sales shares), and full transactions ledger table via `autoTable`.
     3. Integrated into `OrderDetailsModal.jsx` (providing "Print Receipt" and "PDF" download buttons) and `FinancesPage.jsx` (providing "Print PDF" and "Export PDF" buttons).
     4. Added automated unit tests in `app/frontend/test/pdf.test.js` verifying receipt 80mm geometry, item fallbacks, and multi-column financial report generation. All 83/83 monorepo tests pass.
+
+
+<!-- Oct 14 -->
+
+## Testing Report
+- [DESKTOP] - when clicking the finance tab the app crashed blank screen 
+- 
+
+
+## Feature suggestion
+
+--
