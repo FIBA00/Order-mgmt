@@ -433,9 +433,18 @@ function httpApi() {
           // Aggregate metrics from locally stored orders
           const orders = getStored(STORAGE_KEYS.ORDERS, []);
           const today = new Date().toISOString().slice(0, 10);
-          const todaysOrders = orders.filter(
-            (o) => !o.createdAt || o.createdAt.startsWith(today),
-          );
+          const todaysOrders = orders.filter((o) => {
+            if (!o.createdAt) return true;
+            try {
+              const d =
+                o.createdAt instanceof Date ? o.createdAt : new Date(o.createdAt);
+              return !Number.isNaN(d.getTime())
+                ? d.toISOString().slice(0, 10) === today
+                : true;
+            } catch {
+              return true;
+            }
+          });
           const revenueCents = todaysOrders.reduce(
             (sum, o) =>
               o.status !== "cancelled" ? sum + (o.totalCents || 0) : sum,

@@ -159,13 +159,14 @@
 <!-- Oct 14 -->
 
 ## Testing Report
-- [DESKTOP] - when clicking the finance tab the app crashed blank screen , when that happens on the backend log this happened, ```logs [2026-10-24 14:50:03.332 +0300] ERROR: Error while verifying token: jwt expired
-GET /api/orders 401 2.868 ms - 55
-[2026-10-24 14:50:03.354 +0300] ERROR: Error while verifying token: jwt expired
-OPTIONS /api/auth/login 204 1.021 ms - - ```
-- 
-
+- [DESKTOP] [RESOLVED] - when clicking the finance tab the app crashed blank screen, with backend showing token expired:
+  - **Root Cause**:
+    1. In Desktop (Electron IPC), structured clone preserves SQLite `timestamp_ms` records as native JavaScript `Date` instances. In `FinancesPage.jsx` and `client.js`, `periodOrders` used `o.createdAt.startsWith(todayStr)`, which threw `TypeError: o.createdAt.startsWith is not a function` when `createdAt` was a Date instance or timestamp integer, crashing React to a blank screen during render.
+    2. When a web JWT token expired (401), the app safely redirected to login with an explicit session expired notice.
+  - **Resolution**:
+    1. Replaced unsafe string `.startsWith()` calls in `FinancesPage.jsx` and `client.js` with polymorphic date parser `(o.createdAt instanceof Date ? o.createdAt : new Date(o.createdAt)).toISOString().slice(0, 10) === todayStr` that safely accepts Date instances, ISO strings, and integer epoch timestamps without throwing.
+    2. Verified clean rendering of `/finances` under all date formats.
 
 ## Feature suggestion
 
---
+- [UI / BACKEND] lets collect all logs through a package that is used by proffesionals to store them and upload them, while we dont have remote server to upload for now lets have the code to upload while fully functional log collection from the 3 apps.

@@ -70,9 +70,17 @@ export default function FinancesPage({ user, onLogout }) {
   const periodOrders = useMemo(() => {
     if (period === "all") return orders;
     const todayStr = new Date().toISOString().slice(0, 10);
-    return orders.filter(
-      (o) => !o.createdAt || o.createdAt.startsWith(todayStr),
-    );
+    return orders.filter((o) => {
+      if (!o.createdAt) return true;
+      try {
+        const d = o.createdAt instanceof Date ? o.createdAt : new Date(o.createdAt);
+        return !Number.isNaN(d.getTime())
+          ? d.toISOString().slice(0, 10) === todayStr
+          : true;
+      } catch {
+        return true;
+      }
+    });
   }, [orders, period]);
 
   // Aggregate high-level financial metrics
